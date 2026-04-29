@@ -1,0 +1,439 @@
+/*ESTILOS PARA CAMPUS VIRTUAL*/
+
+@font-face {
+  font-family: 'PromptMedium';
+  src: url("../fonts/Prompt Medium.ttf");
+}
+
+.text-align-center
+{
+  text-align: center !important;
+}
+
+.global-container{
+	height:100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+form{
+	padding-top: 10px;
+	font-size: 14px;
+	margin-top: 30px;
+}
+
+.card-title{ font-weight:300; }
+
+.btn{
+	font-size: 14px;
+	margin-top:20px;
+}
+
+
+.login-form{
+	width:530px;
+	margin:20px;
+}
+
+.sign-up{
+	text-align:center;
+	padding:20px 0 0;
+}
+
+.alert{
+	margin-bottom:-30px;
+	font-size: 13px;
+	margin-top:20px;
+}
+
+#action-btn{
+  background-color: rgb(45, 45, 201);
+  color: white;
+  border: none;
+  border-radius: 30px 30px;
+}
+
+#email{
+  border-radius: 30px 30px;
+  background-color: #FAFBFC;
+}
+
+#password{
+  border-radius: 30px 30px;
+  background-color: #FAFBFC;
+}
+
+input[type="text"], input[type="number"], input[type="datetime"], input[type="date"], text{
+  border-radius: 30px 30px !important;
+  background-color: #FAFBFC !important;
+}
+
+textarea, select{
+  border-radius: 30px 30px !important;
+  background-color: #FAFBFC !important;
+}
+
+
+#name{
+  border-radius: 30px 30px;
+  background-color: #FAFBFC;
+}
+
+#birthdate{
+  border-radius: 30px 30px;
+  background-color: #FAFBFC;
+}
+
+.box{
+	border: navajowhite;
+    box-shadow: 1px 1px 4px 1px lightgrey;
+}
+
+.input-field{
+	border-radius: 30px 30px;
+	background-color: rgb(245, 244, 244);
+}
+.text-decoration-none{
+  text-decoration: none;
+}
+
+td a .txt-blue:hover{
+  color: red !important;
+}
+
+.right{
+  right: 0;
+}
+
+.btn-rounded{
+  border-radius: 60px;
+  border:none;
+}
+
+.bg-gray{
+  background-color: rgba(209, 212, 219, .16) ;
+}
+
+.bg-blue{
+  background-color: #1E6AAC;
+}
+
+.bg-darkblue{
+  background-color: #181845;
+}
+
+.txt-darkblue{
+  color: #181845;
+}
+
+.txt-blue{
+  color: #1E6AAC !important;
+}
+
+.txt-white{
+  color:#fff;
+  font-size: 4em;
+  text-align: center;
+  float: left;
+  margin-left:17%;
+}
+
+.txt-white-btn{
+    color:#fff;
+}
+
+.roundIcon{
+    width: 115px;
+    height: 115px;
+   padding: 10px;
+   background-color: #1E6AAC;
+   border: 2px solid #1E6AAC;
+   border-radius: 60px;
+   -moz-border-radius: 15px;
+   text-align: center;
+}
+
+.roundIconIntern{
+    width: 60px;
+    height: 60px;
+   padding: 10px;
+   background-color: #1E6AAC;
+   border: 2px solid #1E6AAC;
+   border-radius: 60px;
+   -moz-border-radius: 15px;
+   text-align: center;
+}
+
+
+.dark-blue-bg{
+  background-color: #181845;
+}
+
+.tituloFerias{
+  color: #1E6AAC;
+
+/* UI Properties */
+text-align: left;
+letter-spacing: 0px;
+color: #1E6AAC;
+opacity: 1;
+}
+
+.inputSearch{
+  background-color: #D1D4DB !important;
+  border-radius: 29px;
+  color:#1E6AAC !important;
+  outline: none;
+}
+
+.inputSearch:focus{
+    outline: none;
+    border-color: transparent;
+}
+
+.inputSearch::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #1E6AAC;
+
+}
+
+.inputSearch:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #1E6AAC;
+}
+
+.inputSearch::-ms-input-placeholder { /* Microsoft Edge */
+  color: #1E6AAC;
+}
+
+
+.blue-text-login{
+  color: #1E6AAC !important;
+  text-decoration: none !important;
+}
+
+.blue-button-login{
+  background-color: #1E6AAC !important;
+}
+
+.text-color-recovery{
+  color: #212357 !important;
+}
+
+.background-button-recovery{
+  background-color: #212357 !important;
+}
+
+.hr-login{
+  color: lightgray !important;
+}
+
+.background-profile{
+  background-color: #1E6AAC;
+  padding: 2%;
+}
+
+.letter-profile-user{
+  background-color: #212357;
+  width: 4em;
+  padding: 3%;
+  font-size: 5em;
+}
+
+.radius-letter{
+  border-radius: 100%;
+}
+
+.new-profile-text{
+    background-color: #D1D4DB;
+    padding: 3%;
+    border-radius: 50px;
+}
+
+.decoration-none{
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+}
+
+.lds-dual-ring-2 {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+}
+
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: #fff transparent #fff transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+.lds-dual-ring-2:after {
+  content: " ";
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #1E6AAC;
+  border-color: #1E6AAC transparent #1E6AAC transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.letter-login{
+  background-color: #1E6AAC;
+  color: white;
+  border-radius: 100%;
+
+  width: 50px;
+  text-align: center;
+  margin: 1%;
+  padding: 0%;
+  margin-right: 5%;
+}
+
+a{
+  cursor: pointer;
+}
+
+.hideDesc{
+  overflow: hidden; /* make sure it hides the content that overflows */
+  white-space: nowrap; /* don't break the line */
+  text-overflow: ellipsis; /* give the beautiful '...' effect */
+}
+
+
+.left-action-btn{
+  left: 85% !important;
+}
+
+.modal.show .modal-dialog {
+  transform: translate(0, 0);
+}
+
+.here{
+  display: none;
+}
+
+.requirements-icons{
+  margin: 1%;
+  padding: 2%;
+  background-color: #1E6AAC;
+  border-radius: 20% 20%;
+  color: white;
+}
+
+.dropdown-toggle .nav-link{
+  display: none !important;
+}
+
+.navbar {
+  border-bottom: none;
+}
+
+.hr-home{
+  color: rgb(172, 172, 172);
+}
+
+.blue-comment{
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.grey-comment{
+  background-color: rgb(223, 223, 223);
+}
+
+.align-name-comment{
+  padding-left: 8vh;
+}
+
+.left-pad{
+  padding-left: 2%;
+}
+
+.circle {
+  width: 50px;
+  height: 50px;
+  padding: 10px;
+  background-color: #1E6AAC;
+  border-radius: 60px;
+  -moz-border-radius: 15px;
+  text-align: center;
+  margin: 1%;
+}
+
+a{
+  text-decoration: none;
+}
+
+.edit:hover{
+  color: #FF9500 !important;
+}
+
+.modal .modal-content .modal-footer {
+  justify-content: center;
+}
+
+.r-10{
+  margin-right: 10%;
+}
+
+
+
+.AnchorPath{
+  position: absolute;
+  bottom: 20%;
+  padding: 4%;
+  justify-content: left;
+  text-align: left;
+}
+
+
+.bottom60{
+  bottom: 60%;
+  z-index: 9999;
+}
+
+.cardTitle{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: -webkit-box;
+-webkit-line-clamp: 1;
+-webkit-box-orient: vertical;
+width: 250px;
+
+}
+
+.cardDescription{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: -webkit-box;
+-webkit-line-clamp: 1;
+-webkit-box-orient: vertical;
+width: 250px;
+}
+
+.max-z-index{
+  z-index: 10000;
+}
