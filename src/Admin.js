@@ -11,6 +11,7 @@ import Sidebar from "./screen/components/Layouts/Header";
 
 import Profile from "./screen/components/Profile/profile";
 import NewProfile from "./screen/components/Profile/newProfile";
+import NotFound from './screen/components/common/404.js'
 
 import { useJwt } from "react-jwt";
 
@@ -55,9 +56,11 @@ function Admin() {
 
       if (prop.layout === "/home") {
         return (
-          <Route path={prop.path} key={key} element={<prop.component />} />
+          <Route path={prop.path} key={key}  element={<prop.component />} />
         );
-      } else {
+      } 
+      else 
+        {
         return null;
       }
     });
@@ -91,9 +94,10 @@ function Admin() {
           <div className="content">
             <Routes>
               {getRoutes(routes)}
-
-              <Route path={"/profile"} element={<Profile />} />
+              <Route path={"/home/profile"} element={<Profile />} />
               <Route path={"/new-profile"} element={<NewProfile />} />
+              {/* Catch-all for 404 */}
+             <Route path="/home/*" element={<NotFound />} />
             </Routes>
           </div>
           <Footer />

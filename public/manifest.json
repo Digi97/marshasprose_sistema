@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Marsh Sistema",
+  "name": "Sistema web para la administración financiera de Marsh Asprose",
   "icons": [
     {
       "src": "favicon.ico",

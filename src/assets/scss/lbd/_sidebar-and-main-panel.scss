@@ -46,7 +46,7 @@ body > .navbar-collapse{
             margin: 10px 10px;
             color: #1E6AAC;
             line-height: 20px;
-            font-family:"PromptMedium", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-family:"NotoSans-Regular", "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
 
         .simple-text{
@@ -70,7 +70,7 @@ body > .navbar-collapse{
 
         li{
             .nav-link{
-                color: #1E6AAC;
+                color: #000f47;
                 margin: 5px 15px;
                 opacity: .86;
                 border-radius: 4px;
@@ -109,7 +109,7 @@ body > .navbar-collapse{
             &.active .nav-link{
                 color: #fff;
                 opacity: 1;
-                background: #1E6AAC;
+                background: #000f47;
                 border-radius: 60px;
 
             }
@@ -139,13 +139,13 @@ body > .navbar-collapse{
             bottom: 10px;
 
             a{
-                color: #1E6AAC !important;
+                color: #000f47 !important;
 
             }
         }
 
         .nav-link{
-            color: #1E6AAC;
+            color: #000f47;
             margin: 5px 15px;
             opacity: .86;
             border-radius: 4px;
@@ -166,7 +166,7 @@ body > .navbar-collapse{
             margin: 10px 10px;
             color: #1E6AAC;
             line-height: 20px;
-            font-family: "PromptMedium", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-family: "NotoSans-Regular", "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
 
         .simple-text{

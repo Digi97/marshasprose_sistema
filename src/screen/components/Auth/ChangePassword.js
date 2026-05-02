@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import axios from "axios";
 import { url } from "../services/api";
-import logo from "../../../assets/img/logo.png";
+import logo from "../../../assets/PNG/LogoOficial.jpg";
 
 class ChangePassword extends Component {
   constructor(props) {
@@ -134,7 +134,7 @@ class ChangePassword extends Component {
             </a>
             </div>
             <div className="text-center m-5">
-              <img src={logo} alt="Logo" />
+              <img src={logo} alt="Logo" width={300}/>
             </div>
             <h3 className="card-title text-center blue-text-login h4">Cambiar Contraseña</h3>
             <div>

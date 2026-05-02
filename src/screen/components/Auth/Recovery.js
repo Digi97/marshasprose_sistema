@@ -3,7 +3,8 @@ import React, { Component } from "react";
 
 import axios from "axios";
 import { url } from "../services/api";
-import logo from "../../../assets/img/logo.png";
+import logo from "../../../assets/PNG/LogoOficial.jpg";
+
 
 // clase de recuperacion contraseña (se ingresa el corrreo)
 class Recovery extends Component {
@@ -133,7 +134,7 @@ class Recovery extends Component {
             </a>
             </div>
             <div className="text-center m-5">
-              <img src={logo} alt="Logo" />
+              <img src={logo} alt="Logo" width={350} />
             </div>
             <h3 className="card-title text-center blue-text-login h4">Restablecer Contraseña</h3>
             {this.state.nextPage === false && (

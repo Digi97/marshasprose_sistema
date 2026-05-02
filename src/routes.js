@@ -1,6 +1,6 @@
 
 import Home from "./screen/components/Home/Home.js";
-
+import Profile from "screen/components/Profile/profile.js";
 import Settings from "./screen/components/Settings/Settings.js";
 
 import crypto from "crypto-js";
@@ -19,43 +19,44 @@ const dashboardRoutes = [
     name: "Facturación",
     icon: "fas fa-file",
     component: Home,
-    layout: "/home/new-profile",
+    layout: "/home/invoice",
   },
   {
     path: "/",
     name: "Gastos",
     icon: "fas fa-file",
     component: Home,
-    layout: "/home/new-profile",
+    layout: "/home/spent",
   },
    {
     path: "/",
     name: "Clientes/Proveedores",
     icon: "fas fa-user",
     component: Home,
-    layout: "/home/new-profile",
+    layout: "/home/customers",
   },
    {
     path: "/",
     name: "Cuentas",
     icon: "fas fa-file",
     component: Home,
-    layout: "/home/new-profile",
+    layout: "/home/accounts",
   },
   {
-    path: "/",
+    path: "/profile",
     name: "Usuarios",
     icon: "fas fa-user",
-    component: Home,
-    layout: "/home/new-profile",
+    component: Profile,
+    layout: "/home",
   },
   {
-    path: "/forum",
+    path: "/settings",
     name: "Ajustes",
     icon: "fas fa-cog",
     component: Settings,
     layout: "/home",
   }
 ];
+
 
 export default dashboardRoutes;

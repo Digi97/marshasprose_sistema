@@ -125,7 +125,7 @@ class Profile extends Component {
   };
 
   componentWillMount() {
-    this.getUserData();
+   // this.getUserData();
   }
 
   render() {
@@ -138,12 +138,12 @@ class Profile extends Component {
               <Card className="card-stats">
                 <div className="text-center d-flex justify-content-center background-profile">
                   <h1 className="letter-profile-user radius-letter text-white">
-                    {this.nameUser}
+            
                   </h1>
                 </div>
                 <div className="background-profile p-0">
                   <h2 className="text-center text-white p-0 m-0">
-                    {this.user.name}
+                   
                   </h2>
                   <br></br>
                 </div>
@@ -168,7 +168,7 @@ class Profile extends Component {
                       aria-describedby="emailHelp"
                       placeholder="Nombre completo"
                       onChange={this.getInputData}
-                      defaultValue={this.user.name}
+                      
                       disabled={this.state.edit}
                     />
                   </div>
@@ -187,7 +187,7 @@ class Profile extends Component {
                       aria-describedby="emailHelp"
                       placeholder="nombre@ejemplo.com"
                       onChange={this.getInputData}
-                      defaultValue={this.user.email}
+                     
                       disabled={this.state.edit}
                     />
                   </div>

@@ -784,18 +784,16 @@ render(){
       defaultActiveKey="question"
       >
 
-      <Tab eventKey="question" title={<span><i className="fas fa-question"></i> Preguntas</span>}>
-       <h4 className="txt-blue">Preguntas</h4>
+      <Tab eventKey="question" title={<span><i className="fas fa-building"></i> Empresa</span>}>
+       <h4 className="txt-blue">Información de Empresa</h4>
         <div className="well">
       
         <Form validated={validatedQuestion} onSubmit={this.SubmitQuestion}>
 
            <Form.Group>
-             <Form.Label className="txt-darkblue">Escribe tu pregunta aquí</Form.Label>
+             <Form.Label className="txt-darkblue">Nombre de la Empresa </Form.Label>
              <Form.Control
-                placeholder="Descripción de la idea"
-                as="textarea"
-                style={{ height: '100px' }}
+                placeholder="Nombre de la Empresa"
                 name="description"
                 onChange={this.getInputQuestion}
                 required

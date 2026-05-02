@@ -1,8 +1,8 @@
-/*ESTILOS PARA CAMPUS VIRTUAL*/
+
 
 @font-face {
-  font-family: 'PromptMedium';
-  src: url("../fonts/Prompt Medium.ttf");
+  font-family: 'NotoSans-Regular';
+  src: url("../fonts/NotoSans-Regular.ttf");
 }
 
 .text-align-center
@@ -112,19 +112,19 @@ td a .txt-blue:hover{
 }
 
 .bg-gray{
-  background-color: rgba(209, 212, 219, .16) ;
+  background-color: #7b7974 ;
 }
 
 .bg-blue{
-  background-color: #1E6AAC;
+  background-color: #000f47;
 }
 
 .bg-darkblue{
-  background-color: #181845;
+  background-color: #000f47;
 }
 
 .txt-darkblue{
-  color: #181845;
+  color: #000f47;
 }
 
 .txt-blue{
@@ -148,7 +148,7 @@ td a .txt-blue:hover{
     height: 115px;
    padding: 10px;
    background-color: #1E6AAC;
-   border: 2px solid #1E6AAC;
+   border: 2px solid #0b4bff;
    border-radius: 60px;
    -moz-border-radius: 15px;
    text-align: center;
@@ -158,8 +158,8 @@ td a .txt-blue:hover{
     width: 60px;
     height: 60px;
    padding: 10px;
-   background-color: #1E6AAC;
-   border: 2px solid #1E6AAC;
+   background-color: #0b4bff;
+   border: 2px solid #0b4bff;
    border-radius: 60px;
    -moz-border-radius: 15px;
    text-align: center;
@@ -167,23 +167,23 @@ td a .txt-blue:hover{
 
 
 .dark-blue-bg{
-  background-color: #181845;
+  background-color: #000f47;
 }
 
 .tituloFerias{
-  color: #1E6AAC;
+  color: #000f47;
 
 /* UI Properties */
 text-align: left;
 letter-spacing: 0px;
-color: #1E6AAC;
+color: #000f47;
 opacity: 1;
 }
 
 .inputSearch{
   background-color: #D1D4DB !important;
   border-radius: 29px;
-  color:#1E6AAC !important;
+  color:#000f47 !important;
   outline: none;
 }
 
@@ -193,47 +193,47 @@ opacity: 1;
 }
 
 .inputSearch::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: #1E6AAC;
+  color: #0b4bff;
 
 }
 
 .inputSearch:-ms-input-placeholder { /* Internet Explorer 10-11 */
-  color: #1E6AAC;
+  color: #0b4bff;
 }
 
 .inputSearch::-ms-input-placeholder { /* Microsoft Edge */
-  color: #1E6AAC;
+  color: #0b4bff;
 }
 
 
 .blue-text-login{
-  color: #1E6AAC !important;
+  color: #000f47 !important;
   text-decoration: none !important;
 }
 
 .blue-button-login{
-  background-color: #1E6AAC !important;
+  background-color: #000f47 !important;
 }
 
 .text-color-recovery{
-  color: #212357 !important;
+  color: #000f47 !important;
 }
 
 .background-button-recovery{
-  background-color: #212357 !important;
+  background-color: #000f47 !important;
 }
 
 .hr-login{
-  color: lightgray !important;
+  color: #ceecff !important;
 }
 
 .background-profile{
-  background-color: #1E6AAC;
+  background-color: #000f47;
   padding: 2%;
 }
 
 .letter-profile-user{
-  background-color: #212357;
+  background-color: #000f47;
   width: 4em;
   padding: 3%;
   font-size: 5em;
@@ -244,7 +244,7 @@ opacity: 1;
 }
 
 .new-profile-text{
-    background-color: #D1D4DB;
+    background-color: #ceecff;
     padding: 3%;
     border-radius: 50px;
 }

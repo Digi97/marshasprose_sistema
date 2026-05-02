@@ -14,6 +14,8 @@ import Login from "./screen/components/Auth/Login";
 import Recovery from "./screen/components/Auth/Recovery";
 import ChangePassword from "./screen/components/Auth/ChangePassword";
 
+import NotFound from './screen/components/common/404.js'
+
 function App() {
   return (
   <BrowserRouter>
@@ -24,8 +26,10 @@ function App() {
       {
         /*(sessionStorage.getItem('token') === null ? <Route path="/home/*" element={ <Navigate replace to="/" />}  /> :<Route path="/home/*" element={<AdminLayout />} /> )*/
       }
-<Route path="/home/" exact element={<AdminLayout />} />
-
+    
+    <Route path="/home/*" exact element={<AdminLayout />} />
+     {/* Catch-all for 404 */}
+    <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>
   );
