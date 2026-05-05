@@ -1,7 +1,5 @@
-import React, {useState} from "react";
-
+import React from "react";
 import logo from "../../../assets/SVG/NotFound.svg";
-
 // react-bootstrap components
 import {
   Container,
@@ -17,7 +15,7 @@ function Error404() {
       <Container fluid>
         <Row>
             <center>
-<h2>Error 404</h2>
+              <h2>Error 404</h2>
             </center>
             
               <img src={logo} alt="Error 404" />

@@ -11,7 +11,7 @@
    @include placeholder($medium-gray,1);
 }
 
-.form-control {
+.form-control, .dt-input {
     background-color: $white-bg;
     border: 1px solid $light-gray;
     border-radius: $border-radius-base;

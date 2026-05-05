@@ -145,7 +145,7 @@ class Login extends Component {
               <img src={logo} alt="Logo" width={400}/>
             </div>
             <h4 className="card-title text-center blue-text-login">
-              Iniciar sesión en Marsh Asprose
+              Iniciar sesión en Marsh Asprose Sistema de Gestión Financiero Contable 
             </h4>
             <br></br>
             <hr className="hr-login"></hr>

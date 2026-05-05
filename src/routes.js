@@ -3,6 +3,9 @@ import Home from "./screen/components/Home/Home.js";
 import Profile from "screen/components/Profile/profile.js";
 import Settings from "./screen/components/Settings/Settings.js";
 
+import Invoice from "./screen/components/Modules/Invoice.js";
+import Spent from "./screen/components/Modules/Spent.js";
+
 import crypto from "crypto-js";
 
 
@@ -15,18 +18,18 @@ const dashboardRoutes = [
     layout: "/home",
   },
     {
-    path: "/",
+    path: "/invoice",
     name: "Facturación",
     icon: "fas fa-file",
-    component: Home,
-    layout: "/home/invoice",
+    component: Invoice,
+    layout: "/home",
   },
   {
-    path: "/",
+    path: "/spent",
     name: "Gastos",
     icon: "fas fa-file",
-    component: Home,
-    layout: "/home/spent",
+    component: Spent,
+    layout: "/home",
   },
    {
     path: "/",

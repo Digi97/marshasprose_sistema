@@ -754,24 +754,6 @@ render(){
   let {key, validatedQuestion, categories, processing, alert, questions, showDelete, evaluations} = this.state;
 
 
-  const columnsEQ = [
-  {dataField: 'questions.description', text:'Pregunta'  },
-  {dataField: 'question_evaluation', text:'Porcentaje' },
-  {dataField: 'id', text:'Editar',  formatter: this.editFormatEQ },
-  {dataField: 'id', text:'Eliminar',  formatter: this.deleteFormatEQ }
-  ];
-
-  const columnsQuestion = [
-  {dataField: 'description', text:'Pregunta' },
-  {dataField: 'id', text: 'Editar', formatter: this.editFormatQuestion },
-  {dataField: 'id', text:'Eliminar',  formatter: this.deleteFormatQuestion }
-  ];
-
-    const columnsEvaluation= [
-    {dataField: 'tittle', text:'Evaluación' },
-    {dataField: 'id', text:'Asignar Preguntas', formatter: this.assignFormatEvaluation },
-    {dataField: 'id', text:'Eliminar',  formatter: this.deleteFormatEvaluation }
-    ];
   return (
     <>
     <Toast onClose={()=> this.setState({alert:{show:false}} )} variant={alert.variant} show={alert.show} title={alert.title} body={alert.body}  />

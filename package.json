@@ -11,6 +11,8 @@
     "axios": "^1.15.2",
     "bootstrap": "^5.3.8",
     "crypto-js": "^4.2.0",
+    "datatables.net-dt": "^2.3.8",
+    "datatables.net-react": "^1.0.2",
     "moment-timezone": "^0.6.2",
     "react": "^19.2.5",
     "react-bootstrap": "^2.10.10",
