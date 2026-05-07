@@ -7,10 +7,10 @@ import {
   Container,
   Row,
   Col,
-  Button,Modal,Tabs, Form, Tab
+  Button,Modal,Tabs, Form, Tab, Dropdown, Well
  } from "react-bootstrap";
 
-
+import Table from 'react-bootstrap/Table';
 
 
 DataTable.use(DT);
@@ -125,7 +125,7 @@ constructor(props)
             defaultActiveKey="info"
             >
 
-               <Tab eventKey="info" title="Información General" className="txt-darkblue">
+               <Tab eventKey="info" title="Información de Gasto" className="txt-darkblue">
                 <Row className="m-2">
                   <Col sm="12" xl="12">
                     <label>Referencia</label>
@@ -147,31 +147,22 @@ constructor(props)
                  <Row className="m-2">
 
                     <Col sm="12" xl="6">
-                      <label className="txt-darkblue">Fecha de inicio</label>
+                      <label className="txt-darkblue">Categoría</label>
                        <Form.Group>
-                         <Form.Control
-                           placeholder="Fecha de inicio"
-                           readOnly
-                           type="date"
-                           name="start_date"
-                           onChange={this.getInputData}
-                           required
-                           >
-                         </Form.Control>
+                          <Form.Select aria-label="Categoría" name="categories_id" onChange={this.getInputEvaluation} required>
+                            <option value="">-- Seleccione una opción --</option>
+                          {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
+                            </Form.Select>
                        </Form.Group>
                      </Col>
 
                     <Col sm="12" xl="6">
-                      <label className="txt-darkblue">Fecha de fin</label>
+                      <label className="txt-darkblue">Tipo Documento</label>
                      <Form.Group>
-                       <Form.Control
-                          placeholder="Fecha de fin"
-                          type="date"
-                          name="end_date"
-                          onChange={this.getInputData}
-                          required
-                          >
-                         </Form.Control>
+                      <Form.Select aria-label="Tipo Documento" name="categories_id" onChange={this.getInputEvaluation} required>
+                              <option value="">-- Seleccione una opción --</option>
+                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
+                              </Form.Select>
                      </Form.Group>
                      </Col>
 
@@ -179,40 +170,169 @@ constructor(props)
 
                    <Row className="m-2">
                      <Col sm="12" xl="12">
-                       <label className="txt-darkblue">Descripción de la feria</label>
+                       <label className="txt-darkblue">Medio Pago</label>
                       <Form.Group>
-                        <Form.Control
-                           placeholder="Descripción de la feria"
-                           as="textarea"
-                           style={{ height: '100px' }}
-                           required
-                           name="description"
-                           onChange={this.getInputData}
-                           >
-                          </Form.Control>
+                         <Form.Select aria-label="Medio Pago" name="categories_id" onChange={this.getInputEvaluation} required>
+                              <option value="">-- Seleccione una opción --</option>
+                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
+                              </Form.Select>
                       </Form.Group>
                       </Col>
                     </Row>
 
-               </Tab>
-               <Tab eventKey="config" title="Configuración">
-                 <Row>
-                   <Col sm="12" xl="12">
-                    <Form.Group>
-                      <Form.Check
-                        type="switch"
-                        id="options_comments"
-                        label="Foro de preguntas y respuestas de los diferentes usuarios"
-                        name="options_comments"
-                        onChange={this.getInputData}
-
-
-                      />
+                  <Row className="m-2">
+                     <Col sm="12" xl="12">
+                       <label className="txt-darkblue">Proveedor</label>
+                 <Dropdown>
+                  <Dropdown.Toggle>Proveedor</Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Form.Control
+                      autoFocus
+                      className="mx-3 my-2 w-auto"
+                      placeholder="Buscar..."
+                      onChange={(e) => {}}
+                      value={""}
+                    />
+                    <Dropdown.Item key={""}>-- Seleccione una opción --</Dropdown.Item>
+                    {/*options
+                      .filter(opt => opt.toLowerCase().includes(filter.toLowerCase()))
+                      .map(opt => <Dropdown.Item key={opt}>{opt}</Dropdown.Item>)
+                    */
+                    
+                    }
+                  </Dropdown.Menu>
+                </Dropdown>
+                </Col>
+                    <div className="well">
+      
+                        <Row className="m-2">
+                     <Col sm="12" xl="6">
+                       <label className="txt-darkblue">Código Comercial</label>
+                      <Form.Group>
+                         <Form.Select aria-label="Código Comercial" name="categories_id" onChange={this.getInputEvaluation} required>
+                              <option value="">-- Seleccione una opción --</option>
+                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
+                              </Form.Select>
                       </Form.Group>
-                    </Col>
-                  </Row>
+                      </Col>
+                  
+                     <Col sm="12" xl="6">
+                       <label className="txt-darkblue">Subtotal</label>
+                        <Form.Group>
+                          <Form.Control
+                          placeholder="Subtotal"
+                          type="text"
+                          onChange={this.getInputData}
+                          name="name"
+                          required
+                          maxLength={200}
+                          />
+                      </Form.Group>
+                      </Col>
+                    </Row>
+
+                   <Row className="m-2">
+                     <Col sm="12" xl="6">
+                       <label className="txt-darkblue">Tipo Impuesto</label>
+                      <Form.Group>
+                         <Form.Select aria-label="Tipo Impuesto" name="categories_id" onChange={this.getInputEvaluation} required>
+                              <option value="">-- Seleccione una opción --</option>
+                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
+                              </Form.Select>
+                      </Form.Group>
+                      </Col>
+               
+                     <Col sm="12" xl="6">
+                       <label className="txt-darkblue">Impuesto</label>
+                        <Form.Group>
+                          <Form.Control
+                          placeholder="Impuesto"
+                          type="text"
+                          onChange={this.getInputData}
+                          name="name"
+                          required
+                          maxLength={3}
+                          />
+                      </Form.Group>
+                      </Col>
+                    </Row>
+
+                    
+                  <Row className="m-2">
+                     <Col sm="12" xl="6">
+                       <label className="txt-darkblue">Total</label>
+                        <Form.Group>
+                          <Form.Control
+                          placeholder="Total"
+                          type="text"
+                          onChange={this.getInputData}
+                          name="name"
+                          required
+                          maxLength={200}
+                          />
+                      </Form.Group>
+                      </Col>
+                    </Row>
+
+                  <Row className="m-2">
+                     <Col sm="12" xl="6">
+                       <label className="txt-darkblue">Detalle</label>
+                        <Form.Group>
+                          <Form.Control
+                          placeholder="Detalle"
+                          type="text"
+                          onChange={this.getInputData}
+                          name="name"
+                          required
+                          maxLength={200}
+                          />
+                      </Form.Group>
+                      </Col>
+                 
+                     <Col sm="12" xl="6">
+                       <label className="txt-darkblue">Descuento</label>
+                        <Form.Group>
+                          <Form.Control
+                          placeholder="Descuento"
+                          type="text"
+                          onChange={this.getInputData}
+                          name="name"
+                          required
+                          maxLength={200}
+                          />
+                      </Form.Group>
+                      </Col>
+                    </Row>
+                    <Row className="m-2">
+                           <Col sm="12" xl="12">
+                    <Table striped bordered hover>
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Código</th>
+                          <th>Descripción</th>
+                          <th>Subtotal</th>
+                          <th>Descuento</th>
+                          <th>Impuesto</th>
+                          <th>Total</th>
+                          <th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                </Table>
+
+                           </Col>
+                    </Row>
+
+
+
+
+
+                    </div>
+              </Row>
 
                </Tab>
+   
 
          </Tabs>
           </Modal.Body>
