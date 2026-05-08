@@ -3,7 +3,12 @@ import { useLocation, NavLink } from "react-router-dom";
 
 import { Nav } from "react-bootstrap";
 
+import { useTranslation } from "react-i18next";
+
+
+
 function Sidebar({ color, image, routes }) {
+    const { t, i18n } = useTranslation();
   const location = useLocation();
   const activeRoute = (routeName) => {
     return location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -29,7 +34,7 @@ function Sidebar({ color, image, routes }) {
             </div>
           </a>
           <a className="simple-text" href="#">
-            Marsh Asprose
+            {t("marsh_asprose")}
           </a>
         </div>
         <Nav>

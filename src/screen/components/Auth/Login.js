@@ -4,6 +4,7 @@ import axios from "axios";
 import { url } from "../services/api";
 import logo from "../../../assets/PNG/LogoOficial.jpg";
 import crypto from "crypto-js";
+import { withTranslation } from 'react-i18next';
 
 class Login extends Component {
   constructor(props) {
@@ -137,6 +138,7 @@ class Login extends Component {
   };
 
   render() {
+     const { t, i18n } = this.props;
     return (
       <div className="global-container m-0 vh-100 row justify-content-center align-items-center">
         <div className="card login-form box">
@@ -145,7 +147,7 @@ class Login extends Component {
               <img src={logo} alt="Logo" width={400}/>
             </div>
             <h4 className="card-title text-center blue-text-login">
-              Iniciar sesión en Marsh Asprose Sistema de Gestión Financiero Contable 
+             {t("system_name")}
             </h4>
             <br></br>
             <hr className="hr-login"></hr>
@@ -159,7 +161,7 @@ class Login extends Component {
               <form onSubmit={this.preventSubmit}>
                 <div className="form-group">
                   <label htmlFor="exampleInputEmail1" className="text-color-recovery">
-                    Dirección de Correo Electrónico
+                    {t("email")}
                   </label>
                   <input
                     type="email"
@@ -173,7 +175,7 @@ class Login extends Component {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="exampleInputPassword1" className="text-color-recovery">Contraseña</label>
+                  <label htmlFor="exampleInputPassword1" className="text-color-recovery">{t("password")}</label>
                   <input
                     type="password"
                     className="form-control form-control-sm"
@@ -192,7 +194,7 @@ class Login extends Component {
                     className="btn btn-primary btn-block blue-button-login col-sm-12 col-md-12 col-xs-12 w-100"
                     onClick={this.login}
                   >
-                    Iniciar Sesión
+                    {t("login")}
                   </button>
                 }
                 {this.state.charging &&
@@ -206,7 +208,7 @@ class Login extends Component {
                 }
                 </div>
                 <div className="sign-up">
-                  ¿Olvido su contraseña? <a href="/recovery" className="blue-text-login">Recuperar</a>
+                  {t("forgot_password")} <a href="/recovery" className="blue-text-login">{t("recover")}</a>
                 </div>
               </form>
             </div>
@@ -217,4 +219,4 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default withTranslation()(Login);

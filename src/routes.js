@@ -9,52 +9,52 @@ import Spent from "./screen/components/Modules/Spent.js";
 import crypto from "crypto-js";
 
 
-const dashboardRoutes = [
+export const dashboardRoutes = (t) => [
   {
     path: "/",
-    name: "Inicio",
+    name: t("home"),
     icon: "fas fa-folder",
     component: Home,
     layout: "/home",
   },
     {
     path: "/invoice",
-    name: "Facturación",
+    name: t("invoice"),
     icon: "fas fa-file",
     component: Invoice,
     layout: "/home",
   },
   {
     path: "/spent",
-    name: "Gastos",
+    name: t("spent"),
     icon: "fas fa-file",
     component: Spent,
     layout: "/home",
   },
    {
     path: "/",
-    name: "Clientes/Proveedores",
+    name: t("customers_providers"),
     icon: "fas fa-user",
     component: Home,
     layout: "/home/customers",
   },
    {
     path: "/",
-    name: "Cuentas",
+    name: t("accounts"),
     icon: "fas fa-file",
     component: Home,
     layout: "/home/accounts",
   },
   {
     path: "/profile",
-    name: "Usuarios",
+    name: t("users"),
     icon: "fas fa-user",
     component: Profile,
     layout: "/home",
   },
   {
     path: "/settings",
-    name: "Ajustes",
+    name: t("settings"),
     icon: "fas fa-cog",
     component: Settings,
     layout: "/home",
@@ -62,4 +62,4 @@ const dashboardRoutes = [
 ];
 
 
-export default dashboardRoutes;
+//export default dashboardRoutes;

@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { url } from "../services/api";
 import logo from "../../../assets/PNG/LogoOficial.jpg";
+import { withTranslation } from 'react-i18next';
 
 class ChangePassword extends Component {
   constructor(props) {
@@ -123,6 +124,7 @@ class ChangePassword extends Component {
   }
   //renderiza la vista de cabiar contraseña (input contraseña, confirmar contraseña y correo)
   render() {
+             const { t, i18n } = this.props;
     return (
       <div className="global-container m-0 vh-100 row justify-content-center align-items-center">
         <div className="card login-form box">
@@ -136,10 +138,10 @@ class ChangePassword extends Component {
             <div className="text-center m-5">
               <img src={logo} alt="Logo" width={300}/>
             </div>
-            <h3 className="card-title text-center blue-text-login h4">Cambiar Contraseña</h3>
+            <h3 className="card-title text-center blue-text-login h4">{t("change_pwd")}</h3>
             <div>
               <small className="text-color-recovery">
-                La contraseña debe tener al menos 8 caracteres
+                {t("pwd_security_parameter")}
               </small >
             </div>
             <div>
@@ -155,7 +157,7 @@ class ChangePassword extends Component {
                 <form onSubmit={this.preventSubmit}>
                   <div className="form-group">
                     <label htmlFor="exampleInputEmail1" className="text-color-recovery">
-                      Direccion de correo electrónico
+                      {t("email")}
                     </label>
                     <input
                       type="email"
@@ -170,7 +172,7 @@ class ChangePassword extends Component {
                   </div>
                   <div className="form-group">
                     <label htmlFor="exampleInputEmail1" className="text-color-recovery">
-                      Nueva contraseña
+                      {t("new_pwd")}
                     </label>
                     <input
                       type="password"
@@ -185,7 +187,7 @@ class ChangePassword extends Component {
                   </div>
                   <div className="form-group">
                     <label htmlFor="exampleInputEmail1" className="text-color-recovery">
-                      Confirmar contraseña
+                      {t("confirm_pwd")}
                     </label>
                     <input
                       type="password"
@@ -206,7 +208,7 @@ class ChangePassword extends Component {
                         className="btn btn-primary btn-block col-md-12 background-button-recovery w-100"
                         onClick={this.changePassword}
                       >
-                        Continuar
+                        {t("continue")}
                       </button>
                     }
                     {this.state.charging &&
@@ -229,4 +231,4 @@ class ChangePassword extends Component {
   }
 }
 
-export default ChangePassword;
+export default withTranslation()(ChangePassword);

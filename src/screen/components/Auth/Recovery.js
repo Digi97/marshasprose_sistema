@@ -5,6 +5,7 @@ import axios from "axios";
 import { url } from "../services/api";
 import logo from "../../../assets/PNG/LogoOficial.jpg";
 
+import { withTranslation } from 'react-i18next';
 
 // clase de recuperacion contraseña (se ingresa el corrreo)
 class Recovery extends Component {
@@ -123,6 +124,7 @@ class Recovery extends Component {
   }
 
   render() {
+         const { t, i18n } = this.props;
     return (
       <div className="global-container m-0 vh-100 row justify-content-center align-items-center">
         <div className="card login-form box">
@@ -130,19 +132,18 @@ class Recovery extends Component {
             <div>
             <a onClick={this.goBack}>
               <i className="fas fa-angle-left blue-text-login"></i>
-              <span className="blue-text-login">Volver</span>
+              <span className="blue-text-login">{t("back")}</span>
             </a>
             </div>
             <div className="text-center m-5">
               <img src={logo} alt="Logo" width={350} />
             </div>
-            <h3 className="card-title text-center blue-text-login h4">Restablecer Contraseña</h3>
+            <h3 className="card-title text-center blue-text-login h4">{t("restablish_password")}</h3>
             {this.state.nextPage === false && (
               <div>
                 <div>
                   <small className="text-center text-color-recovery">
-                    Para restablecer su contraseña introduzca su correo
-                    electrónico
+                    {t("mail_to_restablish")}
                   </small >
                 </div>
                 {this.state.error === true &&
@@ -155,7 +156,7 @@ class Recovery extends Component {
                   <form onSubmit={this.preventSubmit}>
                     <div className="form-group">
                       <label htmlFor="exampleInputEmail1" className="text-color-recovery">
-                        Direccion de correo electrónico
+                        {t("mail")}
                       </label>
                       <input
                         type="email"
@@ -177,7 +178,7 @@ class Recovery extends Component {
                           className="btn btn-primary btn-block col-md-12 background-button-recovery w-100"
                           onClick={this.recovery}
                         >
-                          Continuar
+                          {t("continue")}
                         </button>
                       }
                       {this.state.charging &&
@@ -198,7 +199,7 @@ class Recovery extends Component {
               <div>
                 <div>
                   <p className="text-center text-color-recovery">
-                    Para cambiar tu contraseña ingresa el código de verificación enviado a {this.state.form.email}
+                    {t("mail_change_pwd")} {this.state.form.email}
                   </p>
                 </div>
                 {this.state.error === true &&
@@ -208,7 +209,7 @@ class Recovery extends Component {
                 }
                 <div className="form-group">
                   <label htmlFor="exampleInputEmail1">
-                    Código de verificación
+                    {t("verification_code")}
                   </label>
                   <input
                     type="verification_code"
@@ -228,7 +229,7 @@ class Recovery extends Component {
                       className="btn btn-primary btn-block col-md-12 background-button-recovery"
                       onClick={this.verifyCode}
                     >
-                      Continuar
+                      {t("Continue")}
                     </a>
                   }
                   {this.state.charging &&
@@ -250,4 +251,4 @@ class Recovery extends Component {
   }
 }
 
-export default Recovery;
+export default withTranslation()(Recovery);

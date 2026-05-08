@@ -15,12 +15,20 @@ import NotFound from './screen/components/common/404.js'
 
 import { useJwt } from "react-jwt";
 
-import routes from "./routes.js";
+import {dashboardRoutes}from "./routes.js";
 
 import crypto from "crypto-js";
 
+
+import { useTranslation } from "react-i18next";
+
+
+
 function Admin() {
 
+    const { t } = useTranslation();
+  const routes = dashboardRoutes(t);
+  
     const mainPanel = React.useRef(null);
       const location = useLocation();
 /*
