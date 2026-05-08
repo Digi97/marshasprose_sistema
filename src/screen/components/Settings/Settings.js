@@ -4,6 +4,9 @@ import AppUtil from '../../../AppUtil/AppUtil.js';
 import { url } from "../services/api.js";
 import Toast from '../common/Toast.js';
 
+import Select from 'react-select'
+
+
 import { withTranslation } from "react-i18next";
 
 class Settings extends React.Component {
@@ -767,14 +770,14 @@ render(){
       defaultActiveKey="question"
       >
 
-      <Tab eventKey="question" title={<span><i className="fas fa-building"></i> Empresa</span>}>
+      <Tab eventKey="question" title={<span><i className="fas fa-building"></i> {t("business")}</span>}>
        <h4 className="txt-blue">{t("business_info")}</h4>
         <div className="well">
       
            <Form.Group>
-             <Form.Label className="txt-darkblue">Nombre de la Empresa </Form.Label>
+             <Form.Label className="txt-darkblue">{t("name")}</Form.Label>
              <Form.Control
-                placeholder="Nombre de la Empresa"
+                placeholder={t("name")}
                 name="Nombre_Empresa"
                 onChange={this.getInputQuestion}
                 required
@@ -782,24 +785,83 @@ render(){
                 >
                </Form.Control>
            </Form.Group>
+
+            <Form.Group>
+             <Form.Label className="txt-darkblue">{t("mail")}</Form.Label>
+             <Form.Control
+                placeholder={t("mail")}
+                name="Correo_empresa"
+                onChange={this.getInputQuestion}
+                required
+                value={this.state.question.description}
+                >
+               </Form.Control>
+           </Form.Group>
+           
+           <Form.Group>
+             <Form.Label className="txt-darkblue">{t("nas")}</Form.Label>
+             <Form.Control
+                placeholder={t("nas")}
+                name="Ruta_nas"
+                onChange={this.getInputQuestion}
+                required
+                value={this.state.question.description}
+                >
+               </Form.Control>
+           </Form.Group>
+
+          <Form.Group>
+             <Form.Label className="txt-darkblue">{t("date_format")}</Form.Label>
+             <Form.Control
+                placeholder={t("date_format")}
+                name="Formato_fecha"
+                onChange={this.getInputQuestion}
+                required
+                value={this.state.question.description}
+                >
+               </Form.Control>
+           </Form.Group>
+
+
+         <Form.Group>
+             <Form.Label className="txt-darkblue">{t("identification_type")}</Form.Label>
+              <Select options={this.state.providers} name="provider" onChange={this._saveStateVariable} />
+           </Form.Group>
+
+
+         <Form.Group>
+             <Form.Label className="txt-darkblue">{t("identification")}</Form.Label>
+             <Form.Control
+                placeholder={t("identification")}
+                name="identificacion"
+                onChange={this.getInputQuestion}
+                required
+                value={this.state.question.description}
+                >
+               </Form.Control>
+           </Form.Group>
+
+
+
            <Button className="btn-rounded btn-fill bg-darkblue" type="submit" disabled={processing}>
              {processing ? <div className="lds-dual-ring"></div>: 'Enviar'}
            </Button>
      
         </div>
       </Tab>
-        <Tab eventKey="evaluations" title={<span><i className="fas fa-check"></i> Evaluaciones</span>}>
+      {/*TAB AJUSTES FACTURACION ELECTRÓNICA*/}
+        <Tab eventKey="evaluations" title={<span><i className="fas fa-check"></i> {t("electronic_invoice")}</span>}>
         <div className="well">
-         <h4 className="txt-blue">Evaluaciones</h4>
+         <h4 className="txt-blue">{t("electronic_invoice")}</h4>
 
           <Form validated={this.state.validatedEvaluations} onSubmit={this.SubmitEvaluations}>
           <Row>
             <Col xl="12" sm="12" md="12">
               <Form.Group>
-                <Form.Label className="txt-darkblue">Titulo de evaluación</Form.Label>
+                <Form.Label className="txt-darkblue">{t("terminal")}</Form.Label>
                 <Form.Control
-                   placeholder="Titulo de evaluación"
-                   name="tittle"
+                   placeholder={t("terminal")}
+                   name="terminal"
                    onChange={this.getInputEvaluation}
                    required
                    value={this.state.evaluationsReq.tittle}
@@ -807,18 +869,71 @@ render(){
                   </Form.Control>
               </Form.Group>
               </Col>
+
+           <Col xl="12" sm="12" md="12">
+              <Form.Group>
+                <Form.Label className="txt-darkblue">{t("invoice_key")}</Form.Label>
+                <Form.Control
+                  type="file"
+                   placeholder={t("invoice_key")}
+                   name="Ruta_llave_factura"
+                   onChange={this.getInputEvaluation}
+                   required
+                   value={this.state.evaluationsReq.tittle}
+                   >
+                  </Form.Control>
+              </Form.Group>
+              </Col>
+
+            <Col xl="12" sm="12" md="12">
+              <Form.Group>
+                <Form.Label className="txt-darkblue">{t("pin")}</Form.Label>
+                <Form.Control
+                  type="file"
+                   placeholder={t("pin")}
+                   name="pin_llave"
+                   onChange={this.getInputEvaluation}
+                   required
+                   value={this.state.evaluationsReq.tittle}
+                   >
+                  </Form.Control>
+              </Form.Group>
+              </Col>
+
+
+            <Col xl="12" sm="12" md="12">
+              <Form.Group>
+                <Form.Label className="txt-darkblue">{t("security_code")}</Form.Label>
+                <Form.Control
+                  
+                   placeholder={t("security_code")}
+                   name="codigo_seguridad"
+                   onChange={this.getInputEvaluation}
+                   required
+                   value={this.state.evaluationsReq.tittle}
+                   >
+                  </Form.Control>
+              </Form.Group>
+              </Col>
+
+          <Col xl="12" sm="12" md="12">
+              <Form.Group>
+                <Form.Label className="txt-darkblue">{t("activity_code")}</Form.Label>
+                 <Select options={this.state.codigo_actividad} name="codigo_actividad" onChange={this._saveStateVariable} />
+              </Form.Group>
+              </Col>
+
+
+          <Col xl="12" sm="12" md="12">
+              <Form.Group>
+                <Form.Label className="txt-darkblue">{t("default_tax")}</Form.Label>
+                 <Select options={this.state.codigo_actividad} name="impuesto_id" onChange={this._saveStateVariable} />
+              </Form.Group>
+              </Col>
+
+
             </Row>
-            <Row>
-              <Col xl="12" sm="12" md="12">
-                <Form.Group>
-                  <Form.Label className="txt-darkblue">Categoría</Form.Label>
-                  <Form.Select aria-label="Categoría" name="categories_id" onChange={this.getInputEvaluation} required>
-                    <option value="">-- Seleccione una opción --</option>
-                   {categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))}
-                    </Form.Select>
-                </Form.Group>
-            </Col>
-          </Row>
+     
 
 
 
@@ -830,162 +945,6 @@ render(){
         </Tab>
 
       </Tabs>
-
-        <Modal show={showDelete} onHide={()=> this.toggleDelete(0)}>
-            <Modal.Header closeButton>
-              <Modal.Title className="txt-blue">Eliminar</Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="text-align-center">¿Desea eliminar esta pregunta?</Modal.Body>
-            <Modal.Footer>
-              <button variant="none" size="lg" onClick={()=> this.toggleDelete(0)} className="bg-darkblue btn-lg btn-rounded txt-white-btn">
-                Cancelar
-              </button>
-              {processing ? <div className="lds-dual-ring-2"></div>: (<button size="lg" onClick={() =>this.deleteItem('question', this.state.id)} className="bg-blue btn-lg btn-rounded txt-white-btn">
-                Eliminar
-              </button>)}
-            </Modal.Footer>
-        </Modal>
-
-        <Modal show={this.state.showDeleteEvaluation} onHide={()=> this.toggleDeleteEvaluation(0)}>
-            <Modal.Header closeButton>
-              <Modal.Title className="txt-blue">Eliminar</Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="text-align-center">¿Desea eliminar esta evaluación?</Modal.Body>
-            <Modal.Footer>
-              <button variant="none" size="lg" onClick={()=> this.toggleDeleteEvaluation(0)} className="bg-darkblue btn-lg btn-rounded txt-white-btn">
-                Cancelar
-              </button>
-              {processing ? <div className="lds-dual-ring-2"></div>: (<button size="lg" onClick={() =>this.deleteItem('evaluation', this.state.id)} className="bg-blue btn-lg btn-rounded txt-white-btn">
-                Eliminar
-              </button>)}
-            </Modal.Footer>
-        </Modal>
-          <Modal show={this.state.showDeleteEQ} onHide={()=> this.toggleDeleteEQ(0)}>
-              <Modal.Header closeButton>
-                <Modal.Title className="txt-blue">Eliminar</Modal.Title>
-              </Modal.Header>
-              <Modal.Body className="text-align-center">¿Desea eliminar este Item?</Modal.Body>
-              <Modal.Footer>
-                <button variant="none" size="lg" onClick={()=> this.toggleDeleteEQ(0)} className="bg-darkblue btn-lg btn-rounded txt-white-btn">
-                  Cancelar
-                </button>
-                {processing ? <div className="lds-dual-ring-2"></div>: (<button size="lg" onClick={() =>this.deleteItem('evaluation_question', this.state.id)} className="bg-blue btn-lg btn-rounded txt-white-btn">
-                  Eliminar
-                </button>)}
-              </Modal.Footer>
-          </Modal>
-
-
-
-          <Modal show={this.state.assignEvaluation} onHide={()=> this.toggleAssignEvaluation(0)} size="lg">
-              <Modal.Header closeButton>
-                <Modal.Title className="txt-blue">Asignar evaluación a pregunta</Modal.Title>
-              </Modal.Header>
-              <Modal.Body className="text-align-left">
-                <Form validated={this.state.validatedEvaluationQuestion} onSubmit={this.SubmitEvaluationQuestion} ref={ form => this.messageForm = form }>
-                  <Row>
-                    <Col xl="12" sm="12" md="12">
-                      <Form.Group>
-                        <Form.Label className="txt-darkblue">Preguntas</Form.Label>
-                        <Form.Select aria-label="Preguntas" name="questions_id" id="questions_id" onChange={this.getInputEvaluationQuestion} required>
-                          <option value="">-- Seleccione una opción --</option>
-                         {questions?.map((item, key) =>( <option value={item.id} key={key}>{item.description}</option>))}
-                          </Form.Select>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col xl="12" sm="12" md="12">
-                      <Form.Group>
-                        <Form.Label className="txt-darkblue">Porcentaje de calificación</Form.Label>
-                          <Form.Control
-                             placeholder="Porcentaje de la calificación"
-                             type="number"
-                             onChange={this.getInputEvaluationQuestion}
-                             name="question_evaluation"
-                             id="question_evaluation"
-                             max="100"
-                             min="0"
-                             pattern="^[1-9][0-9]?$|^100$"
-                             defaultValue={this.state.question_evaluation.question_evaluation}
-                             value={this.state.question_evaluation.question_evaluation ? this.state.question_evaluation.question_evaluation : ''}
-                             >
-                            </Form.Control>
-
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row className="text-align-center">
-                    <Col xl="6" sm="12" md="12">
-                      <Button variant="none" size="lg" onClick={()=> this.toggleAssignEvaluation(0)} className="bg-darkblue btn-lg btn-rounded txt-white-btn">
-                        Cancelar
-                      </Button>
-                      </Col>
-                      <Col xl="6"  sm='12' md="12">
-                        {!this.state.editing &&
-                        <Button className="btn-rounded btn-fill bg-darkblue btn-lg" type="submit" disabled={(this.state.percentageUsedPerEvaluation >= 100 ? true : false)}>
-                          {processing ? <div className="lds-dual-ring"></div>: 'Enviar'}
-                        </Button>
-                        }
-                        {this.state.editing &&
-                      <Button className="btn-rounded btn-fill bg-darkblue btn-lg" onClick={this.EditEvaluationQuestion}>
-                        {processing ? <div className="lds-dual-ring"></div>: 'Editar'}
-                      </Button>
-                      }
-                    </Col>
-                  </Row>
-
-                </Form>
-
-              </Modal.Body>
-              <Modal.Footer>
-               </Modal.Footer>
-          </Modal>
-
-
-          {/*Modal de editar las preguntas*/}
-          <Modal show={this.state.showEditQuestion} onHide={()=> this.toggleEdit(0)}>
-              <Modal.Header closeButton>
-                <Modal.Title className="txt-blue">Editar Pregunta</Modal.Title>
-              </Modal.Header>
-              <Modal.Body className="text-align-center">
-                <Form validated={validatedQuestion} onSubmit={this.SubmitEditQuestion}>
-
-                   <Form.Group>
-                     <Form.Label className="txt-darkblue">Escribe tu pregunta aquí</Form.Label>
-                     <Form.Control
-                        placeholder="Descripción de la idea"
-                        as="textarea"
-                        style={{ height: '100px' }}
-                        name="description"
-                        onChange={this.getInputQuestionEdit}
-                        required
-                        value={this.state.questionEdit.description}
-                        >
-                       </Form.Control>
-                   </Form.Group>
-                   <Button className="btn-rounded btn-fill bg-darkblue" type="submit" disabled={processing}>
-                     {processing ? <div className="lds-dual-ring"></div>: 'Editar'}
-                   </Button>
-                </Form>
-
-
-
-              </Modal.Body>
-              <Modal.Footer>
-                <button variant="none" size="lg" onClick={()=> this.toggleEdit(0)} className="bg-darkblue btn-lg btn-rounded txt-white-btn">
-                  Cerrar
-                </button>
-
-              </Modal.Footer>
-          </Modal>
-          {/*Modal de editar las preguntas*/}
-
-
-
-
-
-
     </Container>
     </>
     );

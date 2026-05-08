@@ -51,11 +51,16 @@
         "pwd_security_parameter":"La contraseña debe tener al menos 8 caracteres",
         "home":"Inicio",
         "invoice":"Facturación",
+        "electronic_invoice":"Facturación Electrónica",
         "client_provider":"Clientes/Proveedores",
         "accounts":"Cuentas",
         "users":"Usuarios",
         "settings":"Ajustes",
-        "business_info":"Información de Empresa"
+        "business_info":"Información de Empresa",
+        "business":"Empresa",
+        "name":"Nombre",
+        "nas":"Ruta NAS",
+        "date_format":"Formato Fecha"
 
 
     }

@@ -55,6 +55,19 @@
         "accounts":"Accounts",
         "users":"Users",
         "settings":"Settings",
-           "business_info":"Business Info"
+        "business_info":"Business Info",
+        "business":"Business",
+        "name":"Name",
+        "electronic_invoice":"Electronic Invoice",
+        "nas":"NAS Path",
+        "date_format":"Date Format",
+        "identification":"Identification",
+        "terminal":"Terminal",
+        "invoice_key":"Invoice Key",
+        "pin":"PIN",
+        "security_code":"Security Code",
+        "default_tax":"Default Tax"
+
+
     }
 }
