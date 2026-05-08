@@ -4,8 +4,9 @@ import AppUtil from '../../../AppUtil/AppUtil.js';
 import { url } from "../services/api.js";
 import Toast from '../common/Toast.js';
 
+import { withTranslation } from "react-i18next";
 
-export default class Settings extends React.Component {
+class Settings extends React.Component {
   constructor(props)
   {
       super(props);
@@ -752,7 +753,7 @@ deleteFormatEvaluation = (cell, row, rowIndex, formatExtraData) => {
 
 render(){
   let {key, validatedQuestion, categories, processing, alert, questions, showDelete, evaluations} = this.state;
-
+    const { t } = this.props;
 
   return (
     <>
@@ -767,16 +768,14 @@ render(){
       >
 
       <Tab eventKey="question" title={<span><i className="fas fa-building"></i> Empresa</span>}>
-       <h4 className="txt-blue">Información de Empresa</h4>
+       <h4 className="txt-blue">{t("business_info")}</h4>
         <div className="well">
       
-        <Form validated={validatedQuestion} onSubmit={this.SubmitQuestion}>
-
            <Form.Group>
              <Form.Label className="txt-darkblue">Nombre de la Empresa </Form.Label>
              <Form.Control
                 placeholder="Nombre de la Empresa"
-                name="description"
+                name="Nombre_Empresa"
                 onChange={this.getInputQuestion}
                 required
                 value={this.state.question.description}
@@ -786,7 +785,7 @@ render(){
            <Button className="btn-rounded btn-fill bg-darkblue" type="submit" disabled={processing}>
              {processing ? <div className="lds-dual-ring"></div>: 'Enviar'}
            </Button>
-        </Form>
+     
         </div>
       </Tab>
         <Tab eventKey="evaluations" title={<span><i className="fas fa-check"></i> Evaluaciones</span>}>
@@ -824,7 +823,7 @@ render(){
 
 
              <Button className="btn-rounded btn-fill bg-darkblue" type="submit" disabled={processing}>
-               {processing ? <div className="lds-dual-ring"></div>: 'Enviar'}
+               {processing ? <div className="lds-dual-ring"></div>: t("Send")}
              </Button>
           </Form>
           </div>
@@ -992,3 +991,5 @@ render(){
     );
   }
 }
+
+ export default withTranslation()(Settings)

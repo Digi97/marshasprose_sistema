@@ -54,7 +54,8 @@
         "client_provider":"Clientes/Proveedores",
         "accounts":"Cuentas",
         "users":"Usuarios",
-        "settings":"Ajustes"
+        "settings":"Ajustes",
+        "business_info":"Información de Empresa"
 
 
     }

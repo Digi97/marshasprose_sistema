@@ -33,6 +33,17 @@ constructor(props)
   ],
   show:false,
   processing: false,
+  spent:{
+    reference:"",
+    category:"",
+    doc_type:"",
+    payment_method:"",
+    provider:"",
+
+
+
+    
+  },
   spentDetail:[],
   providers:[
     
@@ -83,10 +94,18 @@ constructor(props)
 
     }
 
+    _saveStateVariable = async (e) => {
+    await this.setState({
+            question: {
+              ...this.state.question,
+              [e.target.name]: e.target.value,
+            },
+          });
+
+    }
+
 
     saveSpent = () => {
-
-
       
     }
 
@@ -200,7 +219,7 @@ constructor(props)
                         placeholder={t("reference")}
                         type="text"
                         onChange={this.getInputData}
-                        name="name"
+                        name="reference"
                         required
                         maxLength={200}
                         >
@@ -215,7 +234,7 @@ constructor(props)
                     <Col sm="12" xl="6">
                       <label className="txt-darkblue">{t("category")}</label>
                        <Form.Group>
-                          <Form.Select aria-label="Categoría" name="categories_id" onChange={this.getInputEvaluation} required>
+                          <Form.Select aria-label="Categoría" name="category" onChange={this._saveStateVariable} required>
                             <option value="">-- Seleccione una opción --</option>
                           {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
                             </Form.Select>
@@ -225,7 +244,7 @@ constructor(props)
                     <Col sm="12" xl="6">
                       <label className="txt-darkblue">{t("doc_type")}</label>
                      <Form.Group>
-                      <Form.Select aria-label="Tipo Documento" name="tipo_documento" onChange={this.getInputEvaluation} required>
+                      <Form.Select aria-label="Tipo Documento" name="doc_type" onChange={this._saveStateVariable} required>
                               <option value="">-- Seleccione una opción --</option>
                             {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
                               </Form.Select>
@@ -238,7 +257,7 @@ constructor(props)
                      <Col sm="12" xl="12">
                        <label className="txt-darkblue">{t("payment_method")}</label>
                       <Form.Group>
-                         <Form.Select aria-label="Medio Pago" name="medio_pago" onChange={this.getInputEvaluation} required>
+                         <Form.Select aria-label="Medio Pago" name="payment_method" onChange={this._saveStateVariable} required>
                               <option value="">-- Seleccione una opción --</option>
                             {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
                               </Form.Select>
@@ -250,7 +269,7 @@ constructor(props)
 
                      <Col sm="12" xl="12">
                        <label className="txt-darkblue">{t("provider")}</label>
-                    <Select options={this.state.providers} name="proveedor" />
+                    <Select options={this.state.providers} name="provider" onChange={this._saveStateVariable} />
                 </Col>
 
 
@@ -263,7 +282,7 @@ constructor(props)
                      <Col sm="12" xl="6">
                        <label className="txt-darkblue">{t("comercial_code")}</label>
                       <Form.Group>
-                         <Form.Select aria-label={t("comercial_code")} name="codigo_comercial" onChange={this.getInputEvaluation} required>
+                         <Form.Select aria-label={t("comercial_code")} name="codigo_comercial" required>
                               <option value="">-- Seleccione una opción --</option>
                               <option value="1">test</option>
                             {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
@@ -292,7 +311,7 @@ constructor(props)
                      <Col sm="12" xl="6">
                        <label className="txt-darkblue">{t("tax_type")}</label>
                       <Form.Group>
-                         <Form.Select aria-label={t("tax_type")} name="tipo_documento" onChange={this.getInputEvaluation} required>
+                         <Form.Select aria-label={t("tax_type")} name="tipo_documento" required>
                               <option value="">-- Seleccione una opción --</option>
                               <option value="1">IVA</option>
                             {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
@@ -326,6 +345,7 @@ constructor(props)
                           name="impuesto"
                           required
                           maxLength={3}
+                          readOnly
                           />
                       </Form.Group>
                       </Col>
@@ -357,6 +377,7 @@ constructor(props)
                           name="total"
                           required
                           maxLength={200}
+                          readOnly
                           />
                       </Form.Group>
                       </Col>

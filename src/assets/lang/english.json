@@ -54,6 +54,7 @@
         "client_provider":"Clients/Providers",
         "accounts":"Accounts",
         "users":"Users",
-        "settings":"Settings"
+        "settings":"Settings",
+           "business_info":"Business Info"
     }
 }
