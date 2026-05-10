@@ -2,13 +2,7 @@ import React, {Component} from "react";
 
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
-// react-bootstrap components
-import { Container,
-  Row,
-  Col,
-  Button,Modal,Tabs, Form, Tab, Dropdown
- } from "react-bootstrap";
-
+import { Container, Row, Col, Button,Modal,Tabs, Form, Tab} from "react-bootstrap";
 import Table from 'react-bootstrap/Table';
 import Select from 'react-select'
 

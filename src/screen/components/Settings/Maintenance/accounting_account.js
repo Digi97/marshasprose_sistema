@@ -81,11 +81,11 @@ constructor(props)
             </Button>
             </Col>
             <Col lg="2" sm="12">
-              <Button
-                className="btn-fill btn-rounded bg-blue"
-                onClick={this.toggleShow}>
-                  {t("cancel")}
-              </Button>
+        <Button
+                   className="btn-fill btn-rounded bg-blue"
+                   onClick={()=> this.props.navigate(-1)}>
+                     {t("cancel")}
+                 </Button>
             </Col>
 
           </Row>

@@ -17,19 +17,12 @@ constructor(props)
       tableData: [],
   show:false,
   processing: false,
-  spent:{
-    reference:"",
-    category:"",
-    doc_type:"",
-    payment_method:"",
-    provider:"",
+  currency:{
+    id:"",
+    nombre:"",
+    codigo:""
 
-
-
-    
-  },
-  spentDetail:[],
-  lines:[]
+  }
     }
   }
 
@@ -40,7 +33,7 @@ constructor(props)
 
     _saveStateVariable = async (e) => {
     await this.setState({
-            question: {
+            currency: {
               ...this.state.question,
               [e.target.name]: e.target.value,
             },
@@ -82,11 +75,11 @@ constructor(props)
             </Button>
             </Col>
             <Col lg="2" sm="12">
-              <Button
-                className="btn-fill btn-rounded bg-blue"
-                onClick={this.toggleShow}>
-                  {t("cancel")}
-              </Button>
+                    <Button
+                              className="btn-fill btn-rounded bg-blue"
+                              onClick={()=> this.props.navigate(-1)}>
+                                {t("cancel")}
+                            </Button>
             </Col>
 
           </Row>

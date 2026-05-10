@@ -2,8 +2,10 @@ import React from "react";
 import {
   useLocation,
   Route,
-  Routes
+  Routes,
+  useNavigate
 } from "react-router-dom";
+
 
 import AdminNavbar from "./screen/components/Layouts/Navbar";
 import Footer from "./screen/components/Layouts/Footer";
@@ -18,6 +20,20 @@ import Accounting_account from "./screen/components/Settings/Maintenance/account
 import Activity_Code from "./screen/components/Settings/Maintenance/activity_code";
 import Cabys_Code from "./screen/components/Settings/Maintenance/cabys_code";
 import Comercial_Code from "./screen/components/Settings/Maintenance/comercial_code";
+import Cost_Center from "./screen/components/Settings/Maintenance/cost_center";
+import Document_Type from "./screen/components/Settings/Maintenance/document_type";
+import Expenses_Category from "./screen/components/Settings/Maintenance/expenses_category";
+import File_Type from "./screen/components/Settings/Maintenance/file_type";
+import Invoice_Status from "./screen/components/Settings/Maintenance/invoice_status";
+import Measurement_Unity from "./screen/components/Settings/Maintenance/measurement_unity";
+import Payment_Method from "./screen/components/Settings/Maintenance/payment_method";
+import Permissions from "./screen/components/Settings/Maintenance/permissions";
+import Presupuestary_Category from "./screen/components/Settings/Maintenance/presupuestary_category";
+import Rol from "./screen/components/Settings/Maintenance/rol";
+import Sale_Condition from "./screen/components/Settings/Maintenance/sale_condition";
+import Tax_Type from "./screen/components/Settings/Maintenance/tax_type";
+import Type_Accounting_Account from "./screen/components/Settings/Maintenance/type_accounting_account";
+
 
 
 //#endregion 
@@ -113,24 +129,24 @@ function Admin() {
               <Route path={"/home/profile"} element={<Profile />} />
               <Route path={"/home/new-profile"} element={<NewProfile />} />
               {/*Mantenimientos */}
-              <Route path={"/maintenance/currency"} element={<Currency />} />
-              <Route path={"/maintenance/activity_code"} element={<Activity_Code />} />
-              <Route path={"/home/maintenance/payment_method"} element={<NewProfile />} />
-              <Route path={"/maintenance/accounting_account"} element={<Accounting_account />} />
-              <Route path={"/home/maintenance/type_accounting_account"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/invoice_status"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/rol"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/presupuestary_category"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/file_type"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/tax_type"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/sale_condition"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/document_type"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/expenses_category"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/measurement_unity"} element={<NewProfile />} />
-              <Route path={"/maintenance/comercial_code"} element={<Comercial_Code />} />
-              <Route path={"/maintenance/cabys_code"} element={<Cabys_Code />} />
-              <Route path={"/home/maintenance/cost_center"} element={<NewProfile />} />
-              <Route path={"/home/maintenance/permissions"} element={<NewProfile />} />
+              <Route path={"/settings/maintenance/currency"} element={<Currency navigate={useNavigate()}   />} />
+              <Route path={"/settings/maintenance/activity_code"} element={<Activity_Code navigate={useNavigate()}   />} />
+              <Route path={"/settings/maintenance/payment_method"} element={<Payment_Method navigate={useNavigate()}  />} />
+              <Route path={"/settings/maintenance/accounting_account"} element={<Accounting_account navigate={useNavigate()}   />} />
+              <Route path={"/settings/maintenance/type_accounting_account"} element={<Type_Accounting_Account navigate={useNavigate()}   />} />
+              <Route path={"/settings/maintenance/invoice_status"} element={<Invoice_Status navigate={useNavigate()}  />} />
+              <Route path={"/settings/maintenance/rol"} element={<Rol navigate={useNavigate()}  />} />
+              <Route path={"/settings/maintenance/presupuestary_category"} element={<Presupuestary_Category navigate={useNavigate()}  />} />
+              <Route path={"/settings/maintenance/file_type"} element={<File_Type navigate={useNavigate()} />} />
+              <Route path={"/settings/maintenance/tax_type"} element={<Tax_Type navigate={useNavigate()}  />} />
+              <Route path={"/settings/maintenance/sale_condition"} element={<Sale_Condition navigate={useNavigate()}  />} />
+              <Route path={"/settings/maintenance/document_type"} element={<Document_Type navigate={useNavigate()}  />} />
+              <Route path={"/settings/maintenance/expenses_category"} element={<Expenses_Category navigate={useNavigate()}   />} />
+              <Route path={"/settings/maintenance/measurement_unity"} element={<Measurement_Unity navigate={useNavigate()}   />} />
+              <Route path={"/settings/maintenance/comercial_code"} element={<Comercial_Code navigate={useNavigate()}   />} />
+              <Route path={"/settings/maintenance/cabys_code"} element={<Cabys_Code navigate={useNavigate()}   />} />
+              <Route path={"/settings/maintenance/cost_center"} element={<Cost_Center navigate={useNavigate()}  />} />
+              <Route path={"/settings/maintenance/permissions"} element={<Permissions navigate={useNavigate()} />} />
 
 
 

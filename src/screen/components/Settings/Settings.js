@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row, Col, Modal, Tabs, Tab, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Tabs, Tab, Button, Form } from "react-bootstrap";
 import AppUtil from '../../../AppUtil/AppUtil.js';
 import { url } from "../services/api.js";
 import Toast from '../common/Toast.js';
@@ -227,7 +227,7 @@ render(){
     <div className="well">
       <div className="list-group">
         
-        <a href="/home/maintenance/currency" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/currency" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("currency")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -235,14 +235,14 @@ render(){
           <p class="mb-1">{t("currency_description")}</p>
         </a>
 
-        <a href="/home/maintenance/activity_code" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/activity_code" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("activity_code")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
           </div>
           <p class="mb-1">{t("activity_code_description")}</p>
         </a>
-        <a href="/home/maintenance/payment_method" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/payment_method" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("payment_method")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -250,7 +250,7 @@ render(){
           <p class="mb-1">{t("payment_method_description")}</p>
         </a>
 
-        <a href="/home/maintenance/accounting_account" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/accounting_account" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("accounting_account")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -258,7 +258,7 @@ render(){
           <p class="mb-1">{t("accounting_account_description")}</p>
         </a>
 
-        <a href="/home/maintenance/type_accounting_account" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/type_accounting_account" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("type_accounting_account")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -266,7 +266,7 @@ render(){
           <p class="mb-1">{t("type_accounting_account_description")}</p>
         </a>
 
-        <a href="/home/maintenance/invoice_status" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/invoice_status" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("invoice_status")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -274,7 +274,7 @@ render(){
           <p class="mb-1">{t("invoice_status_description")}</p>
         </a>
 
-        <a href="/home/maintenance/rol" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/rol" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("rol")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -283,7 +283,7 @@ render(){
         </a>
 
 
-        <a href="/home/maintenance/presupuestary_category" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/presupuestary_category" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("presupuestary_category")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -291,7 +291,7 @@ render(){
           <p class="mb-1">{t("presupuestary_category_description")}</p>
         </a>
 
-        <a href="/home/maintenance/file_type" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/file_type" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("file_type")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -300,7 +300,7 @@ render(){
         </a>
 
 
-        <a href="/home/maintenance/tax_type" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/tax_type" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("tax_type")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -308,7 +308,7 @@ render(){
           <p class="mb-1">{t("tax_type_description")}</p>
         </a>
 
-        <a href="/home/maintenance/sale_condition" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/sale_condition" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("sale_condition")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -316,7 +316,7 @@ render(){
           <p class="mb-1">{t("sale_condition_description")}</p>
         </a>
 
-        <a href="/home/maintenance/document_type" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/document_type" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("document_type")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -325,7 +325,7 @@ render(){
         </a>
 
 
-        <a href="/home/maintenance/expenses_category" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/expenses_category" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("expenses_category")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -333,14 +333,14 @@ render(){
           <p class="mb-1">{t("expenses_category_description")}</p>
         </a>
 
-        <a href="/home/maintenance/measurement_unity" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/measurement_unity" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("measurement_unity")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
           </div>
           <p class="mb-1">{t("measurement_unity_description")}</p>
         </a>
-        <a href="/home/maintenance/comercial_code" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/comercial_code" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("comercial_code")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -348,7 +348,7 @@ render(){
           <p class="mb-1">{t("comercial_code_description")}</p>
         </a>
         
-         <a href="/home/maintenance/cabys_code" class="list-group-item list-group-item-action" aria-current="true">
+         <a href="/home/settings/maintenance/cabys_code" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("cabys_code")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
@@ -356,14 +356,14 @@ render(){
           <p class="mb-1">{t("cabys_code_description")}</p>
         </a>  
         
-        <a href="/home/maintenance/cost_center" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/cost_center" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("cost_center")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
           </div>
           <p class="mb-1">{t("cost_center_description")}</p>
         </a>        
-        <a href="/home/maintenance/permissions" class="list-group-item list-group-item-action" aria-current="true">
+        <a href="/home/settings/maintenance/permissions" class="list-group-item list-group-item-action" aria-current="true">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{t("permissions")}</h5>
             <small><i className="fas fa-arrow-right"></i></small>
