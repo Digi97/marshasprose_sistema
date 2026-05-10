@@ -11,14 +11,22 @@ import Sidebar from "./screen/components/Layouts/Header";
 
 import Profile from "./screen/components/Profile/profile";
 import NewProfile from "./screen/components/Profile/newProfile";
+
+//#region Mantenimientos
+import Currency from "./screen/components/Settings/Maintenance/currency";
+import Accounting_account from "./screen/components/Settings/Maintenance/accounting_account";
+import Activity_Code from "./screen/components/Settings/Maintenance/activity_code";
+import Cabys_Code from "./screen/components/Settings/Maintenance/cabys_code";
+import Comercial_Code from "./screen/components/Settings/Maintenance/comercial_code";
+
+
+//#endregion 
+
+
 import NotFound from './screen/components/common/404.js'
-
 import { useJwt } from "react-jwt";
-
 import {dashboardRoutes}from "./routes.js";
-
 import crypto from "crypto-js";
-
 
 import { useTranslation } from "react-i18next";
 
@@ -103,9 +111,33 @@ function Admin() {
             <Routes>
               {getRoutes(routes)}
               <Route path={"/home/profile"} element={<Profile />} />
-              <Route path={"/new-profile"} element={<NewProfile />} />
-              {/* Catch-all for 404 */}
+              <Route path={"/home/new-profile"} element={<NewProfile />} />
+              {/*Mantenimientos */}
+              <Route path={"/maintenance/currency"} element={<Currency />} />
+              <Route path={"/maintenance/activity_code"} element={<Activity_Code />} />
+              <Route path={"/home/maintenance/payment_method"} element={<NewProfile />} />
+              <Route path={"/maintenance/accounting_account"} element={<Accounting_account />} />
+              <Route path={"/home/maintenance/type_accounting_account"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/invoice_status"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/rol"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/presupuestary_category"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/file_type"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/tax_type"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/sale_condition"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/document_type"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/expenses_category"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/measurement_unity"} element={<NewProfile />} />
+              <Route path={"/maintenance/comercial_code"} element={<Comercial_Code />} />
+              <Route path={"/maintenance/cabys_code"} element={<Cabys_Code />} />
+              <Route path={"/home/maintenance/cost_center"} element={<NewProfile />} />
+              <Route path={"/home/maintenance/permissions"} element={<NewProfile />} />
+
+
+
+              {/* 404 not found para los no reconocidos en home */}
              <Route path="/home/*" element={<NotFound />} />
+
+
             </Routes>
           </div>
           <Footer />
