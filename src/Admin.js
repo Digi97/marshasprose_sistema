@@ -88,7 +88,7 @@ function Admin() {
 
       if (prop.layout === "/home") {
         return (
-          <Route path={prop.path} key={key}  element={<prop.component />} />
+          <Route path={prop.path} key={key}  element={<prop.component />}  />
         );
       } 
       else 

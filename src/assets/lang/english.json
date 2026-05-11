@@ -114,6 +114,11 @@
     "pseudonym":"Pseudonym",
     "percentage":"Percentage",
     "nature":"Nature",
-    "description":"Description"
+    "description":"Description",
+    "employeeid":"Employee ID",
+    "lastname":"Lastname",
+    "secondlastname":"Second Lastname",
+    "key":"Key",
+    "customer":"Customer"
   }
 }

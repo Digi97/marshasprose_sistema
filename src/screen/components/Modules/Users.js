@@ -1,20 +1,9 @@
 import React, {Component} from "react";
-
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
-
-import { Container, Row, Col, Button,Modal,Tabs, Form, Tab} from "react-bootstrap";
-
-import Table from 'react-bootstrap/Table';
-import Select from 'react-select'
-
+import { Container, Row, Col, Button,Modal, Form} from "react-bootstrap";
 import { withTranslation } from "react-i18next";
-
-
 DataTable.use(DT);
-
-
-    
 
 class Users extends Component {
 constructor(props)
@@ -35,11 +24,7 @@ constructor(props)
     correo:"",
     rol_id:0,
     id_empleado:0,
-    activo:false
-
-
-
-    
+    activo:false    
   }
     }
   }
@@ -75,7 +60,7 @@ constructor(props)
       <Container fluid>
         <Row>
           <Col lg="6" sm="12">
-            <h1>{t("spent")}</h1>
+            <h1>{t("users")}</h1>
           </Col>
           <Col lg="6" sm="12">
           <Row>
@@ -93,9 +78,7 @@ constructor(props)
                 {t("clean")}
             </Button>
             </Col>
-            <Col lg="2" sm="12">
-             <Button className="btn-fill btn-rounded bg-blue" onClick={()=> this.props.navigate(-1)}>{t("cancel")}</Button>
-            </Col>
+
           </Row>
           </Col>
 
@@ -133,7 +116,7 @@ constructor(props)
                   <th>{t("business")}</th>
                   <th>{t("name")}</th>
                   <th>{t("lastname")}</th>
-                  <th>{t("secondname")}</th>
+                  <th>{t("secondlastname")}</th>
                   <th>{t("email")}</th>
                   <th>{t("rol")}</th>
                   <th>{t("employeeid")}</th>
@@ -158,243 +141,110 @@ constructor(props)
      
 
           <Modal.Header closeButton>
-            <h3 className=" tituloFerias">{t("create_spent")}</h3>
+            <h3 className=" tituloFerias">{t("users")}</h3>
           </Modal.Header>
           <Modal.Body>
-          <Tabs
-            id="controlled-tab-example"
           
-            className="mb-3 txt-blue"
-            defaultActiveKey="info"
-            >
-
-               <Tab eventKey="info" title={t("spent_info")} className="txt-darkblue">
                 <Row className="m-2">
                   <Col sm="12" xl="12">
-                    <label>{t("reference")}</label>
+                    <label>{t("name")}</label>
                    <Form.Group>
                      <Form.Control
-                        placeholder={t("reference")}
+                        placeholder={t("name")}
                         type="text"
                         onChange={this.getInputData}
-                        name="reference"
+                        name="Nombre"
                         required
-                        maxLength={200}
+                        maxLength={100}
                         >
                        </Form.Control>
                    </Form.Group>
                    </Col>
 
-                 </Row>
+                  <Col sm="12" xl="12">
+                    <label>{t("lastname")}</label>
+                   <Form.Group>
+                     <Form.Control
+                        placeholder={t("lastname")}
+                        type="text"
+                        onChange={this.getInputData}
+                        name="Apellido1"
+                        required
+                        maxLength={100}
+                        >
+                       </Form.Control>
+                   </Form.Group>
+                   </Col>
 
-                 <Row className="m-2">
+                  <Col sm="12" xl="12">
+                    <label>{t("secondlastname")}</label>
+                   <Form.Group>
+                     <Form.Control
+                        placeholder={t("secondlastname")}
+                        type="text"
+                        onChange={this.getInputData}
+                        name="Apellido2"
+                        required
+                        maxLength={100}
+                        >
+                       </Form.Control>
+                   </Form.Group>
+                   </Col>
 
-                    <Col sm="12" xl="6">
-                      <label className="txt-darkblue">{t("category")}</label>
+                    <Col sm="12" xl="12">
+                    <label>{t("password")}</label>
+                   <Form.Group>
+                     <Form.Control
+                        placeholder={t("password")}
+                        type="text"
+                        onChange={this.getInputData}
+                        name="Contraseña"
+                        required
+                        maxLength={20}
+                        >
+                       </Form.Control>
+                   </Form.Group>
+                   </Col>
+
+
+                    <Col sm="12" xl="12">
+                    <label className="txt-darkblue">{t("rol")}</label>
                        <Form.Group>
-                          <Form.Select aria-label="Categoría" name="category" onChange={this._saveStateVariable} required>
+                          <Form.Select aria-label="Rol_id" name="rol_id" onChange={this._saveStateVariable} required>
                             <option value="">-- Seleccione una opción --</option>
                           {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
                             </Form.Select>
                        </Form.Group>
-                     </Col>
+                   </Col>
 
-                    <Col sm="12" xl="6">
-                      <label className="txt-darkblue">{t("doc_type")}</label>
-                     <Form.Group>
-                      <Form.Select aria-label="Tipo Documento" name="doc_type" onChange={this._saveStateVariable} required>
-                              <option value="">-- Seleccione una opción --</option>
-                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                              </Form.Select>
-                     </Form.Group>
-                     </Col>
+                <Col sm="12" xl="12">
+                    <label>{t("employeeid")}</label>
+                   <Form.Group>
+                     <Form.Control
+                        placeholder={t("employeeid")}
+                        type="text"
+                        onChange={this.getInputData}
+                        name="Id_Empleado"
+                        required
+                        maxLength={20}
+                        >
+                       </Form.Control>
+                   </Form.Group>
+                   </Col>
 
-                   </Row>
-
-                   <Row className="m-2">
-                     <Col sm="12" xl="12">
-                       <label className="txt-darkblue">{t("payment_method")}</label>
-                      <Form.Group>
-                         <Form.Select aria-label="Medio Pago" name="payment_method" onChange={this._saveStateVariable} required>
-                              <option value="">-- Seleccione una opción --</option>
-                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                              </Form.Select>
+                       <Col sm="12" xl="12">
+                         <Form.Group>
+                           <Form.Check // prettier-ignore
+                             type="checkbox"
+                            id="active"
+                             label={t("active")}
+                              name="Estado"/>
                       </Form.Group>
-                      </Col>
-                    </Row>
+                   </Col>
 
-                  <Row className="m-2">
+                 </Row>
 
-                     <Col sm="12" xl="12">
-                       <label className="txt-darkblue">{t("provider")}</label>
-                    <Select options={this.state.providers} name="provider" onChange={this._saveStateVariable} />
-                </Col>
-
-
-
-                    <div className="well">
-                      <Form onSubmit={this.addLine}>
-                        
-      
-                        <Row className="m-2">
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("comercial_code")}</label>
-                      <Form.Group>
-                         <Form.Select aria-label={t("comercial_code")} name="codigo_comercial" required>
-                              <option value="">-- Seleccione una opción --</option>
-                              <option value="1">test</option>
-                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                              </Form.Select>
-                      </Form.Group>
-                      </Col>
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("detail")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("detail")}
-                          type="text"
-                          name="detalle"
-                          required
-                          maxLength={200}
-                          />
-                      </Form.Group>
-                      </Col>
-                  
-                 
-                    </Row>
-
-                   <Row className="m-2">
-
-
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("tax_type")}</label>
-                      <Form.Group>
-                         <Form.Select aria-label={t("tax_type")} name="tipo_documento" required>
-                              <option value="">-- Seleccione una opción --</option>
-                              <option value="1">IVA</option>
-                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                              </Form.Select>
-                      </Form.Group>
-                      </Col>
-
-                      <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("subtotal")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("subtotal")}
-                          type="number"
-                          name="subtotal"
-                          required
-                          maxLength={200}
-                          />
-                      </Form.Group>
-                      </Col>
                
-
-                    </Row>
-
-              <Row className="m-2">    
-                 <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("tax")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("tax")}
-                          type="number"  
-                          name="impuesto"
-                          required
-                          maxLength={3}
-                          readOnly
-                          />
-                      </Form.Group>
-                      </Col>
-
-       
-                              
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("discount")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("discount")}
-                          type="number"       
-                          name="descuento"
-                          required
-                          maxLength={200}
-                          />
-                      </Form.Group>
-                      </Col>
-               </Row>
-
-                    
-                  <Row className="m-2">
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("total")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("total")}
-                          type="number"
-                          name="total"
-                          required
-                          maxLength={200}
-                          readOnly
-                          />
-                      </Form.Group>
-                      </Col>
-                      <Col sm="12" xl="6">
-                        <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("add_line")}</Button>
-                      </Col>
-
-
-                    </Row>
-
-
-                  
-                    <Row className="m-3">
-                           <Col sm="12" xl="12">
-                    <Table striped bordered hover>
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>{t("code")}</th>
-                          <th>{t("detail")}</th>
-                          <th>{t("subtotal")}</th>
-                          <th>{t("discount")}</th>
-                          <th>{t("tax")}</th>
-                          <th>{t("total")}</th>
-                          <th>{t("action")}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                       {this.state.lines.length > 0 && (
-                        this.state.lines.map((line, index) => (
-                          <tr key={index}>
-                              <td>{index +1}</td>
-                              <td>{line.codigo_comercial}</td>
-                              <td>{line.detalle}</td>
-                              <td>{line.subtotal}</td>
-                              <td>{line.descuento}</td>
-                              <td>{line.impuesto}</td>
-                              <td>{line.total}</td>
-                              <td><Button variant="danger" className="btn-fill btn-rounded" onClick={() => this.removeLine(index)}> <i className="fas fa-trash" /></Button></td>
-                          </tr>
-                ))
-              )}
-
-
-                      </tbody>
-                </Table>
-
-                           </Col>
-                    </Row>
-
-
-                      </Form>
-                    </div>
-              </Row>
-
-               </Tab>
-   
-
-         </Tabs>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="light" className="btn-rounded" onClick={this.toggleShow}>

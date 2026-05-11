@@ -107,7 +107,7 @@ constructor(props)
 
 
      render(){
-       const { t, i18n } = this.props;
+       const { t } = this.props;
       return (
     <>
       <Container fluid>
@@ -131,13 +131,7 @@ constructor(props)
                 {t("clean")}
             </Button>
             </Col>
-            <Col lg="2" sm="12">
-              <Button
-                className="btn-fill btn-rounded bg-blue"
-                onClick={this.toggleShow}>
-                  {t("cancel")}
-              </Button>
-            </Col>
+          
 
           </Row>
           

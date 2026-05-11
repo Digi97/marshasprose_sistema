@@ -1,6 +1,6 @@
 
 import Home from "./screen/components/Home/Home.js";
-import Profile from "screen/components/Profile/profile.js";
+import Users from "screen/components/Modules/Users.js";
 import Settings from "./screen/components/Settings/Settings.js";
 
 import Invoice from "./screen/components/Modules/Invoice.js";
@@ -46,10 +46,10 @@ export const dashboardRoutes = (t) => [
     layout: "/home/accounts",
   },
   {
-    path: "/profile",
+    path: "/users",
     name: t("users"),
     icon: "fas fa-user",
-    component: Profile,
+    component: Users,
     layout: "/home",
   },
   {
