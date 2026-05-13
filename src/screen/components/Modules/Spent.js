@@ -20,11 +20,7 @@ constructor(props)
     super(props);
 
     this.state = {
-      tableData: [
-    [ 'Tiger Nixon', 'System Architect' ],
-    [ 'Garrett Winters', 'Accountant' ],
-	// ...
-  ],
+      tableData: [],
   show:false,
   processing: false,
   spent:{
@@ -121,7 +117,7 @@ constructor(props)
               <Button
                 className="btn-fill btn-rounded bg-blue"
                 onClick={this.toggleShow}>
-                  {t("create_spent")}
+                  {t("create")}
               </Button>
             </Col>
             <Col lg="2" sm="12">
@@ -169,8 +165,14 @@ constructor(props)
               >
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Position</th>
+                          <th>{t("id")}</th>
+                          <th>{t("code")}</th>
+                          <th>{t("provider")}</th>
+                          <th>{t("subtotal")}</th>
+                          <th>{t("discount")}</th>
+                          <th>{t("tax")}</th>
+                          <th>{t("total")}</th>
+                          <th>{t("action")}</th>
                 </tr>
               </thead>
             </DataTable>

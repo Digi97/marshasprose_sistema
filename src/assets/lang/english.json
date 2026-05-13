@@ -50,8 +50,8 @@
     "confirm_pwd": "Confirm Password",
     "pwd_security_parameter": "Password must contain at least 8 characters",
     "home": "Home",
-    "invoice": "Billing",
-    "electronic_invoice": "Electronic Billing",
+    "invoice": "Invoice",
+    "electronic_invoice": "Electronic Invoice",
     "client_provider": "Clients/Providers",
     "accounts": "Accounts",
     "users": "Users",
@@ -119,6 +119,20 @@
     "lastname":"Lastname",
     "secondlastname":"Second Lastname",
     "key":"Key",
-    "customer":"Customer"
+    "customer":"Customer",
+    "invoice_acceptance":"Invoice Acceptance",
+    "file":"File",
+    "xml_file":"XML File",
+    "province":"Province",
+    "canton":"Canton",
+    "district":"District",
+    "address":"Address",
+    "exonerated":"Exonerated",
+    "main":"Main",
+    "add_phone":"Add Phone",
+    "number":"Number",
+    "yes":"Yes",
+    "no":"No",
+    "status":"Status"
   }
 }

@@ -17,6 +17,7 @@ constructor(props)
     this.state = {
       tableData: [],
   show:false,
+  showAcceptance:false,
   processing: false,
   invoice:{
     id:0,
@@ -37,8 +38,9 @@ constructor(props)
     cliente_id:0,
     condicion_venta_id:0,
     medio_pago:0,
-    lines:[]
+ 
   },
+     lines:[]
 
     }
   }
@@ -47,6 +49,7 @@ constructor(props)
 
 //#region Funciones internas
     toggleShow = () => this.setState({show: !this.state.show})
+    toggleShowInvoiceAcceptance = () => this.setState({showAcceptance: !this.state.showAcceptance})
 
     addLine = (e) => {
       e.preventDefault();
@@ -54,7 +57,7 @@ constructor(props)
 
         const formData = new FormData(e.target);
 
-        const invoice = {
+        const line = {
             categories_id: formData.get("categories_id"),
             tipo_documento: formData.get("tipo_documento"),
             medio_pago: formData.get("medio_pago"),
@@ -68,7 +71,7 @@ constructor(props)
         };
 
         this.setState((prevState) => ({
-            invoice: [...prevState.lines, invoice]
+            lines: [...prevState.lines, line]
         }));   
               e.target.reset();
 
@@ -78,7 +81,7 @@ constructor(props)
 
     removeLine = (index) =>{
     this.setState((prevState) => ({
-        invoice: prevState.lines.filter((line, i) => i !== index)
+        lines: prevState.lines.filter((line, i) => i !== index)
     }));
 
     }
@@ -106,36 +109,31 @@ constructor(props)
       return (
     <>
       <Container fluid>
-        <Row>
+        <Tabs id="controlled-tab-example" className="mb-3 txt-blue" defaultActiveKey="invoice">
+          <Tab eventKey="invoice" title={t("invoice")} className="txt-darkblue">
+          <Row>
           <Col lg="6" sm="12">
             <h1>{t("invoice")}</h1>
           </Col>
           <Col lg="6" sm="12">
-          <Row>
-            <Col lg="3" sm="12">
-              <Button
+            <Row>
+              <Col lg="3" sm="12">
+                <Button
+                  className="btn-fill btn-rounded bg-blue"
+                  onClick={this.toggleShow}>
+                    {t("create")}
+                </Button>
+              </Col>
+              <Col lg="2" sm="12">
+                <Button
                 className="btn-fill btn-rounded bg-blue"
                 onClick={this.toggleShow}>
-                  {t("create")}
+                  {t("clean")}
               </Button>
-            </Col>
-            <Col lg="2" sm="12">
-              <Button
-              className="btn-fill btn-rounded bg-blue"
-              onClick={this.toggleShow}>
-                {t("clean")}
-            </Button>
-            </Col>
-          
-
-          </Row>
-          
-          
-      
+              </Col>
+            </Row>
           </Col>
-
         </Row>
-
         <Row>
           		<DataTable
                 data={this.state.tableData} 
@@ -182,6 +180,78 @@ constructor(props)
             </DataTable>
         
         </Row>
+
+
+          </Tab>
+        
+        <Tab eventKey="invoice_acceptance" title={t("invoice_acceptance")} className="txt-darkblue">
+                   <Row>
+          <Col lg="6" sm="12">
+            <h1>{t("invoice_acceptance")}</h1>
+          </Col>
+          <Col lg="6" sm="12">
+            <Row>
+              <Col lg="3" sm="12">
+                <Button
+                  className="btn-fill btn-rounded bg-blue"
+                  onClick={this.toggleShowInvoiceAcceptance}>
+                    {t("create")}
+                </Button>
+              </Col>
+              <Col lg="2" sm="12">
+                <Button
+                className="btn-fill btn-rounded bg-blue"
+                onClick={this.toggleShow}>
+                  {t("clean")}
+              </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Row>
+          		<DataTable
+                data={this.state.tableData} 
+                className="display table cell-border compact stripe"
+               
+                options={{
+                language: {
+                  zeroRecords:t("zeroRecords"),
+                  emptyTable:t("emptyTable"),
+                  rowsPerPageText:t("rowsPerPageText"),
+                  rangeSeparatorText:t("rangeSeparatorText"),
+                  selectAllRowsItemText:t("selectAllRowsItemText"),
+                  search:t("search"),
+                  paginate:t("paginate"),
+                  searchPlaceholder:t("searchPlaceholder"),
+                  info:t("info"),
+                  lengthMenu: t("lengthMenu"),
+                },
+                layout:{
+                  topStart:"pageLength",
+                  topEnd:"search",
+                  bottomStart: 'info',
+                  bottomEnd:"paging"
+                }
+               }}
+              >
+              <thead>
+                <tr>
+                  <th>{t("id")}</th>
+                  <th>{t("key")}</th>
+                  <th>{t("consecutive")}</th>
+                  <th>{t("date")}</th>
+                  <th>{t("currency")}</th>
+                  <th>{t("invoice_status")}</th>
+                  <th>{t("provider")}</th>
+                  <th>{t("action")}</th>
+                </tr>
+              </thead>
+            </DataTable>
+        
+        </Row>
+               </Tab>
+        </Tabs>
+      
 
              <Modal
               show={this.state.show}
@@ -424,7 +494,7 @@ constructor(props)
                         </tr>
                       </thead>
                       <tbody>
-                       {this.state.invoice.lines.length > 0 && (
+                       {this.state.lines.length > 0 && (
                         this.state.lines.map((line, index) => (
                           <tr key={index}>
                               <td>{index +1}</td>
@@ -459,6 +529,49 @@ constructor(props)
           </Modal.Body>
           <Modal.Footer>
             <Button variant="light" className="btn-rounded" onClick={this.toggleShow}>
+              {t("close")}
+            </Button>
+            {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("save")}</Button>}
+          </Modal.Footer>
+         
+        </Modal>
+
+
+
+          <Modal
+              show={this.state.showAcceptance}
+              onHide={this.toggleShowInvoiceAcceptance}
+              backdrop="static"
+              keyboard={false}
+              size="lg"
+              className="max-z-index"
+          >
+     
+
+          <Modal.Header closeButton>
+            <h3 className=" tituloFerias">{t("invoice_acceptance")}</h3>
+          </Modal.Header>
+          <Modal.Body>    
+                <Row className="m-2">
+                  <Col sm="12" xl="6">
+                    <label>{t("xml_file")}</label>
+                   <Form.Group>
+                     <Form.Control
+                        placeholder={t("xml_file")}
+                        type="file"
+                        accept=".xml"
+                        onChange={this.getInputData}
+                        name="archivo_aceptacion"
+                        required
+                        >
+                       </Form.Control>
+                   </Form.Group>
+                   </Col>
+                 </Row>
+          </Modal.Body>
+          <Modal.Footer>
+
+            <Button variant="light" className="btn-rounded" onClick={this.toggleShowInvoiceAcceptance}>
               {t("close")}
             </Button>
             {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("save")}</Button>}

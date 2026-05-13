@@ -5,6 +5,7 @@ import Settings from "./screen/components/Settings/Settings.js";
 
 import Invoice from "./screen/components/Modules/Invoice.js";
 import Spent from "./screen/components/Modules/Spent.js";
+import Customers_Providers from "./screen/components/Modules/Customers_Providers.js";
 
 import crypto from "crypto-js";
 
@@ -32,11 +33,11 @@ export const dashboardRoutes = (t) => [
     layout: "/home",
   },
    {
-    path: "/",
+    path: "/customers_providers",
     name: t("customers_providers"),
     icon: "fas fa-user",
-    component: Home,
-    layout: "/home/customers",
+    component: Customers_Providers,
+    layout: "/home",
   },
    {
     path: "/",
