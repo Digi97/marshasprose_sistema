@@ -11,8 +11,8 @@ class Login extends Component {
     super(props);
     this.state = {
       form: {
-        email: "",
-        password: "",
+        Correo: "",
+        Contrasena: "",
       },
       error: false,
       errorMsg: "",
@@ -70,10 +70,10 @@ class Login extends Component {
   //se maneja la autenticacion del usuario
   login = () => {
 
+const { t } = this.props;
+         //   window.location.href = "/home/";
 
-            window.location.href = "/home/";
-
-    if (this.state.form.email !== "" && this.state.form.password !== "") 
+    if (this.state.form.Correo !== "" && this.state.form.Contrasena !== "") 
       {
       this.setState({
         charging: true
@@ -81,30 +81,51 @@ class Login extends Component {
       let url_api = url + "login";
 
 
-/*
+
       axios
-        .post(url_api, this.state.form)
+        .post(url_api, this.state.form, {                               // Configuration Object
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept':'application/json',
+      'Access-Control-Allow-Origin':'http://localhost:3000/',
+       'Access-Control-Allow-Credentials': 'true'
+    }
+  })
         .then((response) => {
 
-          if (response.status === 200) {
-            //se guarda el usuario en session
-            //y se encripta la informacion del usuario prueba31@test.comn
-            let user = crypto.AES.encrypt(JSON.stringify(response.data.user), "@virtual_cr").toString();
-            sessionStorage.setItem('token', response.data.access_token);
-
-
-            if (response.data.user.roles[0].name === "Judges")
+          if (response.status === 200) 
             {
-              sessionStorage.setItem('student_id', (response.data.judge_id.length > 0 ? response.data.judge_id[0].id : 0));
-            }else {
-              sessionStorage.setItem('student_id', (response.data.student_id.length > 0 ? response.data.student_id[0].id : 0));
 
-            }
+              if(response.data.codeStatus === 200)
+              {
+              //se guarda el usuario en session
+                  //y se encripta la informacion del usuario prueba31@test.comn
+                  let user = crypto.AES.encrypt(JSON.stringify(response.data.data), "@marsh_contable").toString();
+                  sessionStorage.setItem('token', response.data.message);
 
-            sessionStorage.setItem('user', user);
-            //se redirecciona a main
+                  sessionStorage.setItem('user', user);
+                  //se redirecciona a main
 
-            window.location.href = "/home/";
+                  window.location.href = "/home/";
+              } else
+                {
+                  this.setState({
+                          error: true,
+                          errorMsg: t(response.data.message),
+                          charging:false,
+                          color:"alert alert-danger",
+                        });
+
+
+              }
+
+
+                            console.log(response);
+              
+
+            return;
+
+    
 
           } else {
             this.setState({
@@ -131,7 +152,7 @@ class Login extends Component {
         charging:false,
         color:"alert alert-danger",
       });
-    */
+  
    }
 
     
@@ -167,7 +188,7 @@ class Login extends Component {
                     type="email"
                     className="form-control form-control-sm"
                     id="email"
-                    name="email"
+                    name="Correo"
                     aria-describedby="emailHelp"
                     placeholder="nombre@ejemplo.com"
                     onChange={this.getInputData}
@@ -180,7 +201,7 @@ class Login extends Component {
                     type="password"
                     className="form-control form-control-sm"
                     id="password"
-                    name="password"
+                    name="Contrasena"
                     placeholder="***********"
                     onChange={this.getInputData}
                     maxLength={200}
