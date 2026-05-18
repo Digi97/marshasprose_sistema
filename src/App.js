@@ -1,6 +1,6 @@
 
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes,Navigate } from "react-router-dom";
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -24,7 +24,7 @@ function App() {
       <Route path="/recovery" exact element={ <Recovery />}  />
       <Route path="/change-password" exact element={ <ChangePassword /> } />
       {
-        /*(sessionStorage.getItem('token') === null ? <Route path="/home/*" element={ <Navigate replace to="/" />}  /> :<Route path="/home/*" element={<AdminLayout />} /> )*/
+        (sessionStorage.getItem('token') === null ? <Route path="/home/*" element={ <Navigate replace to="/" />}  /> :<Route path="/home/*" element={<AdminLayout />} /> )
       }
     
     <Route path="/home/*" exact element={<AdminLayout />} />

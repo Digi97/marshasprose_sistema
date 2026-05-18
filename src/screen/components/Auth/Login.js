@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 
 import axios from "axios";
-import { url } from "../services/api";
+import { url, host } from "../services/api";
 import logo from "../../../assets/PNG/LogoOficial.jpg";
 import crypto from "crypto-js";
 import { withTranslation } from 'react-i18next';
@@ -80,14 +80,12 @@ const { t } = this.props;
       });
       let url_api = url + "login";
 
-
-
       axios
         .post(url_api, this.state.form, {                               // Configuration Object
     headers: {
       'Content-Type': 'application/json',
       'Accept':'application/json',
-      'Access-Control-Allow-Origin':'http://localhost:3000/',
+      'Access-Control-Allow-Origin': host,
        'Access-Control-Allow-Credentials': 'true'
     }
   })
@@ -102,45 +100,36 @@ const { t } = this.props;
                   //y se encripta la informacion del usuario prueba31@test.comn
                   let user = crypto.AES.encrypt(JSON.stringify(response.data.data), "@marsh_contable").toString();
                   sessionStorage.setItem('token', response.data.message);
-
                   sessionStorage.setItem('user', user);
                   //se redirecciona a main
 
                   window.location.href = "/home/";
-              } else
-                {
+              } 
+              else
+              {
                   this.setState({
                           error: true,
                           errorMsg: t(response.data.message),
                           charging:false,
                           color:"alert alert-danger",
                         });
+              }    
 
-
-              }
-
-
-                            console.log(response);
-              
-
-            return;
-
-    
-
-          } else {
+          } else 
+            {
             this.setState({
               error: true,
-              errorMsg: "Usuario o contraseña incorrectos",
+              errorMsg: t("invalid_username_or_password"),
               charging:false,
               color:"alert alert-danger",
             });
           }
         })
         .catch((error) => {
-          console.error(error);
+   
           this.setState({
-            error: true,
-            errorMsg: "Ha ocurrido un problema favor intentelo nuevamente",
+            error: true, 
+            errorMsg: error.message,
             color:"alert alert-danger",
             charging:false
           });
@@ -148,7 +137,7 @@ const { t } = this.props;
     }else{
       this.setState({
         error: true,
-        errorMsg: "Todos los campos son requeridos",
+        errorMsg: t("all_inputs_required"),
         charging:false,
         color:"alert alert-danger",
       });
@@ -159,7 +148,7 @@ const { t } = this.props;
   };
 
   render() {
-     const { t, i18n } = this.props;
+     const { t } = this.props;
     return (
       <div className="global-container m-0 vh-100 row justify-content-center align-items-center">
         <div className="card login-form box">

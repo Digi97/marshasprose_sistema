@@ -134,6 +134,10 @@
     "yes":"Yes",
     "no":"No",
     "status":"Status",
-    "invalid_username_or_password":"Invalid Username or Password"
+    "invalid_username_or_password":"Invalid Username or Password",
+    "all_inputs_required":"All inputs are required",
+    "inactive":"Inactive",
+    "updated_successfully":"Record updated successfully",
+    "please_verify_data":"Please verify the data sent"
   }
 }

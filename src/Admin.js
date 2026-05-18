@@ -55,7 +55,7 @@ function Admin() {
   
     const mainPanel = React.useRef(null);
       const location = useLocation();
-/*
+
   //se valida si el token es valido aun
   const { decodedToken, isExpired } = useJwt(sessionStorage.getItem("token"));
   let dateNow = new Date();
@@ -69,19 +69,6 @@ function Admin() {
       window.location.replace("/");
     }
   }
-
-
-  const navigation = useNavigate();
-  const params = useParams();
-
-  let bytes = crypto.AES.decrypt(
-    sessionStorage.getItem("user"),
-      "@virtual_cr"
-    );
-  let userDecrypt = JSON.parse(bytes.toString(crypto.enc.Utf8));
-
-  let user = userDecrypt.roles[0].name;
-*/
 
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
