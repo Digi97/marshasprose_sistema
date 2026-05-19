@@ -77,9 +77,34 @@ constructor(props)
       e.stopPropagation();
       if(user.usuario_id === 0) //creacion
       {
+
+        console.log(user);
+        
            AppUtil.postAPI(`users`, user).then(response => {
-            let user = response ? response.data : [];
+if(response.codeStatus === 200)
+{
+   let user = response ? response.data : [];
+    if(Number.isInteger(user))
+                {
+                    this.setState({
+                  error: true,
+                  errorMsg: t("record_created_successfully"),
+                  color:"alert alert-success"
+                }, () => { window.location.reload(); });
+              
+          } 
+
+           
             console.log(user);
+} else
+  {
+     this.setState({
+                  error: true,
+                  errorMsg: t(response.message),
+                  color:"alert alert-warning"
+                });
+}
+
             
         
            })
@@ -99,7 +124,7 @@ constructor(props)
                   error: true,
                   errorMsg: t("updated_successfully"),
                   color:"alert alert-success"
-                });
+                }, () => { window.location.reload(); });
                 } 
                 else
                   {
@@ -138,7 +163,12 @@ constructor(props)
 
   getUserById = (id) =>
   {
+
+    console.log(id);
+    
         AppUtil.getAPI(`users/${id}`, sessionStorage.getItem('token')).then(response => {
+          console.log(response);
+          
       let user = response ? response.data : [];      
       this.setState({user, show:true}, ()=>{this.getRoles()});
     });
@@ -341,10 +371,10 @@ constructor(props)
                    <Form.Group>
                      <Form.Control
                         placeholder={t("password")}
-                        type="text"
+                        type="password"
                         onChange={this._saveStateVariable}
-                        name="contraseña"
-                        required={user.usuario_id > 0 ? true:false}
+                        name="contrasena"
+                        required={user.usuario_id === 0}
                         maxLength={20}
                         >
                        </Form.Control>
