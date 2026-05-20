@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Row, Col, Tabs, Tab, Button, Form } from "react-bootstrap";
 import AppUtil from '../../../AppUtil/AppUtil.js';
-import { url } from "../services/api.js";
+
 import Toast from '../common/Toast.js';
 
 import Select from 'react-select'
@@ -23,12 +23,27 @@ class Settings extends React.Component {
           body:""
         },
         editing:false,
-        Nombre_Empresa:"",
-        Correo_empresa:"",
-        Ruta_nas:"",
-        Formato_fecha:"",
-        Tipo_identificacion_id:"",
-        identificacion:"",
+      empresa:{
+        emp_id: 1,
+        nombre_empresa: "",
+        correo_empresa: "",
+        ruta_nas: "",
+        numero_sucursal: 0,
+        formato_fecha: "dd-mm-yyyy",
+        ruta_llave_factura: "",
+        pin_llave: "",
+        ruta_logo: "",
+        terminal: 0,
+        codigo_seguridad: "",
+        identificacion: "",
+        codigo_actividad_id: null,
+        tipo_identificacion_id: 0,
+        impuesto_id: null
+      },
+taxes:[],
+identificationType:[],
+activityCode:[]
+
        
     
     
@@ -36,9 +51,130 @@ class Settings extends React.Component {
 }
 
 
-componentDidMount()
+//#region opciones_selects
+ getEmpresaById = () =>
+  {
+    const { t } = this.props;
+    
+        AppUtil.getAPI(`empresa/1`, sessionStorage.getItem('token')).then(response => {
+
+          if(response)
+          { 
+          
+                if(response.codeStatus === 200)
+                {            
+                 
+                      let empresa = response ? response.data : [];  
+         
+                this.setState({empresa, processing: false});
+              }  
+              else
+              {
+                  this.setState({
+                  error: true,
+                  errorMsg: t(response.message),
+                  color:"alert alert-warning"
+                });
+              }
+          }
+          
+      
+    });
+
+  }
+
+  getTaxes = () => AppUtil.getAPI(`catalogos/impuesto`, sessionStorage.getItem('token')).then(response => {
+      let taxes = response ? response.data : [];
+      this.setState({taxes});
+    });
+
+      getIdentificationType = () => AppUtil.getAPI(`tipo_identificacion`, sessionStorage.getItem('token')).then(response => {
+      let identificationType = response ? response.data : [];
+      this.setState({identificationType});
+    });
+
+   getActivityCode = () => AppUtil.getAPI(`catalogos/codigo_actividad`, sessionStorage.getItem('token')).then(response => {
+      let activityCode = response ? response.data : [];
+      this.setState({activityCode});
+    });
+
+    _saveStateVariable = async (e) => {
+
+      const {name, type, checked, value} = e.target;
+
+      
+    await this.setState({
+            empresa: {
+              ...this.state.empresa,
+              [name]: type ==="checkbox" ? (checked? 1:0): value,
+            },
+          });
+    }
+
+
+    logCatalogInfo = async() => {
+  await this.getTaxes();
+  await this.getIdentificationType();
+  await this.getActivityCode();
+    }
+    //#endregion 
+
+
+    //#region actualizacion
+    saveEmpresa = (e) =>{
+        const { t } = this.props;
+      e.preventDefault();
+      e.stopPropagation();
+
+
+      
+
+AppUtil.putAPI(`empresa/1`, this.state.empresa).then(response => {
+      console.log(response);
+        if(response)
+        {
+          let user = response ? response.data : [];
+
+                if(Number.isInteger(user))
+                {
+                    this.setState({
+                  error: true,
+                  errorMsg: t("updated_successfully"),
+                  color:"alert alert-success"
+                }, () => { window.location.reload(); });
+                } 
+                else
+                  {
+              this.setState({
+                  error: true,
+                  errorMsg: t('please_verify_data'),
+                  color:"alert alert-success"
+                });
+                }
+        } 
+        else
+        {
+                  
+        this.setState({
+          error: true,
+          errorMsg: t('please_verify_data'),
+          color:"alert alert-danger"
+        });
+        }
+     
+     // this.setState({user});
+           })
+    }
+    //#endregion
+ componentDidMount()
 { 
-  this._setProcessing(false);
+
+  this.logCatalogInfo().then(()=> {
+    this.getEmpresaById()
+  })
+
+
+    
 }
 
   _setProcessing = (processing) => this.setState({processing});
@@ -46,7 +182,7 @@ componentDidMount()
 
 
 render(){
-  let {processing, alert} = this.state;
+  let {processing, alert, empresa, identificationType,activityCode, taxes} = this.state;
     const { t } = this.props;
 
   return (
@@ -54,7 +190,7 @@ render(){
     <Toast onClose={()=> this.setState({alert:{show:false}} )} variant={alert.variant} show={alert.show} title={alert.title} body={alert.body}  />
 
     <Container fluid>
-    <Form>
+   <Form onSubmit={this.saveEmpresa}>
     <Tabs
  
       className="mb-3"
@@ -69,10 +205,10 @@ render(){
              <Form.Label className="txt-darkblue">{t("name")}</Form.Label>
              <Form.Control
                 placeholder={t("name")}
-                name="Nombre_Empresa"
-                onChange={this.getInputQuestion}
+                name="nombre_empresa"
+                onChange={this._saveStateVariable}
                 required
-                value={this.state.Nombre_Empresa}
+                value={empresa.nombre_empresa}
                 >
                </Form.Control>
            </Form.Group>
@@ -81,10 +217,10 @@ render(){
              <Form.Label className="txt-darkblue">{t("email")}</Form.Label>
              <Form.Control
                 placeholder={t("email")}
-                name="Correo_empresa"
-                onChange={this.getInputQuestion}
+                name="correo_empresa"
+                onChange={this._saveStateVariable}
                 required
-                value={this.state.Correo_empresa}
+                value={empresa.correo_empresa}
                 >
                </Form.Control>
            </Form.Group>
@@ -93,10 +229,10 @@ render(){
              <Form.Label className="txt-darkblue">{t("nas")}</Form.Label>
              <Form.Control
                 placeholder={t("nas")}
-                name="Ruta_nas"
-                onChange={this.getInputQuestion}
+                name="ruta_nas"
+                onChange={this._saveStateVariable}
                 required
-                value={this.state.Ruta_nas}
+                value={empresa.ruta_nas}
                 >
                </Form.Control>
            </Form.Group>
@@ -106,9 +242,9 @@ render(){
              <Form.Control
                 placeholder={t("date_format")}
                 name="Formato_fecha"
-                onChange={this.getInputQuestion}
+                onChange={this._saveStateVariable}
                 required
-                value={this.state.Formato_fecha}
+                value={empresa.formato_fecha}
                 >
                </Form.Control>
            </Form.Group>
@@ -116,7 +252,15 @@ render(){
 
          <Form.Group>
              <Form.Label className="txt-darkblue">{t("identification_type")}</Form.Label>
-              <Select options={this.state.providers} name="Tipo_identificacion_id" onChange={this._saveStateVariable} />
+              {processing ? t('loading'):<Select 
+              options={identificationType} 
+              name="tipo_identificacion_id"  
+              onChange={(value) => this.setState({ empresa: { ...this.state.empresa, tipo_identificacion_id: value,}})  } 
+              getOptionValue={(option) => option.id} 
+              getOptionLabel={(option) => option.nombre} 
+              defaultValue={()=> identificationType?.find(opt => opt.id === empresa.tipo_identificacion_id) } 
+              isSearchable={true}
+              />}
            </Form.Group>
 
 
@@ -125,9 +269,9 @@ render(){
              <Form.Control
                 placeholder={t("identification")}
                 name="identificacion"
-                onChange={this.getInputQuestion}
+                onChange={this._saveStateVariable}
                 required
-                value={this.state.identificacion}
+                value={empresa.identificacion}
                 >
                </Form.Control>
            </Form.Group>
@@ -138,7 +282,7 @@ render(){
         <div className="well">
          <h4 className="txt-blue">{t("electronic_invoice")}</h4>
 
-          <Form validated={this.state.validatedEvaluations} onSubmit={this.SubmitEvaluations}>
+          
           <Row>
             <Col xl="12" sm="12" md="12">
               <Form.Group>
@@ -146,9 +290,10 @@ render(){
                 <Form.Control
                    placeholder={t("terminal")}
                    name="terminal"
-                   onChange={this.getInputEvaluation}
+                   onChange={this._saveStateVariable}
                    required
-                   value={this.state.terminal}
+                   value={empresa.terminal}
+                   type="number"
                    >
                   </Form.Control>
               </Form.Group>
@@ -161,9 +306,8 @@ render(){
                   type="file"
                    placeholder={t("invoice_key")}
                    name="Ruta_llave_factura"
-                   onChange={this.getInputEvaluation}
-                   required
-                   value={this.state.Ruta_llave_factura}
+                   onChange={this._saveStateVariable}
+                   value={empresa.ruta_llave_factura}
                    >
                   </Form.Control>
               </Form.Group>
@@ -174,12 +318,12 @@ render(){
                 <Form.Label className="txt-darkblue">{t("pin")}</Form.Label>
                 <Form.Control
                   type="number"
-                  maxLength={4}
+                    max={9999}
                    placeholder={t("pin")}
                    name="pin_llave"
-                   onChange={this.getInputEvaluation}
+                   onChange={this._saveStateVariable}
                    required
-                   value={this.state.pin_llave}
+                   value={empresa.pin_llave}
                    >
                   </Form.Control>
               </Form.Group>
@@ -193,9 +337,10 @@ render(){
                   
                    placeholder={t("security_code")}
                    name="codigo_seguridad"
-                   onChange={this.getInputEvaluation}
+                   onChange={this._saveStateVariable}
                    required
-                   value={this.state.codigo_seguridad}
+                   max={99999999}
+                   value={empresa.codigo_seguridad}
                    >
                   </Form.Control>
               </Form.Group>
@@ -204,10 +349,19 @@ render(){
           <Col xl="12" sm="12" md="12">
               <Form.Group>
                 <Form.Label className="txt-darkblue">{t("activity_code")}</Form.Label>
+
+      
+          {processing ? t('loading'):
                  <Select 
-                 options={this.state.codigo_actividad} 
-                 name="codigo_actividad" 
-                 onChange={this._saveStateVariable} />
+                  options={activityCode}
+                  value={empresa.codigo_actividad} 
+                  name="codigo_actividad" 
+                  onChange={(value) => this.setState({ empresa: { ...this.state.empresa, codigo_actividad: value,}})  } 
+                  getOptionValue={(option) => option.id} 
+                  getOptionLabel={(option) => option.nombre_actividad} 
+                  isSearchable={true}
+                  defaultValue={()=> activityCode?.find(opt => opt.id === empresa.codigo_actividad_id) } 
+                 />}
               </Form.Group>
               </Col>
 
@@ -215,11 +369,18 @@ render(){
           <Col xl="12" sm="12" md="12">
               <Form.Group>
                 <Form.Label className="txt-darkblue">{t("default_tax")}</Form.Label>
-                 <Select options={this.state.impuesto_id} name="impuesto_id" onChange={this._saveStateVariable} />
+                  {processing ? t('loading'):<Select 
+                 options={taxes} 
+                 name="impuesto_id" 
+                 onChange={(value) => this.setState({ empresa: { ...this.state.empresa, impuesto_id: value,}})  } 
+                  getOptionValue={(option) => option.id} 
+                  getOptionLabel={(option) => option.nombre} 
+                    defaultValue={()=> taxes?.find(opt => opt.id === empresa.impuesto_id) } 
+                 />}
               </Form.Group>
               </Col>
             </Row>
-          </Form>
+      
           </div>
         </Tab>
 

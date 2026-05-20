@@ -46,6 +46,13 @@ export const dashboardRoutes = (t) => [
     component: Home,
     layout: "/home/accounts",
   },
+     {
+    path: "/budget_management",
+    name: t("budget_management"),
+    icon: "fas fa-money-bill",
+    component: Home,
+    layout: "/home",
+  },
   {
     path: "/users",
     name: t("users"),

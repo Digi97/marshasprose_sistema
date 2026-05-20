@@ -141,6 +141,9 @@
     "please_verify_data":"Please verify the data sent",
     "record_created_successfully":"Record created successfully",
     "invalid_string_form_Correo":"Value for email is invalid",
-    "invalid_value_for_Contrasena":"Password is invalid"
+    "invalid_value_for_Contrasena":"Password is invalid",
+    "budget_management":"Budget Management",
+    "permissions_description":"Manage of all permissions on the application",
+    "loading":"Loading..."
   }
 }

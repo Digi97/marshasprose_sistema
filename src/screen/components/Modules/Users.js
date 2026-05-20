@@ -78,7 +78,7 @@ constructor(props)
       if(user.usuario_id === 0) //creacion
       {
 
-        console.log(user);
+
         
            AppUtil.postAPI(`users`, user).then(response => {
 if(response.codeStatus === 200)
@@ -94,8 +94,6 @@ if(response.codeStatus === 200)
               
           } 
 
-           
-            console.log(user);
 } else
   {
      this.setState({
