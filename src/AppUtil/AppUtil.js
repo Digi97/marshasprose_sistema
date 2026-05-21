@@ -135,6 +135,19 @@ const AppUtil = {
       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return isValidEmail.test(email);
   },
+  isValidText:function isValidText(text){
+  let isValidText = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.,;:¡!¿?\-_()]+$/
+  return isValidText.test(text)    
+
+  },
+    isNumberEntero:function isValidText(value){//usaremos este para validar numeros de códigos que sean necesarios enteros
+   return /^\d+$/.test(value);
+
+  },
+  isNumeric:function isNumeric(value)
+  { //usaremos este para validar montos
+    return !isNaN(value) && !isNaN(parseFloat(value));
+  },
 
   reloadPage: function reloadPage()
   {

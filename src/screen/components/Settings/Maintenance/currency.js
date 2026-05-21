@@ -1,198 +1,204 @@
 import React, {Component} from "react";
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
-import { Container, Row, Col, Button,Modal,Tabs, Form, Tab } from "react-bootstrap";
-import Table from 'react-bootstrap/Table';
-import Select from 'react-select'
-
+import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
+import AppUtil from "../../../../AppUtil/AppUtil";
 import { withTranslation } from "react-i18next";
 DataTable.use(DT);
 
 class Currency extends Component {
-constructor(props)
-  {
+  constructor(props) {
     super(props);
-
     this.state = {
-      tableData: [],
-  show:false,
-  processing: false,
-  currency:{
-    id:"",
-    nombre:"",
-    codigo:""
-
+      show: false,
+      processing: false,
+      currency: {
+        id: 0,
+        codigo_moneda: "",
+        nombre: ""
+      },
+      currencyList: []
+    };
   }
-    }
-  }
 
+  getCurrency = () =>
+    AppUtil.getAPI(`catalogos/tipo_moneda`, sessionStorage.getItem('token')).then(response => {
+      let currencyList = response ? response.data : [];
+      console.log(currencyList);
+      
+      this.setState({ currencyList });
+    });
 
+  getCurrencyById = (id) =>
+    AppUtil.getAPI(`catalogos/tipo_moneda/${id}`, sessionStorage.getItem('token')).then(response => {
+      let currency = response ? response.data : {};
+      this.setState({ currency, show: true });
+    });
 
-//#region Funciones internas
-    toggleShow = () => this.setState({show: !this.state.show}) //muestra el modal de agregar/modificar
+  //#region Funciones internas
+  toggleShow = () => this.setState({
+    show: !this.state.show,
+    currency: { id: 0, codigo_moneda: "", nombre: "" }
+  });
 
-    _saveStateVariable = async (e) => {
+  _saveStateVariable = async (e) => {
     await this.setState({
-            currency: {
-              ...this.state.question,
-              [e.target.name]: e.target.value,
-            },
-          });
+      currency: {
+        ...this.state.currency,
+        [e.target.name]: e.target.value,
+      },
+    });
+  };
 
+  saveCurrency = (e) => {
+    const { t } = this.props;
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (this.validateForm(t)) {
+      if (this.state.currency.id === 0) {
+        AppUtil.postAPI(`catalogos/tipo_moneda`, this.state.currency).then(response => {
+          if (response) {
+            let data = response ? response.data : [];
+            if (Number.isInteger(data)) {
+              this.setState({ error: true, errorMsg: t("created_successfully"), color: "alert alert-success" }, () => { window.location.reload(); });
+            } else {
+              this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning" });
+            }
+          } else {
+            this.setState({ error: true, errorMsg: t('please_verify_data'), color: "alert alert-danger" });
+          }
+        });
+      } else {
+        AppUtil.putAPI(`catalogos/tipo_moneda/${this.state.currency.id}`, this.state.currency).then(response => {
+          if (response) {
+            let data = response ? response.data : [];
+            if (Number.isInteger(data)) {
+              this.setState({ error: true, errorMsg: t("updated_successfully"), color: "alert alert-success" }, () => { window.location.reload(); });
+            } else {
+              this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning" });
+            }
+          } else {
+            this.setState({ error: true, errorMsg: t('please_verify_data'), color: "alert alert-danger" });
+          }
+        });
+      }
     }
+  };
 
-
-    saveSpent = () => {
-      
+  validateForm = (t) => {
+    let { currency } = this.state;
+    if (!AppUtil.isValidText(currency.codigo_moneda)) {
+      this.setState({ error: true, errorMsg: t("invalid_string_form_codigo_moneda"), color: "alert alert-warning" });
+      return false;
     }
+    if (!AppUtil.isValidText(currency.nombre)) {
+      this.setState({ error: true, errorMsg: t("invalid_string_form_nombre"), color: "alert alert-warning" });
+      return false;
+    }
+    return true;
+  };
+  //#endregion fin funciones internas
 
-    //#endregion fin funciones internas
+  componentDidMount() {
+    this.getCurrency();
+  }
 
+  ActionButtons = (rowData) => {
+    return (
+      <Row className="m-2">
+        <Col lg="12" sm="12">
+          <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getCurrencyById(rowData.id)}>
+            <i className="fas fa-pen" />
+          </Button>
+        </Col>
+      </Row>
+    );
+  };
 
-     render(){
-       const { t, i18n } = this.props;
-      return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col lg="6" sm="12">
-            <h1>{t("currency")}</h1>
-          </Col>
-          <Col lg="6" sm="12">
+  render() {
+    const { t } = this.props;
+    return (
+      <>
+        <Container fluid>
           <Row>
-            <Col lg="3" sm="12">
-              <Button
-                className="btn-fill btn-rounded bg-blue"
-                onClick={this.toggleShow}>
-                  {t("create")}
-              </Button>
+            <Col lg="6" sm="12">
+              <h1>{t("currency")}</h1>
             </Col>
-            <Col lg="2" sm="12">
-              <Button
-              className="btn-fill btn-rounded bg-blue"
-              onClick={this.toggleShow}>
-                {t("clean")}
-            </Button>
+            <Col lg="6" sm="12">
+              <Row>
+                <Col lg="6" sm="12">
+                  <Button className="btn-fill btn-rounded bg-blue" onClick={this.toggleShow}>{t("create")}</Button>
+                </Col>
+                <Col lg="6" sm="12">
+                  <Button className="btn-fill btn-rounded bg-blue" onClick={() => this.props.navigate(-1)}>{t("cancel")}</Button>
+                </Col>
+              </Row>
             </Col>
-            <Col lg="2" sm="12">
-                    <Button
-                              className="btn-fill btn-rounded bg-blue"
-                              onClick={()=> this.props.navigate(-1)}>
-                                {t("cancel")}
-                            </Button>
-            </Col>
-
           </Row>
-          
-          
-      
-          </Col>
 
-        </Row>
-
-        <Row>
-          		<DataTable
-                data={this.state.tableData} 
-                className="display table cell-border compact stripe"
-               
-                options={{
+          <Row>
+            <DataTable
+              data={this.state.currencyList}
+              columns={[
+                { data: 'id', title: t("id") },
+                { data: 'codigo_moneda', title: t("code") },
+                { data: 'nombre', title: t("currency") },
+                { title: t("action"), data: null, orderable: false, searchable: false },
+              ]}
+              className="display table cell-border compact stripe"
+              slots={{ 3: (cellData, rowData) => this.ActionButtons(rowData, cellData) }}
+              options={{
                 language: {
-                  zeroRecords:t("zeroRecords"),
-                  emptyTable:t("emptyTable"),
-                  rowsPerPageText:t("rowsPerPageText"),
-                  rangeSeparatorText:t("rangeSeparatorText"),
-                  selectAllRowsItemText:t("selectAllRowsItemText"),
-                  search:t("search"),
-                  paginate:t("paginate"),
-                  searchPlaceholder:t("searchPlaceholder"),
-                  info:t("info"),
+                  zeroRecords: t("zeroRecords"),
+                  emptyTable: t("emptyTable"),
+                  search: t("search"),
+                  paginate: t("paginate"),
+                  searchPlaceholder: t("searchPlaceholder"),
+                  info: t("info"),
                   lengthMenu: t("lengthMenu"),
                 },
-                layout:{
-                  topStart:"pageLength",
-                  topEnd:"search",
-                  bottomStart: 'info',
-                  bottomEnd:"paging"
-                }
-               }}
-              >
-              <thead>
-                <tr>
-                  <th>{t("id")}</th>
-                  <th>{t("currency")}</th>
-                  <th>{t("code")}</th>
- <th>{t("action")}</th>
-                </tr>
-              </thead>
-            </DataTable>
-        
-        </Row>
+                layout: { topStart: "pageLength", topEnd: "search", bottomStart: 'info', bottomEnd: "paging" }
+              }}
+            />
+          </Row>
 
-             <Modal
-              show={this.state.show}
-              onHide={this.toggleShow}
-              backdrop="static"
-              keyboard={false}
-              size="lg"
-              className="max-z-index"
-          >
-     
-
-          <Modal.Header closeButton>
-            <h3 className=" tituloFerias">{t("create")}</h3>
-          </Modal.Header>
-          <Modal.Body>
+          <Modal show={this.state.show} onHide={this.toggleShow} backdrop="static" keyboard={false} size="lg" className="max-z-index">
+            <Form onSubmit={this.saveCurrency}>
+              <Modal.Header closeButton>
+                <h3 className="tituloFerias">{t("currency")}</h3>
+              </Modal.Header>
+              {this.state.error === true && (
+                <div className={this.state.color} role="alert">{this.state.errorMsg}</div>
+              )}
+              <Modal.Body>
                 <Row className="m-2">
                   <Col sm="12" xl="12">
                     <label>{t("code")}</label>
-                   <Form.Group>
-                     <Form.Control
-                        placeholder={t("code")}
-                        type="text"
-                        onChange={this.getInputData}
-                        name="codigo"
-                        required
-                        maxLength={3}
-                        >
-                       </Form.Control>
-                   </Form.Group>
-                   </Col>
-
-                 </Row>
-
-                 <Row className="m-2">
-
-                    <Col sm="12" xl="12">
-                      <label className="txt-darkblue">{t("category")}</label>
-                       <Form.Group>
-                            <Form.Control
-                                placeholder={t("name")}
-                                type="text"
-                                onChange={this.getInputData}
-                                name="nombre"
-                                required
-                                maxLength={20}
-                                />
-                       </Form.Group>
-                     </Col>
-
-                   </Row>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="light" className="btn-rounded" onClick={this.toggleShow}>
-              {t("close")}
-            </Button>
-            {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("save")}</Button>}
-          </Modal.Footer>
-         
-        </Modal>
-        
-      </Container>
-    </>
-  );
-
-
-     }
+                    <Form.Group>
+                      <Form.Control placeholder={t("code")} type="text" onChange={this._saveStateVariable} name="codigo_moneda" required maxLength={3} value={this.state.currency.codigo_moneda} />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row className="m-2">
+                  <Col sm="12" xl="12">
+                    <label className="txt-darkblue">{t("currency")}</label>
+                    <Form.Group>
+                      <Form.Control placeholder={t("name")} type="text" onChange={this._saveStateVariable} name="nombre" required maxLength={20} value={this.state.currency.nombre} />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="light" className="btn-rounded" onClick={this.toggleShow}>{t("close")}</Button>
+                {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("save")}</Button>}
+              </Modal.Footer>
+            </Form>
+          </Modal>
+        </Container>
+      </>
+    );
+  }
 }
 
- export default withTranslation()(Currency)
+export default withTranslation()(Currency)

@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import { Container, Row, Col, Button,Modal, Form } from "react-bootstrap";
-
+import AppUtil from "../../../../AppUtil/AppUtil";
 import { withTranslation } from "react-i18next";
 DataTable.use(DT);
 
@@ -15,23 +15,39 @@ constructor(props)
       tableData: [],
   show:false,
   processing: false,
-  activity_code:{
-    id:"",
-    codigo:"",
-    nombre:""
-  }
+  activityCode:{
+    id:0,
+    codigo_actividad1:"",
+    nombre_actividad:""
+  },
+  activityCodeList:[]
     }
   }
 
 
+  
+   getActivityCode = () => AppUtil.getAPI(`catalogos/codigo_actividad`, sessionStorage.getItem('token')).then(response => {
+      let activityCodeList = response ? response.data : [];
+      this.setState({activityCodeList});
+    });
+
+    
+  
+   getActivityCodeById = (id) => AppUtil.getAPI(`catalogos/codigo_actividad/${id}`, sessionStorage.getItem('token')).then(response => {
+      let activityCode = response ? response.data : [];
+
+      
+      this.setState({activityCode:activityCode[0], show:true});
+    });
+
 
 //#region Funciones internas
-    toggleShow = () => this.setState({show: !this.state.show}) //muestra el modal de agregar/modificar
+    toggleShow = () => this.setState({show: !this.state.show, activityCode:{id:0, codigo_actividad1:"", nombre_actividad:""}}) //muestra el modal de agregar/modificar
 
     _saveStateVariable = async (e) => {
     await this.setState({
-            activity_code: {
-              ...this.state.question,
+            activityCode: {
+              ...this.state.activityCode,
               [e.target.name]: e.target.value,
             },
           });
@@ -39,11 +55,133 @@ constructor(props)
     }
 
 
-    saveSpent = () => {
+    saveActivityCode = (e) => {
+          const { t } = this.props;
+          
+        
+      e.preventDefault();
+      e.stopPropagation();
+
+      if(this.validateForm(t))
+      {
+if(this.state.activityCode.id === 0)
+{
+
+AppUtil.postAPI(`catalogos/codigo_actividad`, this.state.activityCode).then(response => {
+     
+        if(response)
+        {
+          let activityCode = response ? response.data : [];
+
+                if(Number.isInteger(activityCode))
+                {
+                    this.setState({
+                  error: true,
+                  errorMsg: t("created_successfully"),
+                  color:"alert alert-success"
+                }, () => { window.location.reload(); });
+                } 
+                else
+                  {
+              this.setState({
+                  error: true,
+                  errorMsg: t(response.message),
+                  color:"alert alert-warning"
+                });
+                }
+        } 
+        else
+        {
+                  
+        this.setState({
+          error: true,
+          errorMsg: t('please_verify_data'),
+          color:"alert alert-danger"
+        });
+        }
+     
+     // this.setState({user});
+           })
+}
+else
+  {
+AppUtil.putAPI(`catalogos/codigo_actividad/${this.state.activityCode.id}`, this.state.activityCode).then(response => {
+     
+
+  
+        if(response)
+        {
+          let activityCode = response ? response.data : [];
+
+                if(Number.isInteger(activityCode))
+                {
+                    this.setState({
+                  error: true,
+                  errorMsg: t("updated_successfully"),
+                  color:"alert alert-success"
+                }, () => { window.location.reload(); });
+                } 
+                else
+                  {
+              this.setState({
+                  error: true,
+                  errorMsg: t(response.message),
+                  color:"alert alert-warning"
+                });
+                }
+        } 
+        else
+        {
+                  
+        this.setState({
+          error: true,
+          errorMsg: t('please_verify_data'),
+          color:"alert alert-danger"
+        });
+        }
+     
+     // this.setState({user});
+           })
+}
+      }
+    }
+
+    validateForm = (t) =>
+    {
+      let {activityCode} = this.state;
+      console.log(activityCode);
       
+      if(activityCode.codigo_actividad1.length > 6 || !AppUtil.isNumberEntero(activityCode.codigo_actividad1))
+      {
+         this.setState({ error: true,  errorMsg: t("invalid_string_form_codigo_actividad"), color:"alert alert-warning" });
+                return false;
+      }
+
+      if(!AppUtil.isValidText(activityCode.nombre_actividad))
+      {
+         this.setState({ error: true,  errorMsg: t("invalid_string_form_nombre_actividad"), color:"alert alert-warning" });
+                return false;
+      }
+
+      return true;
+
     }
 
     //#endregion fin funciones internas
+
+    componentDidMount(){
+      this.getActivityCode();
+    }
+
+      ActionButtons = (rowData) => {
+        return (
+            <Row className="m-2">
+              <Col lg="12" sm="12">
+                   <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getActivityCodeById(rowData.id)}><i className="fas fa-pen" /></Button>
+              </Col>
+            </Row>
+        );
+    };
 
 
      render(){
@@ -57,21 +195,15 @@ constructor(props)
           </Col>
           <Col lg="6" sm="12">
           <Row>
-            <Col lg="3" sm="12">
+            <Col lg="6" sm="12">
               <Button
                 className="btn-fill btn-rounded bg-blue"
                 onClick={this.toggleShow}>
                   {t("create")}
               </Button>
             </Col>
-            <Col lg="2" sm="12">
-              <Button
-              className="btn-fill btn-rounded bg-blue"
-              onClick={this.toggleShow}>
-                {t("clean")}
-            </Button>
-            </Col>
-            <Col lg="2" sm="12">
+          
+            <Col lg="6" sm="12">
          <Button
                     className="btn-fill btn-rounded bg-blue"
                     onClick={()=> this.props.navigate(-1)}>
@@ -89,9 +221,16 @@ constructor(props)
 
         <Row>
           		<DataTable
-                data={this.state.tableData} 
-                className="display table cell-border compact stripe"
-               
+                data={this.state.activityCodeList} 
+                columns={[
+                  {data:'id', title:t("id")},
+                  {data:'codigo_actividad1', title:t("code")},
+                  {data:'nombre_actividad', title:t("name")},
+                  {title:t("action"), data:null, orderable: false, searchable:false, 
+                 },
+                ]}
+                className="display table cell-border compact stripe"     
+                slots={{3: (cellData, rowData) => this.ActionButtons(rowData, cellData)}}
                 options={{
                 language: {
                   zeroRecords:t("zeroRecords"),
@@ -112,17 +251,7 @@ constructor(props)
                   bottomEnd:"paging"
                 }
                }}
-              >
-              <thead>
-                <tr>
-                  <th>{t("id")}</th>
-                  <th>{t("code")}</th>
-                  <th>{t("name")}</th>
-                  <th>{t("action")}</th>
-                </tr>
-              </thead>
-            </DataTable>
-        
+              />  
         </Row>
 
              <Modal
@@ -133,11 +262,16 @@ constructor(props)
               size="lg"
               className="max-z-index"
           >
-     
+     <Form onSubmit={this.saveActivityCode}>
 
           <Modal.Header closeButton>
             <h3 className=" tituloFerias">{t("activity_code")}</h3>
           </Modal.Header>
+                  {this.state.error === true && (
+              <div className={this.state.color} role="alert">
+                {this.state.errorMsg}
+              </div>
+            )}
           <Modal.Body>
                 <Row className="m-2">
                   <Col sm="12" xl="12">
@@ -146,10 +280,11 @@ constructor(props)
                      <Form.Control
                         placeholder={t("code")}
                         type="text"
-                        onChange={this.getInputData}
-                        name="codigo"
+                        onChange={this._saveStateVariable}
+                        name="codigo_actividad1"
                         required
-                        maxLength={100}
+                        maxLength={6}
+                        value={this.state.activityCode.codigo_actividad1}
                         >
                        </Form.Control>
                    </Form.Group>
@@ -165,10 +300,11 @@ constructor(props)
                             <Form.Control
                                 placeholder={t("name")}
                                 type="text"
-                                onChange={this.getInputData}
-                                name="nombre"
+                                onChange={this._saveStateVariable}
+                                name="nombre_actividad"
                                 required
                                 maxLength={200}
+                                value={this.state.activityCode.nombre_actividad}
                                 />
                        </Form.Group>
                      </Col>
@@ -185,7 +321,7 @@ constructor(props)
             </Button>
             {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("save")}</Button>}
           </Modal.Footer>
-         
+         </Form>
         </Modal>
         
       </Container>
