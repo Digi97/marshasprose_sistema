@@ -146,8 +146,8 @@ class Tax_Type extends Component {
                 { data: 'codigo', title: t("code") },
                 { data: 'nombre', title: t("name") },
                 { data: 'porcentaje', title: t("percentage") },
-                 { data: 'tarifaivacodigo', title: t("code") },
-                  { data: 'tarifaivanombre', title: t("name") },
+                { data: 'tarifaivacodigo', title: t("code") },
+                { data: 'tarifaivanombre', title: t("name") },
 
                 { title: t("action"), data: null, orderable: false, searchable: false },
               ]}
@@ -198,6 +198,21 @@ class Tax_Type extends Component {
                       <Form.Control placeholder={t("percentage")} type="number" onChange={this._saveStateVariable} name="porcentaje" required value={this.state.tax_type.porcentaje} />
                     </Form.Group>
                   </Col>
+                </Row>
+                <Row className="m-2">
+      <Col sm="12" xl="6">
+                    <label className="txt-darkblue">{t("iva_tax_code")}</label>
+                    <Form.Group>
+                      <Form.Control placeholder={t("iva_tax_code")} type="text" onChange={this._saveStateVariable} name="tarifaivacodigo" required maxLength={2} value={this.state.tax_type.codigo} />
+                    </Form.Group>
+                  </Col>
+                  <Col sm="12" xl="6">
+                    <label className="txt-darkblue">{t("iva_tax_name")}</label>
+                    <Form.Group>
+                      <Form.Control placeholder={t("iva_tax_name")} onChange={this._saveStateVariable} name="tarifaivanombre" required value={this.state.tax_type.porcentaje} />
+                    </Form.Group>
+                  </Col>
+                
                 </Row>
               </Modal.Body>
               <Modal.Footer>

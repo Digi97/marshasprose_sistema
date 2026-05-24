@@ -5,6 +5,7 @@ import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
 import AppUtil from "../../../../AppUtil/AppUtil";
 import { withTranslation } from "react-i18next";
 DataTable.use(DT);
+//TODO ARREGLAR NUEVO CAMPO DE TIPO MONEDA 
 
 class Accounting_account extends Component {
   constructor(props) {
@@ -20,8 +21,10 @@ class Accounting_account extends Component {
         Usuarios_Usuario_id: 0,
         Estado: false,
         Saldo_inicial: 0,
-        Saldo_actual: 0
+        Saldo_actual: 0,
+        tipo_moneda_id:0
       },
+      currencyList:[],
       accountingAccountList: []
     };
   }
@@ -30,6 +33,13 @@ class Accounting_account extends Component {
     AppUtil.getAPI(`catalogos/cuentas_contables`, sessionStorage.getItem('token')).then(response => {
       let accountingAccountList = response ? response.data : [];
       this.setState({ accountingAccountList });
+    });
+     getCurrency = () =>
+    AppUtil.getAPI(`catalogos/tipo_moneda`, sessionStorage.getItem('token')).then(response => {
+      let currencyList = response ? response.data : [];
+      console.log(currencyList);
+      
+      this.setState({ currencyList });
     });
 
   getAccountingAccountById = (id) =>
@@ -105,6 +115,7 @@ class Accounting_account extends Component {
   //#endregion fin funciones internas
 
   componentDidMount() {
+    this.getCurrency();
     this.getAccountingAccount();
   }
 
@@ -213,6 +224,17 @@ class Accounting_account extends Component {
                     <label className="txt-darkblue">{t("current_amount")}</label>
                     <Form.Group>
                       <Form.Control placeholder={t("current_amount")} type="number" onChange={this._saveStateVariable} name="Saldo_actual" required value={this.state.accountingAccount.Saldo_actual} />
+                    </Form.Group>
+                  </Col>
+
+                   <Col sm="12" xl="6">
+                    <label className="txt-darkblue">{t("currency")}</label>
+                    <Form.Group>
+                      <Form.Select placeholder={t("currency")} 
+                      onChange={this._saveStateVariable} name="tipo_moneda_id" required >
+                           {currencyList?.map((item, key) =>(item.id === accountingAccount.tipo_moneda_id  ? <option value={item.id} selected defaultValue key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}
+                         
+                        </Form.Select>
                     </Form.Group>
                   </Col>
                   <Col sm="12" xl="12">

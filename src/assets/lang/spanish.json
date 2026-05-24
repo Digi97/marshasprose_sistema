@@ -146,7 +146,9 @@
   "permissions_description": "Administración de todos los permisos de la aplicación",
   "loading": "Cargando...",
   "invalid_string_form_codigo_actividad":"Información inválida para el campo Código Actividad",
-  "invalid_string_form_nombre_actividad":"Información inválida para el campo Nombre Actividad"
+  "invalid_string_form_nombre_actividad":"Información inválida para el campo Nombre Actividad",
+  "iva_tax_code":"VAT Rate Code",
+  "iva_tax_name":"VAT Rate Name"
 
 
     }
