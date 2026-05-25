@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  useLocation,
-  Route,
-  Routes,
-  useNavigate
-} from "react-router-dom";
-
+import { useLocation, Route, Routes, useNavigate } from "react-router-dom";
 
 import AdminNavbar from "./screen/components/Layouts/Navbar";
 import Footer from "./screen/components/Layouts/Footer";
@@ -34,33 +28,27 @@ import Sale_Condition from "./screen/components/Settings/Maintenance/sale_condit
 import Tax_Type from "./screen/components/Settings/Maintenance/tax_type";
 import Type_Accounting_Account from "./screen/components/Settings/Maintenance/type_accounting_account";
 
+//#endregion
 
-
-//#endregion 
-
-
-import NotFound from './screen/components/common/404.js'
+import NotFound from "./screen/components/common/404.js";
 import { useJwt } from "react-jwt";
-import {dashboardRoutes}from "./routes.js";
+import { dashboardRoutes } from "./routes.js";
 import crypto from "crypto-js";
 
 import { useTranslation } from "react-i18next";
 
-
-
 function Admin() {
-
-    const { t } = useTranslation();
+  const { t } = useTranslation();
   const routes = dashboardRoutes(t);
-  
-    const mainPanel = React.useRef(null);
-      const location = useLocation();
+
+  const mainPanel = React.useRef(null);
+  const location = useLocation();
 
   //se valida si el token es valido aun
   const { decodedToken, isExpired } = useJwt(sessionStorage.getItem("token"));
   let dateNow = new Date();
   if (decodedToken != null) {
-    sessionStorage.setItem('expire_tkn', parseFloat(decodedToken.exp));
+    sessionStorage.setItem("expire_tkn", parseFloat(decodedToken.exp));
     if (decodedToken.exp * 1000 < dateNow.getTime()) {
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("user");
@@ -72,14 +60,11 @@ function Admin() {
 
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
-
       if (prop.layout === "/home") {
         return (
-          <Route path={prop.path} key={key}  element={<prop.component />}  />
+          <Route path={prop.path} key={key} element={<prop.component />} />
         );
-      } 
-      else 
-        {
+      } else {
         return null;
       }
     });
@@ -116,31 +101,81 @@ function Admin() {
               <Route path={"/home/profile"} element={<Profile />} />
               <Route path={"/home/new-profile"} element={<NewProfile />} />
               {/*Mantenimientos */}
-              <Route path={"/settings/maintenance/currency"} element={<Currency navigate={useNavigate()}   />} />
-              <Route path={"/settings/maintenance/activity_code"} element={<Activity_Code navigate={useNavigate()}   />} />
-              <Route path={"/settings/maintenance/payment_method"} element={<Payment_Method navigate={useNavigate()}  />} />
-              <Route path={"/settings/maintenance/accounting_account"} element={<Accounting_account navigate={useNavigate()}   />} />
-              <Route path={"/settings/maintenance/type_accounting_account"} element={<Type_Accounting_Account navigate={useNavigate()}   />} />
-              <Route path={"/settings/maintenance/invoice_status"} element={<Invoice_Status navigate={useNavigate()}  />} />
-              <Route path={"/settings/maintenance/rol"} element={<Rol navigate={useNavigate()}  />} />
-              <Route path={"/settings/maintenance/presupuestary_category"} element={<Presupuestary_Category navigate={useNavigate()}  />} />
-              <Route path={"/settings/maintenance/file_type"} element={<File_Type navigate={useNavigate()} />} />
-              <Route path={"/settings/maintenance/tax_type"} element={<Tax_Type navigate={useNavigate()}  />} />
-              <Route path={"/settings/maintenance/sale_condition"} element={<Sale_Condition navigate={useNavigate()}  />} />
-              <Route path={"/settings/maintenance/document_type"} element={<Document_Type navigate={useNavigate()}  />} />
-              <Route path={"/settings/maintenance/expenses_category"} element={<Expenses_Category navigate={useNavigate()}   />} />
-              <Route path={"/settings/maintenance/measurement_unity"} element={<Measurement_Unity navigate={useNavigate()}   />} />
-              <Route path={"/settings/maintenance/comercial_code"} element={<Comercial_Code navigate={useNavigate()}   />} />
-              <Route path={"/settings/maintenance/cabys_code"} element={<Cabys_Code navigate={useNavigate()}   />} />
-              <Route path={"/settings/maintenance/cost_center"} element={<Cost_Center navigate={useNavigate()}  />} />
-              <Route path={"/settings/maintenance/permissions"} element={<Permissions navigate={useNavigate()} />} />
-
-
+              <Route
+                path={"/settings/maintenance/currency"}
+                element={<Currency navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/activity_code"}
+                element={<Activity_Code navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/payment_method"}
+                element={<Payment_Method navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/accounting_account"}
+                element={<Accounting_account navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/type_accounting_account"}
+                element={<Type_Accounting_Account navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/invoice_status"}
+                element={<Invoice_Status navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/rol"}
+                element={<Rol navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/presupuestary_category"}
+                element={<Presupuestary_Category navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/file_type"}
+                element={<File_Type navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/tax_type"}
+                element={<Tax_Type navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/sale_condition"}
+                element={<Sale_Condition navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/document_type"}
+                element={<Document_Type navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/expenses_category"}
+                element={<Expenses_Category navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/measurement_unity"}
+                element={<Measurement_Unity navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/comercial_code"}
+                element={<Comercial_Code navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/cabys_code"}
+                element={<Cabys_Code navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/cost_center"}
+                element={<Cost_Center navigate={useNavigate()} />}
+              />
+              <Route
+                path={"/settings/maintenance/permissions"}
+                element={<Permissions navigate={useNavigate()} />}
+              />
 
               {/* 404 not found para los no reconocidos en home */}
-             <Route path="/home/*" element={<NotFound />} />
-
-
+              <Route path="/home/*" element={<NotFound />} />
             </Routes>
           </div>
           <Footer />

@@ -2,7 +2,9 @@ import React, {Component} from "react";
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
+
 import AppUtil from "../../../../AppUtil/AppUtil";
+import { url } from "screen/components/services/api";
 import { withTranslation } from "react-i18next";
 DataTable.use(DT);
 
@@ -16,17 +18,23 @@ class Cabys_Code extends Component {
         id: 0,
         codigo: "",
         nombre: "",
-        Impuesto_id: 0
+        nombreImpuesto:"",
+        impuesto_id: 0
       },
-      cabysCodeList: []
+    
+      taxes:[],
+      token:""
     };
   }
 
-  getCabysCode = () =>
-    AppUtil.getAPI(`catalogos/codigos_cabys`, sessionStorage.getItem('token')).then(response => {
-      let cabysCodeList = response ? response.data : [];
-      this.setState({ cabysCodeList });
-    });
+
+     getTaxType = () =>
+    AppUtil.getAPI(`catalogos/impuesto`, sessionStorage.getItem("token")).then(
+      (response) => {
+        let taxes = response ? response.data : [];
+        this.setState({ taxes });
+      },
+    );
 
   getCabysCodeById = (id) =>
     AppUtil.getAPI(`catalogos/codigos_cabys/${id}`, sessionStorage.getItem('token')).then(response => {
@@ -100,7 +108,10 @@ class Cabys_Code extends Component {
   //#endregion fin funciones internas
 
   componentDidMount() {
-    this.getCabysCode();
+   // this.getCabysCode();
+    let token = sessionStorage.getItem("token");
+    this.setState({token});
+    this.getTaxType()
   }
 
   ActionButtons = (rowData) => {
@@ -137,17 +148,34 @@ class Cabys_Code extends Component {
           </Row>
 
           <Row>
-            <DataTable
-              data={this.state.cabysCodeList}
+           {this.state.token === "" ? <div></div> :<DataTable
+              ajax={{url:`${url}catalogos/codigos_cabys`,
+                type:'GET',
+              
+                headers:{'Authorization':`Bearer ${this.state.token}`,    
+                'Accept': "application/json",
+               "Content-Type": "application/json; charset=UTF-8",  
+              },
+         
+                dataSrc: function(json){     
+                
+                json.recordsTotal = json.data.recordsTotal;
+                json.recordsFiltered = json.data.recordsFiltered;
+                json.draw = json.data.draw;
+                return json.data.data;
+                },
+                dataType:"json",
+                processing:true,
+              }}
               columns={[
                 { data: 'id', title: t("id") },
                 { data: 'codigo', title: t("code") },
                 { data: 'nombre', title: t("name") },
-                { data: 'Impuesto_id', title: t("tax") },
-                { title: t("action"), data: null, orderable: false, searchable: false },
+                { data: 'nombreImpuesto', title: t("tax") },
+                { title: t("action"), data: null, orderable: false, searchable: false, defaultContent:'' },
               ]}
               className="display table cell-border compact stripe"
-              slots={{ 4: (cellData, rowData) => this.ActionButtons(rowData, cellData) }}
+              slots={{ 4: (cellData, rowData) => this.ActionButtons(rowData, cellData) }}          
               options={{
                 language: {
                   zeroRecords: t("zeroRecords"),
@@ -158,9 +186,13 @@ class Cabys_Code extends Component {
                   info: t("info"),
                   lengthMenu: t("lengthMenu"),
                 },
-                layout: { topStart: "pageLength", topEnd: "search", bottomStart: 'info', bottomEnd: "paging" }
+                layout: {  topEnd: "search", bottomStart: 'info', bottomEnd: "paging" },
+                crossDomain:true,
+                processing:true,
+                serverSide:true,
+                searching:true
               }}
-            />
+            />}
           </Row>
 
           <Modal show={this.state.show} onHide={this.toggleShow} backdrop="static" keyboard={false} size="lg" className="max-z-index">
@@ -189,9 +221,13 @@ class Cabys_Code extends Component {
                   </Col>
                   <Col sm="12" xl="12">
                     <label className="txt-darkblue">{t("tax")}</label>
-                    <Form.Group>
-                      <Form.Control placeholder={t("tax")} type="number" onChange={this._saveStateVariable} name="Impuesto_id" required value={this.state.cabys_code.Impuesto_id} />
-                    </Form.Group>
+                       <Form.Group>
+                                          <Form.Select placeholder={t("tax")} onChange={this._saveStateVariable} name="impuesto_id" required >
+                                                  <option value="">{t("select_option")}</option>
+                                            {this.state.taxes?.map((item, key) =>(item.id === this.state.cabys_code.impuesto_id  ? <option value={item.id} selected defaultValue key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}                     
+                                         </Form.Select>
+                                     
+                                     </Form.Group>
                   </Col>
                 </Row>
               </Modal.Body>

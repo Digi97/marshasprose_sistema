@@ -19,8 +19,7 @@ function Error404() {
             </center>
             
               <img src={logo} alt="Error 404" />
-        </Row>
-        
+        </Row>      
       </Container>
     </>
   );

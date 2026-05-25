@@ -147,8 +147,9 @@
   "loading": "Cargando...",
   "invalid_string_form_codigo_actividad":"Información inválida para el campo Código Actividad",
   "invalid_string_form_nombre_actividad":"Información inválida para el campo Nombre Actividad",
-  "iva_tax_code":"VAT Rate Code",
-  "iva_tax_name":"VAT Rate Name"
+  "iva_tax_code":"Código Tarifa IVA",
+  "iva_tax_name":"Nombre Tarifa IVA",
+  "select_option":"-- Seleccione una opción --"
 
 
     }
