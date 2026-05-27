@@ -147,7 +147,14 @@
     "loading": "Loading...",
       "iva_tax_code":"VAT Rate Code",
   "iva_tax_name":"VAT Rate Name",
-    "select_option":"-- Select one option --"
+    "select_option":"-- Select one option --",
+    "email_invalid":"Email format is invalid",
+    "password_and_confirmation_no_match":"Password and Password confirmation don't match",
+    "password_changed_successfully":"Password changed successfully",
+    "something_went_wrong":"Something went wrong",
+    "invalid_format_Correo":"Invalid format of Email",
+    "correo_not_found":"Email not found on our system",
+    "invalid_value_form_Contrasena":"Invalid format for Password"
 
   }
 }

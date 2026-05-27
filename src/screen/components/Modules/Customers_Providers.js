@@ -49,11 +49,11 @@ class Customer_Provider extends Component {
         otrassenas: 0,
       },
       telefonos: [],
-      token:"",
-      identificationType:[],
-      province:[],
-      canton:[],
-      district:[]
+      token: "",
+      identificationType: [],
+      province: [],
+      canton: [],
+      district: [],
     };
   }
 
@@ -91,7 +91,6 @@ class Customer_Provider extends Component {
 
   saveCustomerProvider = () => {};
 
-
   getIdentificationType = () =>
     AppUtil.getAPI(`tipo_identificacion`, sessionStorage.getItem("token")).then(
       (response) => {
@@ -100,8 +99,7 @@ class Customer_Provider extends Component {
       },
     );
 
-
-    getProvincia = () =>
+  getProvincia = () =>
     AppUtil.getAPI(`ubicacion/provincia`, sessionStorage.getItem("token")).then(
       (response) => {
         let province = response ? response.data : [];
@@ -109,35 +107,32 @@ class Customer_Provider extends Component {
       },
     );
 
-   getCanton = (id = 1) =>
-    AppUtil.getAPI(`ubicacion/canton/provincia/${id}`, sessionStorage.getItem("token")).then(
-      (response) => {
-        let canton = response ? response.data : [];
-        this.setState({ canton });
-      },
-    );
+  getCanton = (id = 1) =>
+    AppUtil.getAPI(
+      `ubicacion/canton/provincia/${id}`,
+      sessionStorage.getItem("token"),
+    ).then((response) => {
+      let canton = response ? response.data : [];
+      this.setState({ canton });
+    });
 
+  getDistrito = (id = 1) =>
+    AppUtil.getAPI(
+      `ubicacion/distrito/canton/${id}`,
+      sessionStorage.getItem("token"),
+    ).then((response) => {
+      let district = response ? response.data : [];
+      this.setState({ district });
+    });
 
-    getDistrito = (id = 1) =>
-    AppUtil.getAPI(`ubicacion/distrito/canton/${id}`, sessionStorage.getItem("token")).then(
-      (response) => {
-        let district = response ? response.data : [];
-        this.setState({ district });
-      },
-    );
+  _saveStateVariable = async (e) => {
+    if (e.target.name === "provincia_id") {
+      this.getCanton(e.target.value);
+    }
 
-
-      _saveStateVariable = async (e) => {
-
-        if(e.target.name ==="provincia_id")
-        {
-          this.getCanton(e.target.value)
-        }
-
-        if (e.target.name ==="canton_id")
-        {
-          this.getDistrito(e.target.value)
-        }
+    if (e.target.name === "canton_id") {
+      this.getDistrito(e.target.value);
+    }
 
     await this.setState({
       customer_provider: {
@@ -149,25 +144,22 @@ class Customer_Provider extends Component {
 
   //#endregion fin funciones internas
 
+  componentDidMount() {
+    this.getIdentificationType();
+    this.getUserInfo();
+    this.getProvincia();
+  }
 
-
-
-    componentDidMount() {
-      this.getIdentificationType();
-      this.getUserInfo();
-      this.getProvincia();
-    }
-  
-    getUserInfo = () =>{
-       let bytes = crypto.AES.decrypt(
-            sessionStorage.getItem("user"),
-            "@marsh_contable"
-          );
-          this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
-          this.setState({
-            user: this.user
-          });
-    }
+  getUserInfo = () => {
+    let bytes = crypto.AES.decrypt(
+      sessionStorage.getItem("user"),
+      "@marsh_contable",
+    );
+    this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
+    this.setState({
+      user: this.user,
+    });
+  };
 
   render() {
     const { t } = this.props;
@@ -207,87 +199,72 @@ class Customer_Provider extends Component {
                 </Col>
               </Row>
               <Row>
-{this.state.token === "" ? <div></div> :<DataTable
-              ajax={{url:`${url}clientes`,
-                type:'GET',
-              
-                headers:{'Authorization':`Bearer ${this.state.token}`,    
-                'Accept': "application/json",
-               "Content-Type": "application/json; charset=UTF-8",  
-              },
-         
-                dataSrc: function(json){     
-                
-                json.recordsTotal = json.data.recordsTotal;
-                json.recordsFiltered = json.data.recordsFiltered;
-                json.draw = json.data.draw;
-                return json.data.data;
-                },
-                dataType:"json",
-                processing:true,
-              }}
-              columns={[
-                { data: 'id', title: t("id") },
-                { data: 'identificacion', title: t("identification") },
-                { data: 'tipo_identificacion', title: t("identification_type") },
-                { data: 'nombre', title: t("name") },
-                { data: 'correo', title: t("email") },
-                { title: t("action"), data: null, orderable: false, searchable: false, defaultContent:'' },
-              ]}
-              className="display table cell-border compact stripe"
-              slots={{ 5: (cellData, rowData) => this.ActionButtons(rowData, cellData) }}          
-              options={{
-                language: {
-                  zeroRecords: t("zeroRecords"),
-                  emptyTable: t("emptyTable"),
-                  search: t("search"),
-                  paginate: t("paginate"),
-                  searchPlaceholder: t("searchPlaceholder"),
-                  info: t("info"),
-                  lengthMenu: t("lengthMenu"),
-                },
-                layout: {  topEnd: "search", bottomStart: 'info', bottomEnd: "paging" },
-                crossDomain:true,
-                processing:true,
-                serverSide:true,
-                searching:true
-              }}
-            />}
-
-                <DataTable
-                  data={this.state.tableData}
-                  className="display table cell-border compact stripe"
-                  options={{
-                    language: {
-                      zeroRecords: t("zeroRecords"),
-                      emptyTable: t("emptyTable"),
-                      rowsPerPageText: t("rowsPerPageText"),
-                      rangeSeparatorText: t("rangeSeparatorText"),
-                      selectAllRowsItemText: t("selectAllRowsItemText"),
-                      search: t("search"),
-                      paginate: t("paginate"),
-                      searchPlaceholder: t("searchPlaceholder"),
-                      info: t("info"),
-                      lengthMenu: t("lengthMenu"),
-                    },
-                    layout: {
-                      topStart: "pageLength",
-                      topEnd: "search",
-                      bottomStart: "info",
-                      bottomEnd: "paging",
-                    },
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th>{t("id")}</th>
-                      <th>{t("identification")}</th>
-                      <th>{t("name")}</th>
-                      <th>{t("creation_date")}</th>
-                      <th>{t("action")}</th>
-                    </tr>
-                  </thead>
-                </DataTable>
+                {/*SECCION DE CLIENTES */}
+                {this.state.token === "" ? (
+                  <div></div>
+                ) : (
+                  <DataTable
+                    ajax={{
+                      url: `${url}clientes`,
+                      type: "GET",
+                      headers: {
+                        Authorization: `Bearer ${this.state.token}`,
+                        Accept: "application/json",
+                        "Content-Type": "application/json; charset=UTF-8",
+                      },
+                      dataSrc: function (json) {
+                        json.recordsTotal = json.data.recordsTotal;
+                        json.recordsFiltered = json.data.recordsFiltered;
+                        json.draw = json.data.draw;
+                        return json.data.data;
+                      },
+                      dataType: "json",
+                      processing: true,
+                    }}
+                    columns={[
+                      { data: "id", title: t("id") },
+                      { data: "identificacion", title: t("identification") },
+                      {
+                        data: "tipo_identificacion",
+                        title: t("identification_type"),
+                      },
+                      { data: "nombre", title: t("name") },
+                      { data: "correo", title: t("email") },
+                      {
+                        title: t("action"),
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        defaultContent: "",
+                      },
+                    ]}
+                    className="display table cell-border compact stripe"
+                    slots={{
+                      5: (cellData, rowData) =>
+                        this.ActionButtons(rowData, cellData),
+                    }}
+                    options={{
+                      language: {
+                        zeroRecords: t("zeroRecords"),
+                        emptyTable: t("emptyTable"),
+                        search: t("search"),
+                        paginate: t("paginate"),
+                        searchPlaceholder: t("searchPlaceholder"),
+                        info: t("info"),
+                        lengthMenu: t("lengthMenu"),
+                      },
+                      layout: {
+                        topEnd: "search",
+                        bottomStart: "info",
+                        bottomEnd: "paging",
+                      },
+                      crossDomain: true,
+                      processing: true,
+                      serverSide: true,
+                      searching: true,
+                    }}
+                  />
+                )}
               </Row>
             </Tab>
 
@@ -322,40 +299,72 @@ class Customer_Provider extends Component {
                 </Col>
               </Row>
               <Row>
-                <DataTable
-                  data={this.state.tableData}
-                  className="display table cell-border compact stripe"
-                  options={{
-                    language: {
-                      zeroRecords: t("zeroRecords"),
-                      emptyTable: t("emptyTable"),
-                      rowsPerPageText: t("rowsPerPageText"),
-                      rangeSeparatorText: t("rangeSeparatorText"),
-                      selectAllRowsItemText: t("selectAllRowsItemText"),
-                      search: t("search"),
-                      paginate: t("paginate"),
-                      searchPlaceholder: t("searchPlaceholder"),
-                      info: t("info"),
-                      lengthMenu: t("lengthMenu"),
-                    },
-                    layout: {
-                      topStart: "pageLength",
-                      topEnd: "search",
-                      bottomStart: "info",
-                      bottomEnd: "paging",
-                    },
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th>{t("id")}</th>
-                      <th>{t("identification")}</th>
-                      <th>{t("name")}</th>
-                      <th>{t("creation_date")}</th>
-                      <th>{t("action")}</th>
-                    </tr>
-                  </thead>
-                </DataTable>
+                {/*SECCION DE PROVEEDORES */}
+                {this.state.token === "" ? (
+                  <div></div>
+                ) : (
+                  <DataTable
+                    ajax={{
+                      url: `${url}proveedores`,
+                      type: "GET",
+                      headers: {
+                        Authorization: `Bearer ${this.state.token}`,
+                        Accept: "application/json",
+                        "Content-Type": "application/json; charset=UTF-8",
+                      },
+                      dataSrc: function (json) {
+                        json.recordsTotal = json.data.recordsTotal;
+                        json.recordsFiltered = json.data.recordsFiltered;
+                        json.draw = json.data.draw;
+                        return json.data.data;
+                      },
+                      dataType: "json",
+                      processing: true,
+                    }}
+                    columns={[
+                      { data: "id", title: t("id") },
+                      { data: "identificacion", title: t("identification") },
+                      {
+                        data: "tipo_identificacion",
+                        title: t("identification_type"),
+                      },
+                      { data: "nombre", title: t("name") },
+                      { data: "correo", title: t("email") },
+                      {
+                        title: t("action"),
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        defaultContent: "",
+                      },
+                    ]}
+                    className="display table cell-border compact stripe"
+                    slots={{
+                      5: (cellData, rowData) =>
+                        this.ActionButtons(rowData, cellData),
+                    }}
+                    options={{
+                      language: {
+                        zeroRecords: t("zeroRecords"),
+                        emptyTable: t("emptyTable"),
+                        search: t("search"),
+                        paginate: t("paginate"),
+                        searchPlaceholder: t("searchPlaceholder"),
+                        info: t("info"),
+                        lengthMenu: t("lengthMenu"),
+                      },
+                      layout: {
+                        topEnd: "search",
+                        bottomStart: "info",
+                        bottomEnd: "paging",
+                      },
+                      crossDomain: true,
+                      processing: true,
+                      serverSide: true,
+                      searching: true,
+                    }}
+                  />
+                )}
               </Row>
             </Tab>
           </Tabs>
@@ -377,14 +386,31 @@ class Customer_Provider extends Component {
                     {t("identification_type")}
                   </label>
                   <Form.Group>
-                           
-                                      
-                                                              <Form.Select placeholder={t("tipo_identificacion_id")} onChange={this._saveStateVariable} name="tipo_identificacion_id" required >
-                                                                      <option value="">{t("select_option")}</option>
-                                                                {this.state.identificationType?.map((item, key) =>(item.id === this.state.customer_provider.tipo_identificacion_id  ? <option value={item.id} selected defaultValue key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}                     
-                                                             </Form.Select>
-                                                         
-                                                  
+                    <Form.Select
+                      placeholder={t("tipo_identificacion_id")}
+                      onChange={this._saveStateVariable}
+                      name="tipo_identificacion_id"
+                      required
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {this.state.identificationType?.map((item, key) =>
+                        item.id ===
+                        this.state.customer_provider.tipo_identificacion_id ? (
+                          <option
+                            value={item.id}
+                            selected
+                            defaultValue
+                            key={key}
+                          >
+                            {item.nombre}
+                          </option>
+                        ) : (
+                          <option value={item.id} key={key}>
+                            {item.nombre}
+                          </option>
+                        ),
+                      )}
+                    </Form.Select>
                   </Form.Group>
                 </Col>
                 <Col sm="12" xl="6">
@@ -481,37 +507,91 @@ class Customer_Provider extends Component {
                 <Col sm="12" xl="4">
                   <label className="txt-darkblue">{t("province")}</label>
                   <Form.Group>
-              
-
-                         <Form.Select placeholder={t("province")} onChange={this._saveStateVariable} name="provincia_id" required >
-                                                                      <option value="">{t("select_option")}</option>
-                                                                {this.state.province?.map((item, key) =>(item.id === this.state.customer_provider.provincia_id  ? <option value={item.id} selected defaultValue key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}                     
-                                                             </Form.Select>
-                
+                    <Form.Select
+                      placeholder={t("province")}
+                      onChange={this._saveStateVariable}
+                      name="provincia_id"
+                      required
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {this.state.province?.map((item, key) =>
+                        item.id ===
+                        this.state.customer_provider.provincia_id ? (
+                          <option
+                            value={item.id}
+                            selected
+                            defaultValue
+                            key={key}
+                          >
+                            {item.nombre}
+                          </option>
+                        ) : (
+                          <option value={item.id} key={key}>
+                            {item.nombre}
+                          </option>
+                        ),
+                      )}
+                    </Form.Select>
                   </Form.Group>
                 </Col>
 
                 <Col sm="12" xl="4">
                   <label className="txt-darkblue">{t("canton")}</label>
                   <Form.Group>
-          
-                         <Form.Select placeholder={t("canton")} onChange={this._saveStateVariable} name="canton_id" required >
-                                                                      <option value="">{t("select_option")}</option>
-                                                                {this.state.canton?.map((item, key) =>(item.id === this.state.customer_provider.canton_id  ? <option value={item.id} selected defaultValue key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}                     
-                                                             </Form.Select>
-                
+                    <Form.Select
+                      placeholder={t("canton")}
+                      onChange={this._saveStateVariable}
+                      name="canton_id"
+                      required
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {this.state.canton?.map((item, key) =>
+                        item.id === this.state.customer_provider.canton_id ? (
+                          <option
+                            value={item.id}
+                            selected
+                            defaultValue
+                            key={key}
+                          >
+                            {item.nombre}
+                          </option>
+                        ) : (
+                          <option value={item.id} key={key}>
+                            {item.nombre}
+                          </option>
+                        ),
+                      )}
+                    </Form.Select>
                   </Form.Group>
                 </Col>
 
                 <Col sm="12" xl="4">
                   <label className="txt-darkblue">{t("district")}</label>
                   <Form.Group>
-             
-
-                    <Form.Select placeholder={t("district")} onChange={this._saveStateVariable} name="distrito_id" required >
-                                                                      <option value="">{t("select_option")}</option>
-                                                                {this.state.district?.map((item, key) =>(item.id === this.state.customer_provider.distrito_id  ? <option value={item.id} selected defaultValue key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}                     
-                                                             </Form.Select>
+                    <Form.Select
+                      placeholder={t("district")}
+                      onChange={this._saveStateVariable}
+                      name="distrito_id"
+                      required
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {this.state.district?.map((item, key) =>
+                        item.id === this.state.customer_provider.distrito_id ? (
+                          <option
+                            value={item.id}
+                            selected
+                            defaultValue
+                            key={key}
+                          >
+                            {item.nombre}
+                          </option>
+                        ) : (
+                          <option value={item.id} key={key}>
+                            {item.nombre}
+                          </option>
+                        ),
+                      )}
+                    </Form.Select>
                   </Form.Group>
                 </Col>
               </Row>

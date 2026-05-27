@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { url } from "../services/api";
 import logo from "../../../assets/PNG/LogoOficial.jpg";
-
+import { Navigate, redirect } from "react-router-dom";
 import { withTranslation } from 'react-i18next';
 
 // clase de recuperacion contraseña (se ingresa el corrreo)
@@ -12,14 +12,14 @@ class Recovery extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      form: {
-        email: "",
-        verification_code: ""
-      },
       error: false,
       errorMsg: "",
       nextPage: false,
-      charging: false
+      charging: false,
+      correo:"",
+      maskedCorreo:"",
+       verification_code: "",
+       redirect:false
     };
   }
 
@@ -30,43 +30,41 @@ class Recovery extends Component {
   preventSubmit(e) {
     e.preventDefault();
   }
-
-  //se obtiene la info de los inputs
-  getInputData = async (e) => {
-    await this.setState({
-      form: {
-        ...this.state.form,
-        [e.target.name]: e.target.value,
-      },
-    });
-  };
-
   //se maneja la recuperacion de contraseña
   recovery = () => {
-    if (this.state.form.email !== "") {
+       const { t } = this.props;
+    if (this.state.correo !== "") {
       this.setState({
         charging: true
       });
-      let url_api = url + "request-password";
-      axios
-        .post(url_api, this.state.form)
+      axios.post(`${url}login/recover`,{correo: this.state.correo})
         .then((response) => {
-          if (response.status === 200) {
-            this.setState({
-              nextPage: true,
-              error: false,
-              errorMsg: "",
-              charging: false
-            })
-          } else {
+          if (response.status === 200) 
+          {
+            if (response.data.codeStatus ===200)
+            {
+              this.setState({
+                nextPage: true,
+                error: false,
+                errorMsg: "",
+                charging: false,
+                maskedCorreo:response.data.data.correo
+              })
+            }
+            else 
+            {
             this.setState({
               error: true,
-              errorMsg: "Usuario o contraseña incorrectos",
+              errorMsg: t(response.data.message),
               charging: false
             });
+          } 
+          
           }
         })
         .catch((error) => {
+          console.error(error);
+          
           this.setState({
             error: true,
             errorMsg: "Ha ocurrido un problema favor intentelo nuevamente",
@@ -84,21 +82,26 @@ class Recovery extends Component {
 
   //se verifica que el código de verificación sea valido
   verifyCode = () => {
-    if (this.state.form.code !== "") {
+         const { t } = this.props;
+
+    if (this.state.verification_code !== "") 
+      {
       this.setState({
         charging: true
       });
-      let url_api = url + "validate-code";
       axios
-        .post(url_api, this.state.form)
+        .post(`${url}login/validate-code`, {codigo_recupera_clave: this.state.verification_code, correo: this.state.correo})
         .then((response) => {
-          if (response.data.data) {
-            sessionStorage.setItem('code', this.state.form.verification_code);
-            window.location.href = "/change-password";
+   
+          
+          if (response.data.codeStatus ===200) 
+            {
+              sessionStorage.setItem("correo", this.state.correo)
+              this.setState({redirect: true});
           } else {
             this.setState({
               error: true,
-              errorMsg: "Código de verificación incorrecto",
+              errorMsg: t(response.data.message),
               charging: false
             });
           }
@@ -124,7 +127,10 @@ class Recovery extends Component {
   }
 
   render() {
-         const { t, i18n } = this.props;
+         const { t } = this.props;
+
+          if (this.state.redirect) { return <Navigate to="/change-password" />; }
+
     return (
       <div className="global-container m-0 vh-100 row justify-content-center align-items-center">
         <div className="card login-form box">
@@ -154,19 +160,20 @@ class Recovery extends Component {
                 <div className="card-text">
                   {/* <div className="alert alert-danger alert-dismissible fade show" role="alert">Incorrect username or password.</div> */}
                   <form onSubmit={this.preventSubmit}>
+                    {/**PRIMER PASO DE CAMBIO DE CONTRASEÑA */}
                     <div className="form-group">
                       <label htmlFor="exampleInputEmail1" className="text-color-recovery">
-                        {t("mail")}
+                        {t("email")}
                       </label>
                       <input
                         type="email"
                         className="form-control form-control-sm"
-                        id="email"
-                        name="email"
+                        id="correo"
+                        name="correo"
                         aria-describedby="emailHelp"
                         placeholder="nombre@ejemplo.com"
                         maxLength={200}
-                        onChange={this.getInputData.bind(this)}
+                        onChange={(e)=> this.setState({correo:e.target.value})}
                       />
                     </div>
                     <br></br>
@@ -199,7 +206,7 @@ class Recovery extends Component {
               <div>
                 <div>
                   <p className="text-center text-color-recovery">
-                    {t("mail_change_pwd")} {this.state.form.email}
+                    {t("mail_change_pwd")} {this.state.maskedCorreo}
                   </p>
                 </div>
                 {this.state.error === true &&
@@ -218,7 +225,7 @@ class Recovery extends Component {
                     name="verification_code"
                     aria-describedby="codeHelp"
                     placeholder="Ingresa el código"
-                    onChange={this.getInputData.bind(this)}
+                    onChange={(e)=> this.setState({ verification_code:e.target.value})}
                   />
                 </div>
                 <div className="d-flex justify-content-center w-100">
@@ -229,7 +236,7 @@ class Recovery extends Component {
                       className="btn btn-primary btn-block col-md-12 background-button-recovery"
                       onClick={this.verifyCode}
                     >
-                      {t("Continue")}
+                      {t("continue")}
                     </a>
                   }
                   {this.state.charging &&

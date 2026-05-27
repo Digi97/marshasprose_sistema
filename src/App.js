@@ -16,13 +16,15 @@ import ChangePassword from "./screen/components/Auth/ChangePassword";
 
 import NotFound from './screen/components/common/404.js'
 
+
 function App() {
+
   return (
   <BrowserRouter>
     <Routes>
       <Route path="/" exact element={ <Login />}  />
-      <Route path="/recovery" exact element={ <Recovery />}  />
-      <Route path="/change-password" exact element={ <ChangePassword /> } />
+      <Route path="/recovery" exact  element={ <Recovery   />}  />
+      <Route path="/change-password" exact  element={ <ChangePassword  /> } />
       {
         (sessionStorage.getItem('token') === null ? <Route path="/home/*" element={ <Navigate replace to="/" />}  /> :<Route path="/home/*" element={<AdminLayout />} /> )
       }
