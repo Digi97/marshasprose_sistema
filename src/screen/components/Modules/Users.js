@@ -384,7 +384,7 @@ if(response.codeStatus === 200)
                     <label className="txt-darkblue">{t("rol")}</label>
                        <Form.Group>
                           <Form.Select aria-label="Roles_id" name="roles_id" onChange={this._saveStateVariable} required>
-                            <option value="">-- Seleccione una opción --</option>
+                            <option value="">{t("select_option")}</option>
                            
                             {roles?.map((item, key) =>(item.id === user.roles_id  ? <option value={item.id} selected defaultValue key={key}>{item.descripcion}</option> :  <option value={item.id} key={key}>{item.descripcion}</option>))}
                             </Form.Select>

@@ -29,7 +29,7 @@ class Customer_Provider extends Component {
       tableData: [],
       showCustomer: false,
       showProvider: false,
-      processing: false,
+      processing: true,
       customer_provider: {
         id: 0,
         identificacion: "",
@@ -54,10 +54,22 @@ class Customer_Provider extends Component {
       province: [],
       canton: [],
       district: [],
+      activityCode:[]
     };
   }
 
   //#region Funciones internas
+
+    _saveStateVariable = async (e) => {
+    const { name, type, checked, value } = e.target;
+
+    await this.setState({
+      customer_provider: {
+        ...this.state.customer_provider,
+        [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
+      },
+    });
+  };
   toggleShowCustomer = () =>
     this.setState({ showCustomer: !this.state.showCustomer });
   toggleShowProvider = () =>
@@ -95,10 +107,46 @@ class Customer_Provider extends Component {
     AppUtil.getAPI(`tipo_identificacion`, sessionStorage.getItem("token")).then(
       (response) => {
         let identificationType = response ? response.data : [];
-        this.setState({ identificationType });
+        this.setState({ identificationType }); 
       },
     );
 
+    getCensus = () => {
+
+          let {customer_provider} = this.state;
+      if(customer_provider.tipo_identificacion_id == 1)//buscamos sunicamente fisicos
+      {
+
+ AppUtil.getAPI(`catalogos/padron/${customer_provider.identificacion}`, sessionStorage.getItem("token")).then(
+      (response) => {
+        let usuario = response ? response.data : [];
+
+        console.log(usuario);
+        
+       
+        customer_provider.nombre = usuario.nombre
+        customer_provider.apellido1 = usuario.apellido1
+        customer_provider.apellido2 = usuario.apellido2
+
+        this.setState({ customer_provider }); 
+      },
+    );
+      }
+
+   
+
+
+    }
+
+
+    
+  getActivityCode = () =>
+    AppUtil.getAPI(`catalogos/codigo_actividad`, sessionStorage.getItem("token")).then(
+      (response) => {
+        let activityCode = response ? response.data : [];
+        this.setState({ activityCode, processing:false });
+      },
+    );
   getProvincia = () =>
     AppUtil.getAPI(`ubicacion/provincia`, sessionStorage.getItem("token")).then(
       (response) => {
@@ -148,6 +196,7 @@ class Customer_Provider extends Component {
     this.getIdentificationType();
     this.getUserInfo();
     this.getProvincia();
+    this.getActivityCode();
   }
 
   getUserInfo = () => {
@@ -163,6 +212,7 @@ class Customer_Provider extends Component {
 
   render() {
     const { t } = this.props;
+    let{customer_provider} = this.state;
     return (
       <>
         <Container fluid>
@@ -387,7 +437,7 @@ class Customer_Provider extends Component {
                   </label>
                   <Form.Group>
                     <Form.Select
-                      placeholder={t("tipo_identificacion_id")}
+                      placeholder={t("identification_type")}
                       onChange={this._saveStateVariable}
                       name="tipo_identificacion_id"
                       required
@@ -395,7 +445,7 @@ class Customer_Provider extends Component {
                       <option value="">{t("select_option")}</option>
                       {this.state.identificationType?.map((item, key) =>
                         item.id ===
-                        this.state.customer_provider.tipo_identificacion_id ? (
+                        customer_provider.tipo_identificacion_id ? (
                           <option
                             value={item.id}
                             selected
@@ -419,10 +469,12 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("identification")}
                       type="text"
-                      onChange={this.getInputData}
-                      name="clave"
+                      onChange={this._saveStateVariable}
+                      name="identificacion"
                       required
-                      maxLength={45}
+                      maxLength={20}
+                      value={customer_provider.identificacion}
+                      onBlur={this.getCensus}
                     ></Form.Control>
                   </Form.Group>
                 </Col>
@@ -431,17 +483,30 @@ class Customer_Provider extends Component {
               <Row className="m-2">
                 <Col sm="12" xl="6">
                   <label className="txt-darkblue">{t("activity_code")}</label>
-                  <Form.Group>
-                    <Form.Select
-                      aria-label="codigo_actividad_id"
-                      name="codigo_actividad_id"
-                      onChange={this._saveStateVariable}
-                      required
-                    >
-                      <option value="">-- Seleccione una opción --</option>
-                      {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                    </Form.Select>
-                  </Form.Group>
+                   {this.state.processing ? (
+                      t("loading")
+                    ) : (
+                      <Select
+                        options={this.state.activityCode}
+                        name="codigo_actividad_id"
+                        onChange={(value) =>
+                          this.setState({
+                            customer_provider: {
+                              ...this.state.customer_provider,
+                              codigo_actividad_id: value,
+                            },
+                          })
+                        }
+                        getOptionValue={(option) => option.id}
+                        getOptionLabel={(option) => `${option.codigo_actividad1} - ${option.nombre_actividad}`}
+                        defaultValue={() =>
+                          this.state.activityCode?.find(
+                            (opt) => opt.id === this.state.customer_provider.codigo_actividad_id,
+                          )
+                        }
+                        isSearchable={true}
+                      />
+                    )}
                 </Col>
 
                 <Col sm="12" xl="6">
@@ -450,8 +515,9 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("name")}
                       type="text"
-                      onChange={this.getInputData}
-                      name="Nombre"
+                      onChange={this._saveStateVariable}
+                      name="nombre"
+                      value={customer_provider.nombre}
                       required
                       maxLength={250}
                     ></Form.Control>
@@ -465,9 +531,10 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("lastname")}
                       type="text"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="Apellido1"
                       required
+                      value={customer_provider.apellido1}
                       maxLength={100}
                     ></Form.Control>
                   </Form.Group>
@@ -479,10 +546,11 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("secondlastname")}
                       type="text"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="Apellido2"
                       required
                       maxLength={100}
+                      value={customer_provider.apellido2}
                     ></Form.Control>
                   </Form.Group>
                 </Col>
@@ -495,7 +563,7 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("email")}
                       type="mail"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="correo"
                       required
                     />
@@ -603,7 +671,7 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("address")}
                       type="textarea"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="OtrasSenas"
                       required
                     />
@@ -775,7 +843,7 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("identification")}
                       type="text"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="clave"
                       required
                       maxLength={45}
@@ -806,7 +874,7 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("name")}
                       type="text"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="Nombre"
                       required
                       maxLength={250}
@@ -821,7 +889,7 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("lastname")}
                       type="text"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="Apellido1"
                       required
                       maxLength={100}
@@ -835,7 +903,7 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("secondlastname")}
                       type="text"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="Apellido2"
                       required
                       maxLength={100}
@@ -851,7 +919,7 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("email")}
                       type="mail"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="correo"
                       required
                     />
@@ -913,7 +981,7 @@ class Customer_Provider extends Component {
                     <Form.Control
                       placeholder={t("address")}
                       type="textarea"
-                      onChange={this.getInputData}
+                      onChange={this._saveStateVariable}
                       name="OtrasSenas"
                       required
                     />
