@@ -20,7 +20,7 @@ const AppUtil = {
       let dataRet = response.data;
       return dataRet;
     } catch (e) {
-      console.error(e.response.data);
+      console.error(e);
       return false;
     }
   },

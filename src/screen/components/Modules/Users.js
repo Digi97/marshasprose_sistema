@@ -162,7 +162,7 @@ if(response.codeStatus === 200)
   getUserById = (id) =>
   {
 
-    console.log(id);
+    
     
         AppUtil.getAPI(`users/${id}`, sessionStorage.getItem('token')).then(response => {
           console.log(response);

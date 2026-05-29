@@ -27,8 +27,8 @@ class Customer_Provider extends Component {
 
     this.state = {
       tableData: [],
-      showCustomer: false,
-      showProvider: false,
+      show: false,
+      isProvider: false,
       processing: true,
       customer_provider: {
         id: 0,
@@ -42,11 +42,11 @@ class Customer_Provider extends Component {
         canton_id: 0,
         provincia_id: 0,
         codigo_actividad: 0,
-        estado: 0,
+        estado: true,
         fecha_creacion: "",
         fecha_actualizacion: "",
-        exonerado: 0,
-        otrassenas: 0,
+        exonerado: false,
+        otrasSenas: "",
       },
       telefonos: [],
       token: "",
@@ -70,10 +70,28 @@ class Customer_Provider extends Component {
       },
     });
   };
-  toggleShowCustomer = () =>
-    this.setState({ showCustomer: !this.state.showCustomer });
-  toggleShowProvider = () =>
-    this.setState({ showProvider: !this.state.showProvider });
+  toggleShow = (isCustomer = true) =>
+    this.setState({ show: !this.state.show,    
+      isCustomer,
+      customer_provider: {
+        id: 0,
+        identificacion: "",
+        tipo_identificacion_id: 0,
+        nombre: "",
+        apellido1: "",
+        apellido2: "",
+        correo: "",
+        distrito_id: 0,
+        canton_id: 0,
+        provincia_id: 0,
+        codigo_actividad: 0,
+        estado: true,
+        fecha_creacion: "",
+        fecha_actualizacion: "",
+        exonerado: false,
+        otrasSenas: "",
+      } });
+
 
   addPhone = (e) => {
     e.preventDefault();
@@ -82,11 +100,13 @@ class Customer_Provider extends Component {
     const formData = new FormData(e.target);
 
     const telefonos = {
-      Numero: formData.get("Numero"),
+      numero: formData.get("numero"),
       codigo_pais: formData.get("codigo_pais"),
-      main: formData.get("telefono_principal"),
+      telefono_principal: formData.get("telefono_principal") == 'on' ? 1: 0
     };
 
+    console.log(telefonos);
+    
     this.setState((prevState) => ({
       telefonos: [...prevState.telefonos, telefonos],
     }));
@@ -101,7 +121,87 @@ class Customer_Provider extends Component {
     }));
   };
 
-  saveCustomerProvider = () => {};
+  saveCustomerProvider = (e) => {
+
+     const { t } = this.props;
+
+    e.preventDefault();
+    e.stopPropagation();
+    let {customer_provider,showCustomer, showProvider, telefonos} = this.state;
+
+    if(telefonos.length === 0)
+    {
+        this.setState({ error: true, errorMsg: t("phone_required"), color:"alert alert-warning" });
+      return
+    }
+
+    let endpoint = showCustomer ? `clientes` :`proveedor`;
+      
+       customer_provider.estado = customer_provider.estado? 1 : 0;
+       customer_provider.exonerado = customer_provider.exonerado ? 1:0;
+       customer_provider.telefonos = telefonos;
+    
+       if(customer_provider.id === 0)//creacion
+    {
+       AppUtil.postAPI(endpoint, customer_provider).then(response => {
+if(response.codeStatus === 200)
+{
+   let customer_provider = response ? response.data : [];
+    if(Number.isInteger(customer_provider))
+                {
+                    this.setState({
+                  error: true,
+                  errorMsg: t("record_created_successfully"),
+                  color:"alert alert-success"
+                }, () => { window.location.reload(); });
+              
+          } 
+
+} else
+  {
+  
+    
+     this.setState({ error: true, errorMsg: t(response.message), color:"alert alert-warning" });
+}
+           })
+
+    }
+    else //actualizacion
+    {
+
+       AppUtil.putAPI(`${endpoint}/${customer_provider.id}`, customer_provider).then(response => {
+
+        if(response)
+        {
+          let customer_provider = response ? response.data : [];
+                if(Number.isInteger(customer_provider))
+                {
+                    this.setState({
+                  error: true,
+                  errorMsg: t("updated_successfully"),
+                  color:"alert alert-success"
+                }, () => { window.location.reload(); });
+                } 
+                else
+                  {
+              this.setState({
+                  error: true,
+                  errorMsg: t('please_verify_data'),
+                  color:"alert alert-warning"
+                });
+                }
+        } 
+        else
+        {         
+        this.setState({
+          error: true,
+          errorMsg: t('please_verify_data'),
+          color:"alert alert-danger"
+        });
+        }
+           })
+    }
+  };
 
   getIdentificationType = () =>
     AppUtil.getAPI(`tipo_identificacion`, sessionStorage.getItem("token")).then(
@@ -119,16 +219,17 @@ class Customer_Provider extends Component {
 
  AppUtil.getAPI(`catalogos/padron/${customer_provider.identificacion}`, sessionStorage.getItem("token")).then(
       (response) => {
-        let usuario = response ? response.data : [];
-
-        console.log(usuario);
-        
-       
-        customer_provider.nombre = usuario.nombre
-        customer_provider.apellido1 = usuario.apellido1
-        customer_provider.apellido2 = usuario.apellido2
-
+        let person = response ? response.data : [];
+if(person !== null)
+{
+        customer_provider.nombre = typeof(person.nombre) =="undefined" ? "" :person.nombre
+        customer_provider.apellido1 = typeof(person.apellido1) =="undefined"?"": person.apellido1
+        customer_provider.apellido2 = typeof(person.apellido2) =="undefined"?"": person.apellido2
         this.setState({ customer_provider }); 
+}
+        
+
+
       },
     );
       }
@@ -136,10 +237,7 @@ class Customer_Provider extends Component {
    
 
 
-    }
-
-
-    
+    }    
   getActivityCode = () =>
     AppUtil.getAPI(`catalogos/codigo_actividad`, sessionStorage.getItem("token")).then(
       (response) => {
@@ -174,20 +272,25 @@ class Customer_Provider extends Component {
     });
 
   _saveStateVariable = async (e) => {
-    if (e.target.name === "provincia_id") {
-      this.getCanton(e.target.value);
+
+       const {name, type, checked, value} = e.target;
+
+    if (name === "provincia_id") 
+    {
+      this.getCanton(value);
     }
 
-    if (e.target.name === "canton_id") {
-      this.getDistrito(e.target.value);
+    if (name === "canton_id") {
+      this.getDistrito(value);
     }
+
 
     await this.setState({
-      customer_provider: {
-        ...this.state.customer_provider,
-        [e.target.name]: e.target.value,
-      },
-    });
+            customer_provider: {
+              ...this.state.customer_provider,
+              [name]: type ==="checkbox" ? (checked? 1:0): value,
+            },
+          });
   };
 
   //#endregion fin funciones internas
@@ -205,14 +308,63 @@ class Customer_Provider extends Component {
       "@marsh_contable",
     );
     this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
-    this.setState({
-      user: this.user,
+    this.setState({ user: this.user, token: sessionStorage.getItem("token") });
+  };
+
+  getCustomerProviderById = (id, isCustomer = true) => {
+
+    console.log(id);
+    
+     const { t } = this.props;
+      let url = isCustomer ? `clientes/${id}` : `proveedor/${id}`;
+
+
+        AppUtil.getAPI(url, sessionStorage.getItem('token')).then(response => {
+          if(response.codeStatus === 200)
+          {
+          let customer_provider = response ? response.data : [];  
+          let telefonos =    customer_provider.telefonos;
+
+          customer_provider.exonerado = customer_provider.exonerado  ==1 ? true: false;
+          customer_provider.estado = customer_provider.estado ==1 ? true: false;
+
+          delete customer_provider.telefonos;
+
+
+          this.setState({customer_provider, telefonos, showCustomer:true}, ()=>{
+            this.getActivityCode();
+            this.getCanton(customer_provider.provincia_id);
+            this.getDistrito(customer_provider.canton_id);
+            
+          });
+          } 
+          else  
+          {
+   this.setState({ error: true, errorMsg: t(response.message), color:"alert alert-warning" });
+          }
+          
+   
     });
+
+
+
+  }
+
+
+
+   ActionButtons = (rowData) => {
+      return (
+          <Row className="m-2">
+            <Col lg="12" sm="12">
+                 <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getCustomerProviderById(rowData.id)}><i className="fas fa-pen" /></Button>
+            </Col>
+          </Row>
+      );
   };
 
   render() {
     const { t } = this.props;
-    let{customer_provider} = this.state;
+    let{customer_provider, token} = this.state;
     return (
       <>
         <Container fluid>
@@ -235,7 +387,7 @@ class Customer_Provider extends Component {
                     <Col lg="3" sm="12">
                       <Button
                         className="btn-fill btn-rounded bg-blue"
-                        onClick={this.toggleShowCustomer}
+                        onClick={this.toggleShow}
                       >
                         {t("create")}
                       </Button>
@@ -274,10 +426,7 @@ class Customer_Provider extends Component {
                     columns={[
                       { data: "id", title: t("id") },
                       { data: "identificacion", title: t("identification") },
-                      {
-                        data: "tipo_identificacion",
-                        title: t("identification_type"),
-                      },
+                      { data: "tipo_identificacion", title: t("identification_type")},
                       { data: "nombre", title: t("name") },
                       { data: "correo", title: t("email") },
                       {
@@ -332,7 +481,7 @@ class Customer_Provider extends Component {
                     <Col lg="3" sm="12">
                       <Button
                         className="btn-fill btn-rounded bg-blue"
-                        onClick={this.toggleShowProvider}
+                        onClick={()=> this.toggleShow(false)}
                       >
                         {t("create")}
                       </Button>
@@ -340,7 +489,7 @@ class Customer_Provider extends Component {
                     <Col lg="2" sm="12">
                       <Button
                         className="btn-fill btn-rounded bg-blue"
-                        onClick={this.toggleShow}
+                        onClick={()=> {}}
                       >
                         {t("clean")}
                       </Button>
@@ -355,7 +504,7 @@ class Customer_Provider extends Component {
                 ) : (
                   <DataTable
                     ajax={{
-                      url: `${url}proveedores`,
+                      url: `${url}proveedor`,
                       type: "GET",
                       headers: {
                         Authorization: `Bearer ${this.state.token}`,
@@ -419,17 +568,22 @@ class Customer_Provider extends Component {
             </Tab>
           </Tabs>
           <Modal
-            show={this.state.showCustomer}
-            onHide={this.toggleShowCustomer}
+            show={this.state.show}
+            onHide={this.toggleShow}
             backdrop="static"
             keyboard={false}
             size="lg"
             className="max-z-index"
           >
             <Modal.Header closeButton>
-              <h3 className=" tituloFerias">{t("customer")}</h3>
+              <h3 className=" tituloFerias">{this.state.isCustomer ?  t("customer"): t('provider')}</h3>
             </Modal.Header>
-            <Modal.Body>
+            {this.state.error === true && (
+              <div className={this.state.color} role="alert">
+                {this.state.errorMsg}
+              </div>
+            )}
+            <Modal.Body>        
               <Row className="m-2">
                 <Col sm="12" xl="6">
                   <label className="txt-darkblue">
@@ -489,14 +643,7 @@ class Customer_Provider extends Component {
                       <Select
                         options={this.state.activityCode}
                         name="codigo_actividad_id"
-                        onChange={(value) =>
-                          this.setState({
-                            customer_provider: {
-                              ...this.state.customer_provider,
-                              codigo_actividad_id: value,
-                            },
-                          })
-                        }
+                        onChange={(value) => this.setState({ customer_provider: { ...this.state.customer_provider, codigo_actividad_id: value.id}}) }
                         getOptionValue={(option) => option.id}
                         getOptionLabel={(option) => `${option.codigo_actividad1} - ${option.nombre_actividad}`}
                         defaultValue={() =>
@@ -566,6 +713,7 @@ class Customer_Provider extends Component {
                       onChange={this._saveStateVariable}
                       name="correo"
                       required
+                      value={customer_provider.correo}
                     />
                   </Form.Group>
                 </Col>
@@ -672,8 +820,9 @@ class Customer_Provider extends Component {
                       placeholder={t("address")}
                       type="textarea"
                       onChange={this._saveStateVariable}
-                      name="OtrasSenas"
+                      name="otrasSenas"
                       required
+                      value={customer_provider.otrasSenas}
                     />
                   </Form.Group>
                 </Col>
@@ -686,6 +835,8 @@ class Customer_Provider extends Component {
                     id="exonerado"
                     label={t("exonerated")}
                     name="exonerado"
+                    onChange={this._saveStateVariable}
+                    checked={customer_provider.exonerado}
                   />
                 </Col>
 
@@ -695,10 +846,12 @@ class Customer_Provider extends Component {
                     id="estado"
                     label={t("status")}
                     name="estado"
+                    onChange={this._saveStateVariable}
+                    checked={customer_provider.estado}
                   />
                 </Col>
               </Row>
-
+           
               <div className="well">
                 <Form onSubmit={this.addPhone}>
                   <Row className="m-2">
@@ -720,7 +873,7 @@ class Customer_Provider extends Component {
                         <Form.Control
                           placeholder={t("number")}
                           type="number"
-                          name="Numero"
+                          name="numero"
                           required
                           maxLength={20}
                         />
@@ -734,6 +887,7 @@ class Customer_Provider extends Component {
                         id="telefono_principal"
                         label={t("main")}
                         name="telefono_principal"
+                        checked={this.state.telefonos.findIndex(t => t.telefono_principal === 1) ===-1 }
                       />
                     </Col>
                     <Col sm="12" xl="6">
@@ -765,8 +919,8 @@ class Customer_Provider extends Component {
                               <tr key={index}>
                                 <td>{index + 1}</td>
                                 <td>{line.codigo_pais}</td>
-                                <td>{line.Numero}</td>
-                                <td>{line.main === 1 ? t("yes") : t("no")}</td>
+                                <td>{line.numero}</td>
+                                <td>{line.telefono_principal === 1 ? t("yes") : t("no")}</td>
                                 <td>
                                   <Button
                                     variant="danger"
@@ -801,6 +955,7 @@ class Customer_Provider extends Component {
                   variant="primary"
                   className="btn-fill btn-rounded"
                   type="submit"
+                  onClick={this.saveCustomerProvider}
                 >
                   {t("save")}
                 </Button>
@@ -808,317 +963,7 @@ class Customer_Provider extends Component {
             </Modal.Footer>
           </Modal>
 
-          <Modal
-            show={this.state.showProvider}
-            onHide={this.toggleProvider}
-            backdrop="static"
-            keyboard={false}
-            size="lg"
-            className="max-z-index"
-          >
-            <Modal.Header closeButton>
-              <h3 className=" tituloFerias">{t("provider")}</h3>
-            </Modal.Header>
-            <Modal.Body>
-              <Row className="m-2">
-                <Col sm="12" xl="6">
-                  <label className="txt-darkblue">
-                    {t("identification_type")}
-                  </label>
-                  <Form.Group>
-                    <Form.Select
-                      aria-label="tipo_identificacion_id"
-                      name="tipo_identificacion_id"
-                      onChange={this._saveStateVariable}
-                      required
-                    >
-                      <option value="">-- Seleccione una opción --</option>
-                      {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-                <Col sm="12" xl="6">
-                  <label>{t("identification")}</label>
-                  <Form.Group>
-                    <Form.Control
-                      placeholder={t("identification")}
-                      type="text"
-                      onChange={this._saveStateVariable}
-                      name="clave"
-                      required
-                      maxLength={45}
-                    ></Form.Control>
-                  </Form.Group>
-                </Col>
-              </Row>
-
-              <Row className="m-2">
-                <Col sm="12" xl="6">
-                  <label className="txt-darkblue">{t("activity_code")}</label>
-                  <Form.Group>
-                    <Form.Select
-                      aria-label="codigo_actividad_id"
-                      name="codigo_actividad_id"
-                      onChange={this._saveStateVariable}
-                      required
-                    >
-                      <option value="">-- Seleccione una opción --</option>
-                      {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-
-                <Col sm="12" xl="6">
-                  <label>{t("name")}</label>
-                  <Form.Group>
-                    <Form.Control
-                      placeholder={t("name")}
-                      type="text"
-                      onChange={this._saveStateVariable}
-                      name="Nombre"
-                      required
-                      maxLength={250}
-                    ></Form.Control>
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="m-2">
-                <Col sm="12" xl="6">
-                  <label>{t("lastname")}</label>
-                  <Form.Group>
-                    <Form.Control
-                      placeholder={t("lastname")}
-                      type="text"
-                      onChange={this._saveStateVariable}
-                      name="Apellido1"
-                      required
-                      maxLength={100}
-                    ></Form.Control>
-                  </Form.Group>
-                </Col>
-
-                <Col sm="12" xl="6">
-                  <label>{t("secondlastname")}</label>
-                  <Form.Group>
-                    <Form.Control
-                      placeholder={t("secondlastname")}
-                      type="text"
-                      onChange={this._saveStateVariable}
-                      name="Apellido2"
-                      required
-                      maxLength={100}
-                    ></Form.Control>
-                  </Form.Group>
-                </Col>
-              </Row>
-
-              <Row className="m-2">
-                <Col sm="12" xl="12">
-                  <label className="txt-darkblue">{t("email")}</label>
-                  <Form.Group>
-                    <Form.Control
-                      placeholder={t("email")}
-                      type="mail"
-                      onChange={this._saveStateVariable}
-                      name="correo"
-                      required
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-
-              <Row className="m-2">
-                <Col sm="12" xl="4">
-                  <label className="txt-darkblue">{t("province")}</label>
-                  <Form.Group>
-                    <Form.Select
-                      aria-label="Provincia_id"
-                      name="Provincia_id"
-                      onChange={this._saveStateVariable}
-                      required
-                    >
-                      <option value="">-- Seleccione una opción --</option>
-                      {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-
-                <Col sm="12" xl="4">
-                  <label className="txt-darkblue">{t("canton")}</label>
-                  <Form.Group>
-                    <Form.Select
-                      aria-label="Canton_id"
-                      name="Canton_id"
-                      onChange={this._saveStateVariable}
-                      required
-                    >
-                      <option value="">-- Seleccione una opción --</option>
-                      {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-
-                <Col sm="12" xl="4">
-                  <label className="txt-darkblue">{t("district")}</label>
-                  <Form.Group>
-                    <Form.Select
-                      aria-label="Distrito_id"
-                      name="Distrito_id"
-                      onChange={this._saveStateVariable}
-                      required
-                    >
-                      <option value="">-- Seleccione una opción --</option>
-                      {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-              </Row>
-
-              <Row className="m-2">
-                <Col sm="12" xl="12">
-                  <label className="txt-darkblue">{t("address")}</label>
-                  <Form.Group>
-                    <Form.Control
-                      placeholder={t("address")}
-                      type="textarea"
-                      onChange={this._saveStateVariable}
-                      name="OtrasSenas"
-                      required
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-
-              <Row className="m-2">
-                <Col sm="12" xl="4">
-                  <Form.Check // prettier-ignore
-                    type="checkbox"
-                    id="exonerado"
-                    label={t("exonerated")}
-                    name="exonerado"
-                  />
-                </Col>
-
-                <Col sm="12" xl="4">
-                  <Form.Check // prettier-ignore
-                    type="checkbox"
-                    id="estado"
-                    label={t("status")}
-                    name="estado"
-                  />
-                </Col>
-              </Row>
-
-              <div className="well">
-                <Form onSubmit={this.addPhone}>
-                  <Row className="m-2">
-                    <Col sm="12" xl="6">
-                      <label className="txt-darkblue">{t("code")}</label>
-                      <Form.Group>
-                        <Form.Control
-                          placeholder={"+506"}
-                          type="number"
-                          name="codigo_pais"
-                          required
-                          maxLength={4}
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col sm="12" xl="6">
-                      <label className="txt-darkblue">{t("number")}</label>
-                      <Form.Group>
-                        <Form.Control
-                          placeholder={t("number")}
-                          type="number"
-                          name="Numero"
-                          required
-                          maxLength={20}
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row className="m-2">
-                    <Col sm="12" xl="6">
-                      <Form.Check // prettier-ignore
-                        type="checkbox"
-                        id="telefono_principal"
-                        label={t("main")}
-                        name="telefono_principal"
-                      />
-                    </Col>
-                    <Col sm="12" xl="6">
-                      <Button
-                        variant="primary"
-                        className="btn-fill btn-rounded"
-                        type="submit"
-                      >
-                        {t("add_phone")}
-                      </Button>
-                    </Col>
-                  </Row>
-
-                  <Row className="m-3">
-                    <Col sm="12" xl="12">
-                      <Table striped bordered hover>
-                        <thead>
-                          <tr>
-                            <th>{t("id")}</th>
-                            <th>{t("code")}</th>
-                            <th>{t("number")}</th>
-                            <th>{t("main")}</th>
-                            <th>{t("action")}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {this.state.telefonos.length > 0 &&
-                            this.state.telefonos.map((line, index) => (
-                              <tr key={index}>
-                                <td>{index + 1}</td>
-                                <td>{line.codigo_pais}</td>
-                                <td>{line.Numero}</td>
-                                <td>{line.main === 1 ? t("yes") : t("no")}</td>
-                                <td>
-                                  <Button
-                                    variant="danger"
-                                    className="btn-fill btn-rounded"
-                                    onClick={() => this.removeLine(index)}
-                                  >
-                                    {" "}
-                                    <i className="fas fa-trash" />
-                                  </Button>
-                                </td>
-                              </tr>
-                            ))}
-                        </tbody>
-                      </Table>
-                    </Col>
-                  </Row>
-                </Form>
-              </div>
-            </Modal.Body>
-
-            <Modal.Footer>
-              <Button
-                variant="light"
-                className="btn-rounded"
-                onClick={this.toggleShowProvider}
-              >
-                {t("close")}
-              </Button>
-              {this.state.processing ? (
-                <div className="lds-dual-ring-2"></div>
-              ) : (
-                <Button
-                  variant="primary"
-                  className="btn-fill btn-rounded"
-                  type="submit"
-                >
-                  {t("save")}
-                </Button>
-              )}
-            </Modal.Footer>
-          </Modal>
-        </Container>
+          </Container>
       </>
     );
   }

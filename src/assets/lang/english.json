@@ -154,7 +154,7 @@
     "something_went_wrong":"Something went wrong",
     "invalid_format_Correo":"Invalid format of Email",
     "correo_not_found":"Email not found on our system",
-    "invalid_value_form_Contrasena":"Invalid format for Password"
-
+    "invalid_value_form_Contrasena":"Invalid format for Password",
+    "phone_required":"Please enter at least one phone"
   }
 }
