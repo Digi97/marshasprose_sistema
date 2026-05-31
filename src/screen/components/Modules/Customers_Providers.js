@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, createRef  } from "react";
 
 import DataTable from "datatables.net-react";
 import DT from "datatables.net-dt";
@@ -28,7 +28,7 @@ class Customer_Provider extends Component {
     this.state = {
       tableData: [],
       show: false,
-      isProvider: false,
+        isProvider: false,
       processing: true,
       customer_provider: {
         id: 0,
@@ -56,10 +56,16 @@ class Customer_Provider extends Component {
       district: [],
       activityCode:[]
     };
+     this.modalTopRef = createRef();
   }
 
   //#region Funciones internas
 
+  scrollToTop = () => {
+        if (this.modalTopRef.current) {
+            this.modalTopRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
     _saveStateVariable = async (e) => {
     const { name, type, checked, value } = e.target;
 
@@ -127,15 +133,16 @@ class Customer_Provider extends Component {
 
     e.preventDefault();
     e.stopPropagation();
-    let {customer_provider,showCustomer, showProvider, telefonos} = this.state;
+    let {customer_provider,isProvider, telefonos} = this.state;
 
     if(telefonos.length === 0)
     {
+      this.scrollToTop();
         this.setState({ error: true, errorMsg: t("phone_required"), color:"alert alert-warning" });
       return
     }
 
-    let endpoint = showCustomer ? `clientes` :`proveedor`;
+    let endpoint = isProvider ? `proveedor`: `clientes` ;
       
        customer_provider.estado = customer_provider.estado? 1 : 0;
        customer_provider.exonerado = customer_provider.exonerado ? 1:0;
@@ -143,6 +150,8 @@ class Customer_Provider extends Component {
     
        if(customer_provider.id === 0)//creacion
     {
+
+      
        AppUtil.postAPI(endpoint, customer_provider).then(response => {
 if(response.codeStatus === 200)
 {
@@ -160,14 +169,14 @@ if(response.codeStatus === 200)
 } else
   {
   
-    
+    this.scrollToTop();
      this.setState({ error: true, errorMsg: t(response.message), color:"alert alert-warning" });
 }
            })
 
     }
     else //actualizacion
-    {
+    {    
 
        AppUtil.putAPI(`${endpoint}/${customer_provider.id}`, customer_provider).then(response => {
 
@@ -184,15 +193,13 @@ if(response.codeStatus === 200)
                 } 
                 else
                   {
-              this.setState({
-                  error: true,
-                  errorMsg: t('please_verify_data'),
-                  color:"alert alert-warning"
-                });
+                    this.scrollToTop();
+               this.setState({ error: true, errorMsg: t(response.message), color:"alert alert-warning" });
                 }
         } 
         else
         {         
+          this.scrollToTop();
         this.setState({
           error: true,
           errorMsg: t('please_verify_data'),
@@ -293,6 +300,8 @@ if(person !== null)
           });
   };
 
+
+
   //#endregion fin funciones internas
 
   componentDidMount() {
@@ -300,6 +309,7 @@ if(person !== null)
     this.getUserInfo();
     this.getProvincia();
     this.getActivityCode();
+    
   }
 
   getUserInfo = () => {
@@ -313,8 +323,7 @@ if(person !== null)
 
   getCustomerProviderById = (id, isCustomer = true) => {
 
-    console.log(id);
-    
+
      const { t } = this.props;
       let url = isCustomer ? `clientes/${id}` : `proveedor/${id}`;
 
@@ -331,7 +340,7 @@ if(person !== null)
           delete customer_provider.telefonos;
 
 
-          this.setState({customer_provider, telefonos, showCustomer:true}, ()=>{
+          this.setState({customer_provider, telefonos, show:true, isProvider: !isCustomer}, ()=>{
             this.getActivityCode();
             this.getCanton(customer_provider.provincia_id);
             this.getDistrito(customer_provider.canton_id);
@@ -352,11 +361,22 @@ if(person !== null)
 
 
 
-   ActionButtons = (rowData) => {
+   ActionButtonsCustomers = (rowData) => {
       return (
           <Row className="m-2">
             <Col lg="12" sm="12">
                  <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getCustomerProviderById(rowData.id)}><i className="fas fa-pen" /></Button>
+            </Col>
+          </Row>
+      );
+  };
+
+  
+   ActionButtonsProviders = (rowData) => {
+      return (
+          <Row className="m-2">
+            <Col lg="12" sm="12">
+                 <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getCustomerProviderById(rowData.id,false)}><i className="fas fa-pen" /></Button>
             </Col>
           </Row>
       );
@@ -427,8 +447,9 @@ if(person !== null)
                       { data: "id", title: t("id") },
                       { data: "identificacion", title: t("identification") },
                       { data: "tipo_identificacion", title: t("identification_type")},
-                      { data: "nombre", title: t("name") },
-                      { data: "correo", title: t("email") },
+                      { data: "nombre", title: t("name"),  render:function(data, type,row){ return `${row.nombre} ${row.apellido1} ${row.apellido2}` }  },
+                     { data: "correo", title: t("email") },
+                      { data: "estado", title: t("status"), render:function(data, type,row){ return data ==1 ? t("active"): t("inactive") } },
                       {
                         title: t("action"),
                         data: null,
@@ -439,8 +460,8 @@ if(person !== null)
                     ]}
                     className="display table cell-border compact stripe"
                     slots={{
-                      5: (cellData, rowData) =>
-                        this.ActionButtons(rowData, cellData),
+                      6: (cellData, rowData) =>
+                        this.ActionButtonsCustomers(rowData, cellData),
                     }}
                     options={{
                       language: {
@@ -523,12 +544,10 @@ if(person !== null)
                     columns={[
                       { data: "id", title: t("id") },
                       { data: "identificacion", title: t("identification") },
-                      {
-                        data: "tipo_identificacion",
-                        title: t("identification_type"),
-                      },
-                      { data: "nombre", title: t("name") },
+                      { data: "tipo_identificacion", title: t("identification_type") },
+                      { data: "nombre", title: t("name"),  render:function(data, type,row){ return `${row.nombre} ${row.apellido1} ${row.apellido2}` }  },
                       { data: "correo", title: t("email") },
+                      { data: "estado", title: t("status"), render:function(data, type,row){ return data ==1 ? t("active"): t("inactive") } },
                       {
                         title: t("action"),
                         data: null,
@@ -539,8 +558,8 @@ if(person !== null)
                     ]}
                     className="display table cell-border compact stripe"
                     slots={{
-                      5: (cellData, rowData) =>
-                        this.ActionButtons(rowData, cellData),
+                      6: (cellData, rowData) =>
+                        this.ActionButtonsProviders(rowData, cellData),
                     }}
                     options={{
                       language: {
@@ -576,8 +595,9 @@ if(person !== null)
             className="max-z-index"
           >
             <Modal.Header closeButton>
-              <h3 className=" tituloFerias">{this.state.isCustomer ?  t("customer"): t('provider')}</h3>
+              <h3 className=" tituloFerias">{this.state.isProvider ? t('provider'): t("customer")}</h3>
             </Modal.Header>
+             <div ref={this.modalTopRef} />
             {this.state.error === true && (
               <div className={this.state.color} role="alert">
                 {this.state.errorMsg}
@@ -844,7 +864,7 @@ if(person !== null)
                   <Form.Check // prettier-ignore
                     type="checkbox"
                     id="estado"
-                    label={t("status")}
+                    label={t("active")}
                     name="estado"
                     onChange={this._saveStateVariable}
                     checked={customer_provider.estado}
@@ -887,7 +907,7 @@ if(person !== null)
                         id="telefono_principal"
                         label={t("main")}
                         name="telefono_principal"
-                        checked={this.state.telefonos.findIndex(t => t.telefono_principal === 1) ===-1 }
+                        checked={this.state.telefonos?.findIndex(t => t.telefono_principal === 1) ===-1 }
                       />
                     </Col>
                     <Col sm="12" xl="6">
@@ -944,7 +964,7 @@ if(person !== null)
               <Button
                 variant="light"
                 className="btn-rounded"
-                onClick={this.toggleShowCustomer}
+                onClick={this.toggleShow}
               >
                 {t("close")}
               </Button>
