@@ -6,6 +6,7 @@ import Settings from "./screen/components/Settings/Settings.js";
 import Invoice from "./screen/components/Modules/Invoice.js";
 import Spent from "./screen/components/Modules/Spent.js";
 import Customers_Providers from "./screen/components/Modules/Customers_Providers.js";
+import Budget from "./screen/components/Modules/Budget.js";
 
 import crypto from "crypto-js";
 
@@ -50,7 +51,7 @@ export const dashboardRoutes = (t) => [
     path: "/budget_management",
     name: t("budget_management"),
     icon: "fas fa-money-bill",
-    component: Home,
+    component: Budget,
     layout: "/home",
   },
   {

@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, createRef} from "react";
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import { Container, Row, Col, Button,Modal, Form} from "react-bootstrap";
@@ -35,12 +35,18 @@ constructor(props)
       error: false,
       errorMsg: "",
       color:"",
-    }
+    };
+    this.modalTopRef = createRef();
   }
 
 
 
 //#region Funciones internas
+  scrollToTop = () => {
+        if (this.modalTopRef.current) {
+            this.modalTopRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
     toggleShow = () => this.setState({show: !this.state.show, user:{usuario_id:0,
     empresa:"",
     apellido1:"",
@@ -92,7 +98,10 @@ if(response.codeStatus === 200)
                   color:"alert alert-success"
                 }, () => { window.location.reload(); });
               
-          } 
+          } else{
+             this.scrollToTop();
+               this.setState({ error: true, errorMsg: t(response.message), color:"alert alert-warning" });
+          }
 
 } else
   {
@@ -126,16 +135,17 @@ if(response.codeStatus === 200)
                 } 
                 else
                   {
+                    this.scrollToTop()
               this.setState({
                   error: true,
-                  errorMsg: t('please_verify_data'),
-                  color:"alert alert-success"
+                  errorMsg: t(response.message),
+                  color:"alert alert-warning"
                 });
                 }
         } 
         else
         {
-                  
+                   this.scrollToTop()
         this.setState({
           error: true,
           errorMsg: t('please_verify_data'),

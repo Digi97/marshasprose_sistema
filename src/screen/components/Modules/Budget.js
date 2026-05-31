@@ -1,11 +1,11 @@
-import React, {Component} from "react";
+import React, {Component, createRef} from "react";
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import { Container, Row, Col, Button,Modal, Form} from "react-bootstrap";
 import { withTranslation } from "react-i18next";
-
+import crypto from "crypto-js";
+import moment from 'moment-timezone'
 import AppUtil from "../../../AppUtil/AppUtil";
-import presupuestary_category from "../Settings/Maintenance/presupuestary_category";
 
 DataTable.use(DT);
 
@@ -18,14 +18,15 @@ constructor(props)
       tableData: [],
   show:false,
   processing: false,
+  budgets:[],
   budget:{
     id:0,
     codigo:"",
     nombre:"",
     descripcion:"",
     anio_presupuesto:"",
-    periodo_inicio:"",
-    periodo_fin:"",
+    periodo_inicio:moment().format("YYYY-MM-DD"),
+    periodo_fin:moment().add(1, 'y').format("YYYY-MM-DD"),
     categoria_presupuestaria_id:"",
     monto_aprobado:"",
     monto_modificado:"",
@@ -43,20 +44,30 @@ constructor(props)
       error: false,
       errorMsg: "",
       color:"",
+      user:{}
     }
+       this.modalTopRef = createRef();
+       console.log();
+       
   }
 
 
 
 //#region Funciones internas
+  scrollToTop = () => {
+        if (this.modalTopRef.current) {
+            this.modalTopRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
     toggleShow = () => this.setState({show: !this.state.show,budget:{
     id:0,
     codigo:"",
     nombre:"",
     descripcion:"",
     anio_presupuesto:"",
-    periodo_inicio:"",
-    periodo_fin:"",
+    periodo_inicio:moment().format("YYYY-MM-DD"),
+    periodo_fin:moment().add(1, 'y').format("YYYY-MM-DD"),
     categoria_presupuestaria_id:"",
     monto_aprobado:"",
     monto_modificado:"",
@@ -73,7 +84,7 @@ constructor(props)
       const {name, type, checked, value} = e.target;
     await this.setState({
             budget: {
-              ...this.state.user,
+              ...this.state.budget,
               [name]: type ==="checkbox" ? (checked? 1:0): value,
             },
           });
@@ -83,21 +94,22 @@ constructor(props)
 
 
     const { t } = this.props;
-    let {budget} = this.state;
-    budget.estado = budget.estado ? 1 : 0; //asignacion para tipo de dato 
+    let {budget} = this.state; //asignacion para tipo de dato 
 
        e.preventDefault();
       e.stopPropagation();
-      if(user.usuario_id === 0) //creacion
+   
+      budget.usuarios_Usuario_id = this.state.user.usuario_id;
+ 
+      if(budget.id === 0) //creacion
       {
 
-
         
-           AppUtil.postAPI(`users`, user).then(response => {
+           AppUtil.postAPI(`gestion_presupuestaria`, budget).then(response => {
 if(response.codeStatus === 200)
 {
-   let user = response ? response.data : [];
-    if(Number.isInteger(user))
+   let budget = response ? response.data : [];
+    if(Number.isInteger(budget))
                 {
                     this.setState({
                   error: true,
@@ -109,12 +121,9 @@ if(response.codeStatus === 200)
 
 } else
   {
-     this.setState({
-                  error: true,
-                  errorMsg: t(response.message),
-                  color:"alert alert-warning"
-                });
-}
+     this.setState({ error: true, errorMsg: t(response.message), color:"alert alert-warning" });
+    this.scrollToTop();
+    }
 
             
         
@@ -123,13 +132,13 @@ if(response.codeStatus === 200)
       } 
       else //actualizacion
       {
-      AppUtil.putAPI(`users/${user.usuario_id}`, user).then(response => {
+      AppUtil.putAPI(`gestion_presupuestaria/${budget.id}`, budget).then(response => {
 
         if(response)
         {
-          let user = response ? response.data : [];
+          let budget = response ? response.data : [];
 
-                if(Number.isInteger(user))
+                if(Number.isInteger(budget))
                 {
                     this.setState({
                   error: true,
@@ -139,11 +148,7 @@ if(response.codeStatus === 200)
                 } 
                 else
                   {
-              this.setState({
-                  error: true,
-                  errorMsg: t('please_verify_data'),
-                  color:"alert alert-success"
-                });
+              this.setState({ error: true, errorMsg: t(response.message),  color:"alert alert-success" });
                 }
         } 
         else
@@ -155,8 +160,7 @@ if(response.codeStatus === 200)
           color:"alert alert-danger"
         });
         }
-     
-     // this.setState({user});
+
            })
       }
     // e.target.reset();
@@ -165,31 +169,33 @@ if(response.codeStatus === 200)
 
       }
 
-    getUsers = () =>{
-      AppUtil.getAPI(`users`, sessionStorage.getItem('token')).then(response => {
-      let users = response ? response.data : [];
-      this.setState({users});
+    getBudget = () =>{
+      AppUtil.getAPI(`gestion_presupuestaria`, sessionStorage.getItem('token')).then(response => {
+      let budgets = response ? response.data : [];
+      this.setState({budgets});
     });
   }
 
-  getUserById = (id) =>
+  getBudgetById = (id) =>
   {
 
-    
-    
-        AppUtil.getAPI(`users/${id}`, sessionStorage.getItem('token')).then(response => {
-          console.log(response);
-          
-      let user = response ? response.data : [];      
-      this.setState({user, show:true}, ()=>{this.getRoles()});
+        AppUtil.getAPI(`gestion_presupuestaria/${id}`, sessionStorage.getItem('token')).then(response => {
+        
+      let budget = response ? response.data : [];      
+      this.setState({budget, show:true}, ()=>{this.getCostCenter(); this.getCategories()});
     });
 
   }
 
 
-  getRoles = () => AppUtil.getAPI(`roles`, sessionStorage.getItem('token')).then(response => {
-      let roles = response ? response.data : [];
-      this.setState({roles});
+  getCategories = () => AppUtil.getAPI(`catalogos/categoria_presupuestaria`, sessionStorage.getItem('token')).then(response => {
+      let presupuestary_category = response ? response.data : [];
+      this.setState({presupuestary_category});
+    });
+
+      getCostCenter = () => AppUtil.getAPI(`catalogos/centro_costos`, sessionStorage.getItem('token')).then(response => {
+      let cost_center = response ? response.data : [];
+      this.setState({cost_center});
     });
 
 
@@ -197,28 +203,40 @@ if(response.codeStatus === 200)
     return (
         <Row className="m-2">
           <Col lg="12" sm="12">
-               <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getUserById(rowData.usuario_id)}><i className="fas fa-pen" /></Button>
+               <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getBudgetByIdById(rowData.usuario_id)}><i className="fas fa-pen" /></Button>
           </Col>
         </Row>
     );
 };
 
   componentDidMount(){
-    this.getUsers();
-    
+    this.getUserInfo();
+    this.getBudget();
+    this.getCostCenter(); 
+    this.getCategories();
   }
+
+   getUserInfo = () => {
+      let bytes = crypto.AES.decrypt(
+        sessionStorage.getItem("user"),
+        "@marsh_contable",
+      );
+      this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
+      this.setState({ user: this.user, token: sessionStorage.getItem("token") });
+    };
+
     //#endregion fin funciones internas
 
 
      render(){
        const { t } = this.props;
-       let {roles, users, user} = this.state;
+       let {cost_center, budget, budgets, presupuestary_category} = this.state;
       return (
     <>
       <Container fluid>
         <Row>
           <Col lg="6" sm="12">
-            <h1>{t("users")}</h1>
+            <h1>{t("budget_management")}</h1>
           </Col>
           <Col lg="6" sm="12">
           <Row>
@@ -229,13 +247,7 @@ if(response.codeStatus === 200)
                   {t("create")}
               </Button>
             </Col>
-            <Col lg="2" sm="12">
-              <Button
-              className="btn-fill btn-rounded bg-blue"
-              onClick={this.toggleShow}>
-                {t("clean")}
-            </Button>
-            </Col>
+          
 
           </Row>
           </Col>
@@ -244,22 +256,23 @@ if(response.codeStatus === 200)
 
         <Row>
                 <DataTable
-                data={users} 
+                data={budgets} 
                 columns={[
-                  {data:'usuario_id', title:t("id")},
+                  {data:'id', title:t("id")},
+                  {data:'codigo', title:t("code")},
                   {data:'nombre', title:t("name")},
-                  {data:'apellido1', title:t("lastname")},
-                  {data:'apellido2', title:t("secondlastname")},
-                  {data:'correo', title:t("email")},
-                  {data:'rol', title:t("rol")},
-                  {data:'id_Empleado', title:t("employeeid")},
+                  {data:'year', title:t("year_budget")},
+                  {data:'periodo_inicio', title:t("begin_period")},
+                  {data:'periodo_fin', title:t("end_period")},
+                  {data:'categoria', title:t("category")},
+                  {data:'centro_costos', title:t("cost_center")},
                   {data:'activo', title:t("status"), render: (data, type, row) => { return row.activo ===1 ? t('active'):t("inactive") }},
                   {title:t("action"), data:null, orderable: false, searchable:false, 
                  //   render:(data, type, row)=> {return `<Button variant="danger" className="btn-fill btn-rounded" onClick={this.removeLine(${row.usuario_id})}><i className="fas fa-trash" /></Button>` }
                  },
                 ]}
                 className="display table cell-border compact stripe"     
-                slots={{8: (cellData, rowData) => this.ActionButtons(rowData, cellData)}}
+                slots={{9: (cellData, rowData) => this.ActionButtons(rowData, cellData)}}
                 options={{
                 language: {
                   zeroRecords:t("zeroRecords"),
@@ -294,10 +307,10 @@ if(response.codeStatus === 200)
               size="lg"
               className="max-z-index"
           >
-     <Form onSubmit={this.saveUser}>
+     <Form onSubmit={this.saveBudget}>
 
           <Modal.Header closeButton>
-            <h3 className=" tituloFerias">{t("users")}</h3>
+            <h3 className=" tituloFerias">{t("budget_management")}</h3>
                {this.state.error === true && (
               <div className={this.state.color} role="alert">
                 {this.state.errorMsg}
@@ -308,15 +321,15 @@ if(response.codeStatus === 200)
           
                 <Row className="m-2">
                   <Col sm="12" xl="6">
-                    <label>{t("name")}</label>
+                    <label>{t("code")}</label>
                    <Form.Group>
                      <Form.Control
-                        placeholder={t("name")}
+                        placeholder={t("code")}
                         type="text"
                         onChange={this._saveStateVariable}
-                        name="Nombre"
+                        name="codigo"
                         required
-                        value={user.nombre}
+                        value={budget.codigo}
                         maxLength={100}
                         >
                        </Form.Control>
@@ -324,16 +337,16 @@ if(response.codeStatus === 200)
                    </Col>
 
                   <Col sm="12" xl="6">
-                    <label>{t("lastname")}</label>
+                    <label>{t("name")}</label>
                    <Form.Group>
                      <Form.Control
-                        placeholder={t("lastname")}
+                        placeholder={t("name")}
                         type="text"
                          onChange={this._saveStateVariable}
-                        name="apellido1"
+                        name="nombre"
                         required
                         maxLength={100}
-                        value={user.apellido1}
+                        value={budget.nombre}
                         >
                        </Form.Control>
                    </Form.Group>
@@ -342,16 +355,16 @@ if(response.codeStatus === 200)
                    <Row className="m-2">
 
                   <Col sm="12" xl="6">
-                    <label>{t("secondlastname")}</label>
+                    <label>{t("description")}</label>
                    <Form.Group>
                      <Form.Control
-                        placeholder={t("secondlastname")}
+                        placeholder={t("description")}
                         type="text"
-                         onChange={this._saveStateVariable}
-                        name="apellido2"
+                        onChange={this._saveStateVariable}
+                        name="descripcion"
                         required
                         maxLength={100}
-                        value={user.apellido2}
+                        value={budget.descripcion}
                         >
                        </Form.Control>
                    </Form.Group>
@@ -359,16 +372,16 @@ if(response.codeStatus === 200)
 
 
                 <Col sm="12" xl="6">
-                    <label>{t("email")}</label>
+                    <label>{t("year_budget")}</label>
                    <Form.Group>
                      <Form.Control
-                        placeholder={t("email")}
+                        placeholder={t("year_budget")}
                         type="text"
                          onChange={this._saveStateVariable}
-                        name="correo"
+                        name="anio_presupuesto"
                         required
                         maxLength={100}
-                        value={user.correo}
+                        value={budget.anio_presupuesto}
                         >
                        </Form.Control>
                    </Form.Group>
@@ -377,48 +390,173 @@ if(response.codeStatus === 200)
 
 
              <Row className="m-2">
-                    <Col sm="12" xl="12">
-                    <label>{t("password")}</label>
+                    <Col sm="12" xl="6">
+                    <label>{t("begin_period")}</label>
                    <Form.Group>
                      <Form.Control
-                        placeholder={t("password")}
-                        type="password"
+                        placeholder={t("begin_period")}
+                        type="date"
                         onChange={this._saveStateVariable}
-                        name="contrasena"
-                        required={user.usuario_id === 0}
+                        name="periodo_inicio"
+                        required
                         maxLength={20}
+                        value={budget.periodo_inicio}
                         >
                        </Form.Control>
                    </Form.Group>
                    </Col>
 
 
-                    <Col sm="12" xl="12">
-                    <label className="txt-darkblue">{t("rol")}</label>
+                    <Col sm="12" xl="6">
+                    <label className="txt-darkblue">{t("end_period")}</label>
                        <Form.Group>
-                          <Form.Select aria-label="Roles_id" name="roles_id" onChange={this._saveStateVariable} required>
-                            <option value="">{t("select_option")}</option>
-                           
-                            {roles?.map((item, key) =>(item.id === user.roles_id  ? <option value={item.id} selected defaultValue key={key}>{item.descripcion}</option> :  <option value={item.id} key={key}>{item.descripcion}</option>))}
-                            </Form.Select>
+                           <Form.Control
+                        placeholder={t("end_period")}
+                        type="date"
+                        onChange={this._saveStateVariable}
+                        name="periodo_fin"
+                        required
+                        maxLength={20}
+                        value={budget.periodo_fin}
+                        >
+                       </Form.Control>
                        </Form.Group>
                    </Col>
+                   </Row>
+                   <Row className="m-2">
 
-                <Col sm="12" xl="12">
-                    <label>{t("employeeid")}</label>
-                   <Form.Group>
-                     <Form.Control
-                        placeholder={t("employeeid")}
-                        type="text"
-                        onChange={this._saveStateVariable}
-                        name="id_Empleado"
-                        required
-                        value={user.id_Empleado}
-                        maxLength={20}
-                        >
-                       </Form.Control>
+                <Col sm="12" xl="6">
+                    <label>{t("presupuestary_category")}</label>
+                   <Form.Group>                  
+                     <Form.Select
+                                          placeholder={t("presupuestary_category")}
+                                          onChange={this._saveStateVariable}
+                                          name="categoria_presupuestaria_id"
+                                          required
+                                        >
+                                          <option value="">{t("select_option")}</option>
+                                          {presupuestary_category?.map((item, key) =>
+                                            item.id ===
+                                            budget.categoria_presupuestaria_id ? (
+                                              <option
+                                                value={item.id}
+                                                selected
+                                                defaultValue
+                                                key={key}
+                                              >
+                                                {item.nombre}
+                                              </option>
+                                            ) : (
+                                              <option value={item.id} key={key}>
+                                                {item.nombre}
+                                              </option>
+                                            ),
+                                          )}
+                                        </Form.Select>
                    </Form.Group>
                    </Col>
+
+<Col sm="12" xl="6">
+                    <label>{t("cost_center")}</label>
+                   <Form.Group>                  
+                     <Form.Select
+                                          placeholder={t("cost_center")}
+                                          onChange={this._saveStateVariable}
+                                          name="centro_Costos_id"
+                                          required
+                                        >
+                                          <option value="">{t("select_option")}</option>
+                                          {cost_center?.map((item, key) =>
+                                            item.id ===
+                                            budget.centro_Costos_id ? (
+                                              <option
+                                                value={item.id}
+                                                selected
+                                                defaultValue
+                                                key={key}
+                                              >
+                                                {item.nombre}
+                                              </option>
+                                            ) : (
+                                              <option value={item.id} key={key}>
+                                                {item.nombre}
+                                              </option>
+                                            ),
+                                          )}
+                                        </Form.Select>
+                   </Form.Group>
+                   </Col>
+                   </Row>
+
+<Row className="m-2">
+  <Col sm="12" xl="4">
+      <label className="txt-darkblue">{t("amount_approved")}</label>
+                       <Form.Group>
+                      <Form.Control
+                        placeholder={t("amount_approved")}
+                        type="number"
+                        onChange={this._saveStateVariable}
+                        name="monto_aprobado"
+                        required
+                        value={budget.monto_aprobado}
+                        >
+                       </Form.Control>
+                       </Form.Group>
+  
+  </Col>
+
+    <Col sm="12" xl="4">
+      <label className="txt-darkblue">{t("amount_modified")}</label>
+                       <Form.Group>
+                      <Form.Control
+                        placeholder={t("amount_modified")}
+                        type="number"
+                        onChange={this._saveStateVariable}
+                        name="monto_modificado"
+                        required
+                        value={budget.monto_modificado}
+                        >
+                       </Form.Control>
+                       </Form.Group>
+  
+  </Col>
+
+    <Col sm="12" xl="4">
+      <label className="txt-darkblue">{t("amount_compromised")}</label>
+                       <Form.Group>
+                      <Form.Control
+                        placeholder={t("amount_compromised")}
+                        type="number"
+                        onChange={this._saveStateVariable}
+                        name="monto_comprometido"
+                        required
+                        value={budget.monto_comprometido}
+                        >
+                       </Form.Control>
+                       </Form.Group>
+  
+  </Col>
+</Row>
+
+<Row className="m-2">
+    <Col sm="12" xl="12">
+      <label className="txt-darkblue">{t("amount_executed")}</label>
+                       <Form.Group>
+                      <Form.Control
+                        placeholder={t("amount_executed")}
+                        type="number"
+                        onChange={this._saveStateVariable}
+                        name="monto_ejecutado"
+                        required
+                        value={budget.monto_ejecutado}
+                        >
+                       </Form.Control>
+                       </Form.Group>
+  
+  </Col>
+</Row>
+
+                   <Row className="m-2">
 
                        <Col sm="12" xl="12">
                          <Form.Group>
@@ -426,9 +564,9 @@ if(response.codeStatus === 200)
                               type="checkbox"
                               id="active"
                               label={t("active")}
-                              name="activo"
+                              name="estado"
                               onChange={this._saveStateVariable}
-                              checked={user.activo ===1 ? true :false}
+                              checked={budget.estado ===1 ? true :false}
                               />
                       </Form.Group>
                    </Col>

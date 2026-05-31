@@ -149,7 +149,14 @@
   "invalid_string_form_nombre_actividad":"Información inválida para el campo Nombre Actividad",
   "iva_tax_code":"Código Tarifa IVA",
   "iva_tax_name":"Nombre Tarifa IVA",
-  "select_option":"-- Seleccione una opción --"
+  "select_option":"-- Seleccione una opción --",
+  "year_budget":"Año Presupuesto",
+  "begin_period":"Periodo Inicio",
+    "end_period":"Periodo Fin",
+    "amount_approved":"Monto Aprobado",
+    "amount_executed":"Monto Ejecutado",
+    "amount_compromised":"Monto Comprometido",
+     "amount_modified":"Monto Modificado"
 
 
     }

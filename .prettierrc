@@ -1,6 +1,4 @@
 {
-  "editor.defaultFormatter": "<another formatter>",
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "tabWidth": 4,
+  "useTabs": false
 }
