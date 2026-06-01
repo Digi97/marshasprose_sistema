@@ -47,7 +47,7 @@ constructor(props)
       user:{}
     }
        this.modalTopRef = createRef();
-       console.log();
+
        
   }
 
@@ -96,7 +96,7 @@ constructor(props)
     const { t } = this.props;
     let {budget} = this.state; //asignacion para tipo de dato 
 
-       e.preventDefault();
+      e.preventDefault();
       e.stopPropagation();
    
       budget.usuarios_Usuario_id = this.state.user.usuario_id;
@@ -203,7 +203,7 @@ if(response.codeStatus === 200)
     return (
         <Row className="m-2">
           <Col lg="12" sm="12">
-               <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getBudgetByIdById(rowData.usuario_id)}><i className="fas fa-pen" /></Button>
+               <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getBudgetById(rowData.id)}><i className="fas fa-pen" /></Button>
           </Col>
         </Row>
     );
@@ -261,12 +261,13 @@ if(response.codeStatus === 200)
                   {data:'id', title:t("id")},
                   {data:'codigo', title:t("code")},
                   {data:'nombre', title:t("name")},
-                  {data:'year', title:t("year_budget")},
-                  {data:'periodo_inicio', title:t("begin_period")},
-                  {data:'periodo_fin', title:t("end_period")},
-                  {data:'categoria', title:t("category")},
-                  {data:'centro_costos', title:t("cost_center")},
-                  {data:'activo', title:t("status"), render: (data, type, row) => { return row.activo ===1 ? t('active'):t("inactive") }},
+                  {data:'anio_presupuesto', title:t("year_budget")},
+                  {data:'periodo_inicio', title:t("begin_period"), render: (data, type, row) =>{ 
+                   return moment(`${data}`).format(`${row.formato}`) }},
+                  {data:'periodo_fin', title:t("end_period"),  render: (data, type, row) =>{ return moment(`${data}`).format(`${row.formato}`) }},
+                  {data:'categoria_presupuestaria', title:t("category")},
+                  {data:'centro_costo', title:t("cost_center")},
+                  {data:'estado', title:t("status"), render: (data, type, row) => { return row.estado ===1 ? t('active'):t("inactive") }},
                   {title:t("action"), data:null, orderable: false, searchable:false, 
                  //   render:(data, type, row)=> {return `<Button variant="danger" className="btn-fill btn-rounded" onClick={this.removeLine(${row.usuario_id})}><i className="fas fa-trash" /></Button>` }
                  },
@@ -400,7 +401,7 @@ if(response.codeStatus === 200)
                         name="periodo_inicio"
                         required
                         maxLength={20}
-                        value={budget.periodo_inicio}
+                        value={moment(budget.periodo_inicio).format("YYYY-MM-DD")}
                         >
                        </Form.Control>
                    </Form.Group>
@@ -417,7 +418,7 @@ if(response.codeStatus === 200)
                         name="periodo_fin"
                         required
                         maxLength={20}
-                        value={budget.periodo_fin}
+                        value={moment(budget.periodo_fin).format("YYYY-MM-DD")}
                         >
                        </Form.Control>
                        </Form.Group>

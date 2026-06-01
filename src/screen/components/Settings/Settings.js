@@ -1,14 +1,11 @@
-import React from "react";
+import React, {Component, createRef} from "react";
 import { Container, Row, Col, Tabs, Tab, Button, Form } from "react-bootstrap";
 import AppUtil from "../../../AppUtil/AppUtil.js";
-
 import Toast from "../common/Toast.js";
-
 import Select from "react-select";
-
 import { withTranslation } from "react-i18next";
 //TODO: agregar informacion de conexion a smtp para obtener facturas
-class Settings extends React.Component {
+class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,10 +37,20 @@ class Settings extends React.Component {
       taxes: [],
       identificationType: [],
       activityCode: [],
+      error: false,
+      errorMsg: "",
+      color:"",
     };
+    this.modalTopRef = createRef();
   }
 
   //#region opciones_selects
+  scrollToTop = () => {
+        if (this.modalTopRef.current) {
+            this.modalTopRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
   getEmpresaById = () => {
     const { t } = this.props;
 
@@ -115,7 +122,7 @@ class Settings extends React.Component {
     e.preventDefault();
     e.stopPropagation();
     AppUtil.putAPI(`empresa/1`, this.state.empresa).then((response) => {
-      console.log(response);
+    
       if (response) {
         let user = response ? response.data : [];
 
@@ -125,17 +132,9 @@ class Settings extends React.Component {
               error: true,
               errorMsg: t("updated_successfully"),
               color: "alert alert-success",
-            },
-            () => {
-              window.location.reload();
-            },
-          );
+            });
         } else {
-          this.setState({
-            error: true,
-            errorMsg: t(response.message),
-            color: "alert alert-warning",
-          });
+          this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning", });
         }
       } else {
         this.setState({
@@ -179,6 +178,11 @@ class Settings extends React.Component {
         />
 
         <Container fluid>
+           {this.state.error === true && (
+              <div className={this.state.color} role="alert">
+                {this.state.errorMsg}
+              </div>
+            )}
           <Form onSubmit={this.saveEmpresa}>
             <Tabs className="mb-3">
               <Tab
@@ -189,7 +193,9 @@ class Settings extends React.Component {
                   </span>
                 }
               >
+                
                 <h4 className="txt-blue">{t("business_info")}</h4>
+               
                 <div className="well">
                   <Form.Group>
                     <Form.Label className="txt-darkblue">
@@ -379,7 +385,7 @@ class Settings extends React.Component {
                               this.setState({
                                 empresa: {
                                   ...this.state.empresa,
-                                  codigo_actividad: value,
+                                  codigo_actividad_id: value.id,
                                 },
                               })
                             }
@@ -407,14 +413,7 @@ class Settings extends React.Component {
                           <Select
                             options={taxes}
                             name="impuesto_id"
-                            onChange={(value) =>
-                              this.setState({
-                                empresa: {
-                                  ...this.state.empresa,
-                                  impuesto_id: value,
-                                },
-                              })
-                            }
+                            onChange={(value) => this.setState({ empresa: {  ...this.state.empresa, impuesto_id: value.id,  }}) }
                             getOptionValue={(option) => option.id}
                             getOptionLabel={(option) => option.nombre}
                             defaultValue={() =>
