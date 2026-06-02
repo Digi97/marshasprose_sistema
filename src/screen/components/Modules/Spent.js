@@ -37,7 +37,7 @@ class Spent extends Component {
       // Objeto principal del gasto
       spent: {
         id: 0,
-        Doc_Referencia: "",
+        doc_Referencia: "",
         categoria_gasto_id: 0,
         Tipo_documento_id: 0,
         Medio_pago_id: 0,
@@ -47,6 +47,15 @@ class Spent extends Component {
         Impuesto: 0,
         Total: 0,
         Usuarios_Usuario_id: 0,
+        createElectronicDoc:1 //delete on send
+
+      },
+      AuxLine:{
+        total:"",
+        subtotal:"",
+        descuento:"",
+        impuesto:"",
+        porcentaje:0
       },
 
       // Líneas de detalle
@@ -54,11 +63,12 @@ class Spent extends Component {
 
       // Catálogos
       categories: [],
-      docTypes: [],
       paymentMethods: [],
       providers: [],
       commercialCodes: [],
-
+      taxes:[],
+      defaultTax:{},
+      selectedTax:{},
       token: "",
     };
 
@@ -70,7 +80,7 @@ class Spent extends Component {
   componentDidMount() {
     this.getUserInfo();
     this.getCategories();
-    this.getDocTypes();
+    this.getTaxes();
     this.getPaymentMethods();
     this.getProviders();
     this.getCommercialCodes();
@@ -115,19 +125,16 @@ class Spent extends Component {
         impuesto: 0,
         total: 0,
         usuarios_Usuario_id: this.user ? this.user.usuario_id : 0,
+        createElectronicDoc:1
       },
     });
 
   // Actualiza campos del objeto principal spent
-  _saveStateVariable = async (e) => {
-    const { name, value } = e.target;
-    await this.setState({
-      spent: {
-        ...this.state.spent,
-        [name]: value,
-      },
-    });
-  };
+_saveStateVariable = async (e) => {
+
+      const {name, type, checked, value} = e.target;
+    await this.setState({ spent: { ...this.state.spent, [name]: type ==="checkbox" ? (checked? 1:0): value }});
+    }
 
   // Actualiza el proveedor desde react-select
   _saveProvider = (selectedOption) => {
@@ -195,6 +202,57 @@ class Spent extends Component {
     }));
   };
 
+  _calculaInput = (e, isSelect= false) =>{
+
+ 
+   let {name, type, value, selectedIndex} = e.target;
+    if(isSelect)
+    {
+      const index = selectedIndex;
+      const optionElement = e.target.options[index];
+      const taxOption = optionElement.getAttribute('attr');
+      
+      name = 'porcentaje'
+      value = taxOption
+      }
+          
+    
+   
+     this.setState({ AuxLine: { ...this.state.AuxLine, [name]: value }}, () =>{
+
+    let {AuxLine, selectedTax} = this.state;
+    let subtotal = isNaN(AuxLine.subtotal) ? 0 :AuxLine.subtotal,
+     tax = isNaN(AuxLine.porcentaje) ? 0 : AuxLine.porcentaje , 
+     impuesto =0,
+     total = 0, 
+     descuento = isNaN(AuxLine.descuento)? 0 :AuxLine.descuento ;
+
+     impuesto = (subtotal-descuento) * (tax/100)
+     total = (subtotal-descuento) + impuesto;
+
+    AuxLine.total = total;
+    AuxLine.impuesto = impuesto
+    this.setState({AuxLine})
+
+
+     });
+    
+    
+/*
+     AuxLine:{
+        total:0,
+        subtotal:0,
+        descuento:0,
+        impuesto:0
+      },*/
+
+
+
+
+
+
+  }
+
   getCategories = () =>
     AppUtil.getAPI("catalogos/categoria_gasto", sessionStorage.getItem("token")).then(
       (response) => {
@@ -203,13 +261,7 @@ class Spent extends Component {
       }
     );
 
-  getDocTypes = () =>
-    AppUtil.getAPI("catalogos/tipo_documento", sessionStorage.getItem("token")).then(
-      (response) => {
-        const docTypes = response ? response.data : [];
-        this.setState({ docTypes });
-      }
-    );
+
 
   getPaymentMethods = () =>
     AppUtil.getAPI("catalogos/medio_pago", sessionStorage.getItem("token")).then(
@@ -228,11 +280,8 @@ class Spent extends Component {
         if(response)
         {
           //doble data porque se obtiene como objeto listo de datatable
-          const data = response ? response.data.data : [];
-          const providers = data.map((p) => ({
-            value: p.id,
-            label: `${p.nombre} ${p.apellido1}`,
-          }));
+          const providers = response ? response.data.data : [];
+        
           this.setState({ providers, processing: false });
         } else{
           this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning", });
@@ -246,11 +295,19 @@ class Spent extends Component {
   getCommercialCodes = () =>
     AppUtil.getAPI("catalogos/codigo_comercial", sessionStorage.getItem("token")).then(
       (response) => {
-        console.log(response);
+      
         
         const commercialCodes = response ? response.data : [];
         this.setState({ commercialCodes });
       }
+    );
+
+    getTaxes = () =>
+    AppUtil.getAPI(`catalogos/impuesto`, sessionStorage.getItem("token")).then(
+      (response) => {
+        let taxes = response ? response.data : [];
+        this.setState({ taxes });
+      },
     );
 
   // ─────────────────────────────────────────────
@@ -278,16 +335,17 @@ class Spent extends Component {
             this.setState({
               spent: {
                 id: spentData.id,
-                Doc_Referencia: spentData.Doc_Referencia,
-                Descripcion: spentData.Descripcion,
-                Categoria_gasto_id: spentData.Categoria_gasto_id,
-                Tipo_documento_id: spentData.Tipo_documento_id,
-                Medio_pago_id: spentData.Medio_pago_id,
-                Proveedor_id: spentData.Proveedor_id,
-                Subtotal: spentData.Subtotal,
-                Impuesto: spentData.Impuesto,
-                Total: spentData.Total,
-                Usuarios_Usuario_id: spentData.Usuarios_Usuario_id,
+                Doc_Referencia: spentData.doc_Referencia,
+                Descripcion: spentData.descripcion,
+                Categoria_gasto_id: spentData.categoria_gasto_id,
+                Tipo_documento_id: spentData.tipo_documento_id,
+                Medio_pago_id: spentData.medio_pago_id,
+                Proveedor_id: spentData.proveedor_id,
+                Subtotal: spentData.subtotal,
+                Impuesto: spentData.impuesto,
+                Total: spentData.total,
+                Usuarios_Usuario_id: spentData.usuarios_Usuario_id,
+
               },
               lines,
               show: true,
@@ -433,7 +491,6 @@ class Spent extends Component {
       spent,
       lines,
       categories,
-      docTypes,
       paymentMethods,
       providers,
       commercialCodes,
@@ -442,6 +499,8 @@ class Spent extends Component {
       color,
       processing,
       token,
+      taxes,
+      AuxLine
     } = this.state;
 
     return (
@@ -466,7 +525,6 @@ class Spent extends Component {
             </Col>
           </Row>
 
-          {/* ── DATATABLE ── */}
           <Row>
             {token === "" ? (
               <div />
@@ -487,11 +545,11 @@ class Spent extends Component {
                 }}
                 columns={[
                   { data: "id",            title: t("id") },
-                  { data: "Doc_Referencia", title: t("reference") },
-                  { data: "Proveedor",      title: t("provider") },
-                  { data: "Subtotal",       title: t("subtotal") },
-                  { data: "Impuesto",       title: t("tax") },
-                  { data: "Total",          title: t("total") },
+                  { data: "doc_Referencia", title: t("reference") },
+                  { data: "proveedor",      title: t("provider") },
+                  { data: "subtotal",       title: t("subtotal") },
+                  { data: "impuesto",       title: t("tax") },
+                  { data: "total",          title: t("total") },
                   {
                     title: t("action"),
                     data: null,
@@ -524,8 +582,6 @@ class Spent extends Component {
               />
             )}
           </Row>
-
-          {/* ── MODAL ── */}
           <Modal
             show={this.state.show}
             onHide={this.toggleShow}
@@ -544,8 +600,6 @@ class Spent extends Component {
             <Modal.Body>
               {/* Ref al tope para scroll en error */}
               <div ref={this.modalTopRef} />
-
-              {/* Alerta */}
               {error && (
                 <Alert
                   className={color}
@@ -556,7 +610,6 @@ class Spent extends Component {
                 </Alert>
               )}
 
-                  {/* Referencia */}
                   <Row className="m-2">
                     <Col sm="12" xl="6">
                       <label>{t("reference")}</label>
@@ -565,10 +618,10 @@ class Spent extends Component {
                           placeholder={t("reference")}
                           type="text"
                           onChange={this._saveStateVariable}
-                          name="Doc_Referencia"
+                          name="doc_Referencia"
                           required
                           maxLength={150}
-                          value={spent.Doc_Referencia}
+                          value={spent.doc_Referencia}
                         />
                       </Form.Group>
                     </Col>
@@ -581,24 +634,22 @@ class Spent extends Component {
                           as="textarea"
                           rows={2}
                           onChange={this._saveStateVariable}
-                          name="Descripcion"
+                          name="descripcion"
                           required
                           maxLength={800}
-                          value={spent.Descripcion}
+                          value={spent.descripcion}
                         />
                       </Form.Group>
                     </Col>
                   </Row>
-
-                  {/* Categoría / Tipo documento */}
                   <Row className="m-2">
                     <Col sm="12" xl="6">
                       <label className="txt-darkblue">{t("category")}</label>
                       <Form.Group>
                         <Form.Select
-                          name="Categoria_gasto_id"
+                          name="categoria_gasto_id"
                           onChange={this._saveStateVariable}
-                          value={spent.Categoria_gasto_id}
+                          value={spent.categoria_gasto_id}
                           required
                         >
                           <option value="">{t("select_option")}</option>
@@ -611,37 +662,15 @@ class Spent extends Component {
                       </Form.Group>
                     </Col>
 
-                    <Col sm="12" xl="6">
-                      <label className="txt-darkblue">{t("doc_type")}</label>
-                      <Form.Group>
-                        <Form.Select
-                          name="Tipo_documento_id"
-                          onChange={this._saveStateVariable}
-                          value={spent.tipo_documento_id}
-                          required
-                        >
-                          <option value="">{t("select_option")}</option>
-                          {docTypes.map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {item.nombre}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-
-                  {/* Medio pago */}
-                  <Row className="m-2">
-                    <Col sm="12" xl="12">
+  <Col sm="12" xl="6">
                       <label className="txt-darkblue">
                         {t("payment_method")}
                       </label>
                       <Form.Group>
                         <Form.Select
-                          name="Medio_pago_id"
+                          name="medio_pago_id"
                           onChange={this._saveStateVariable}
-                          value={spent.Medio_pago_id}
+                          value={spent.medio_pago_id}
                           required
                         >
                           <option value="">{t("select_option")}</option>
@@ -652,26 +681,46 @@ class Spent extends Component {
                           ))}
                         </Form.Select>
                       </Form.Group>
-                    </Col>
+                    </Col>           
                   </Row>
 
-                  {/* Proveedor */}
                   <Row className="m-2">
                     <Col sm="12" xl="12">
                       <label className="txt-darkblue">{t("provider")}</label>
-                      <Select
-                        options={providers}
-                        name="proveedor_id"
-                        onChange={this._saveProvider}
-                        value={
-                          providers.find(
-                            (p) => p.value === spent.Proveedor_id
-                          ) || null
-                        }
-                        placeholder={`-- ${t("select_option")} --`}
-                      />
+                  
+    {this.state.processing ? (
+                          t("loading")
+                        ) : (
+                          <Select
+                            options={providers}
+                            name="proveedor_id"
+                            onChange={(value) => this.setState({ spent: { ...this.state.spent, proveedor_id: value.id}}) }
+                            getOptionValue={(option) => option.id}
+                            getOptionLabel={(option) => `${option.nombre} ${option.apellido1}`}
+                            defaultValue={() =>
+                              providers?.find(
+                                (opt) => opt.id === spent.proveedor_id,
+                              )
+                            }
+                            isSearchable={true}
+                          />
+                        )}
+                      
+                      <Col sm="12" xl="12">
+                           <Form.Group>
+                                                   <Form.Check // prettier-ignore
+                                                      type="checkbox"
+                                                      id="createElectronicDoc"
+                                                      label={t("create_electronic_doc")}
+                                                      name="createElectronicDoc"
+                                                      onChange={this._saveStateVariable}
+                                                      checked={spent.createElectronicDoc ===1 ? true:false}
+                                                      />
+                                              </Form.Group>
+              
                     </Col>
-                    
+                    </Col>
+                             
                   </Row>
 
                   {/* ── SECCIÓN DE DETALLES ── */}
@@ -701,7 +750,7 @@ class Spent extends Component {
                           <Form.Group>
                             <Form.Control
                               placeholder={t("detail")}
-                              type="text"
+                              type="textarea"
                               name="detalle"
                               required
                               maxLength={200}
@@ -723,22 +772,18 @@ class Spent extends Component {
                               required
                               min={0}
                               step="0.01"
+                              onChange={(e)=> this._calculaInput(e)}
+                              value={AuxLine.subtotal}
                             />
                           </Form.Group>
                         </Col>
 
                         <Col sm="12" xl="4">
                           <label className="txt-darkblue">{t("tax")}</label>
-                          <Form.Group>
-                            <Form.Control
-                              placeholder={t("tax")}
-                              type="number"
-                              name="impuesto"
-                              required
-                              min={0}
-                              step="0.01"
-                            />
-                          </Form.Group>
+                                 <Form.Select aria-label="Roles_id" name="roles_id" onChange={(e) => this._calculaInput(e,true) } required>
+                                   <option value="">{t("select_option")}</option>                                
+                                    {taxes?.map((item, key) =>(item.id === this.state.defaultTax  ? <option value={item.id} selected defaultValue attr={item.porcentaje} key={key}>{item.nombre}</option> :  <option attr={item.porcentaje} value={item.id} key={key}>{item.nombre}</option>))}
+                                  </Form.Select>                          
                         </Col>
 
                         <Col sm="12" xl="4">
@@ -752,14 +797,32 @@ class Spent extends Component {
                               name="descuento"
                               required
                               min={0}
+                              onChange={(e)=> this._calculaInput(e)}
                               step="0.01"
-                              defaultValue={0}
+                              value={AuxLine.descuento}
                             />
                           </Form.Group>
                         </Col>
                       </Row>
 
                       <Row className="m-2">
+                        
+                        <Col sm="12" xl="6">
+                        <label className="txt-darkblue">{t("tax")}</label>
+                        <Form.Group>
+                            <Form.Control
+                              placeholder={t("tax")}
+                              type="number"
+                              name="impuesto"
+                              required
+                              readOnly
+                              onChange={(e)=> this._calculaInput(e)}
+                              min={0}
+                              step="0.01"
+                              value={AuxLine.impuesto}
+                            />
+                          </Form.Group>
+                        </Col>
                         <Col sm="12" xl="6">
                           <label className="txt-darkblue">{t("total")}</label>
                           <Form.Group>
@@ -767,9 +830,12 @@ class Spent extends Component {
                               placeholder={t("total")}
                               type="number"
                               name="total"
+                              onChange={(e)=> this._calculaInput(e)}
                               required
                               min={0}
                               step="0.01"
+                              readOnly
+                              value={AuxLine.total}
                             />
                           </Form.Group>
                         </Col>

@@ -156,7 +156,8 @@
     "amount_approved":"Monto Aprobado",
     "amount_executed":"Monto Ejecutado",
     "amount_compromised":"Monto Comprometido",
-     "amount_modified":"Monto Modificado"
+     "amount_modified":"Monto Modificado",
+     "create_electronic_doc":"Crear Documento Electrónico"
 
 
     }
