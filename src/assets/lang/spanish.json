@@ -157,7 +157,13 @@
     "amount_executed":"Monto Ejecutado",
     "amount_compromised":"Monto Comprometido",
      "amount_modified":"Monto Modificado",
-     "create_electronic_doc":"Crear Documento Electrónico"
+     "create_electronic_doc":"Crear Documento Electrónico",
+     "totals":"Totales",
+     "qty":"Cantidad",
+     "created_by":"Creado por",
+     "permissions_per_rol":"Permisos por Rol",
+     "add":"Agregar",
+     "permission":"Permiso"
 
 
     }

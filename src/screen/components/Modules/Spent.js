@@ -8,9 +8,9 @@ import {
   Col,
   Button,
   Modal,
-  Tabs,
+  
   Form,
-  Tab,
+  
   Alert,
 } from "react-bootstrap";
 import Table from "react-bootstrap/Table";
@@ -39,23 +39,25 @@ class Spent extends Component {
         id: 0,
         doc_Referencia: "",
         categoria_gasto_id: 0,
-        Tipo_documento_id: 0,
-        Medio_pago_id: 0,
-        Proveedor_id: 0,
-        Descripcion: "",
-        Subtotal: 0,
-        Impuesto: 0,
-        Total: 0,
-        Usuarios_Usuario_id: 0,
-        createElectronicDoc:1 //delete on send
-
+        tipo_documento_id: 0,
+        medio_pago_id: 0,
+        proveedor_id: 0,
+        descripcion: "",
+        subtotal: 0,
+        impuesto: 0,
+        total: 0,
+        usuarios_Usuario_id: 0,
+        createElectronicDoc:1, //delete on send
+        descuento:0,
+        tipo_moneda_id:0
       },
       AuxLine:{
         total:"",
         subtotal:"",
         descuento:"",
         impuesto:"",
-        porcentaje:0
+        porcentaje:0,
+        cantidad:1
       },
 
       // Líneas de detalle
@@ -67,8 +69,8 @@ class Spent extends Component {
       providers: [],
       commercialCodes: [],
       taxes:[],
-      defaultTax:{},
-      selectedTax:{},
+      defaultTax:0,
+      currency:[],
       token: "",
     };
 
@@ -79,11 +81,7 @@ class Spent extends Component {
 
   componentDidMount() {
     this.getUserInfo();
-    this.getCategories();
-    this.getTaxes();
-    this.getPaymentMethods();
-    this.getProviders();
-    this.getCommercialCodes();
+  
   }
 
   scrollToTop = () => {
@@ -102,8 +100,17 @@ class Spent extends Component {
       token: sessionStorage.getItem("token"),
       spent: {
         ...this.state.spent,
-        Usuarios_Usuario_id: this.user.usuario_id,
+        usuarios_Usuario_id: this.user.usuario_id,
       },
+      defaultTax: this.user.impuestoDefault
+    }, ()=>{
+  this.getCategories();
+    this.getTaxes();
+    this.getPaymentMethods();
+    this.getProviders();
+    this.getCommercialCodes();    
+this.getCurrency();
+
     });
   };
 
@@ -124,8 +131,10 @@ class Spent extends Component {
         subtotal: 0,
         impuesto: 0,
         total: 0,
+        descuento:0,
         usuarios_Usuario_id: this.user ? this.user.usuario_id : 0,
-        createElectronicDoc:1
+        createElectronicDoc:1,
+        tipo_moneda_id:0
       },
     });
 
@@ -162,14 +171,22 @@ _saveStateVariable = async (e) => {
       total: parseFloat(formData.get("total")) || 0,
       medio_pago_id: parseInt(formData.get("medio_pago")) || 0,
       gastos_id: 0, // se asigna tras guardar el encabezado
-      // Para mostrar en tabla
-      _codigo_label: formData.get("codigo_comercial_label") || formData.get("codigo_comercial"),
+      cantidad:parseFloat(formData.get("cantidad")) || 0,//agrgamos uno por defecto
+      codigo_comercial: formData.get("codigo_comercial_label") || formData.get("codigo_comercial"),
     };
+
 
     // Recalcular totales del encabezado
     this.setState(
       (prevState) => ({
         lines: [...prevState.lines, newLine],
+        AuxLine:{
+        total:"",
+        subtotal:"",
+        descuento:"",
+        impuesto:"",
+        porcentaje:0
+      },
       }),
       () => this._recalcularTotales()
     );
@@ -188,16 +205,19 @@ _saveStateVariable = async (e) => {
 
   _recalcularTotales = () => {
     const { lines } = this.state;
-    const subtotal = lines.reduce((acc, l) => acc + l.Subtotal, 0);
-    const impuesto = lines.reduce((acc, l) => acc + l.Impuesto, 0);
-    const total = lines.reduce((acc, l) => acc + l.Total, 0);
+    
+    const subtotal = lines.reduce((acc, l) => acc + l.subtotal, 0);
+    const impuesto = lines.reduce((acc, l) => acc + l.impuesto, 0);
+    const total = lines.reduce((acc, l) => acc + l.total, 0);
+    const descuento = lines.reduce((acc, l) => acc + l.descuento, 0);
 
     this.setState((prevState) => ({
       spent: {
         ...prevState.spent,
-        Subtotal: subtotal,
-        Impuesto: impuesto,
-        Total: total,
+        subtotal,
+        impuesto,
+        total,
+        descuento
       },
     }));
   };
@@ -211,7 +231,6 @@ _saveStateVariable = async (e) => {
       const index = selectedIndex;
       const optionElement = e.target.options[index];
       const taxOption = optionElement.getAttribute('attr');
-      
       name = 'porcentaje'
       value = taxOption
       }
@@ -220,15 +239,16 @@ _saveStateVariable = async (e) => {
    
      this.setState({ AuxLine: { ...this.state.AuxLine, [name]: value }}, () =>{
 
-    let {AuxLine, selectedTax} = this.state;
+    let {AuxLine} = this.state;
     let subtotal = isNaN(AuxLine.subtotal) ? 0 :AuxLine.subtotal,
      tax = isNaN(AuxLine.porcentaje) ? 0 : AuxLine.porcentaje , 
      impuesto =0,
      total = 0, 
+     cantidad = isNaN(AuxLine.cantidad) ? 1 : AuxLine.cantidad , 
      descuento = isNaN(AuxLine.descuento)? 0 :AuxLine.descuento ;
 
-     impuesto = (subtotal-descuento) * (tax/100)
-     total = (subtotal-descuento) + impuesto;
+     impuesto = ((subtotal*cantidad)-descuento) * (tax/100)
+     total = ((subtotal*cantidad)-descuento) + impuesto;
 
     AuxLine.total = total;
     AuxLine.impuesto = impuesto
@@ -237,20 +257,6 @@ _saveStateVariable = async (e) => {
 
      });
     
-    
-/*
-     AuxLine:{
-        total:0,
-        subtotal:0,
-        descuento:0,
-        impuesto:0
-      },*/
-
-
-
-
-
-
   }
 
   getCategories = () =>
@@ -268,6 +274,15 @@ _saveStateVariable = async (e) => {
       (response) => {
         const paymentMethods = response ? response.data : [];
         this.setState({ paymentMethods });
+      }
+    );
+
+
+    getCurrency = () =>
+    AppUtil.getAPI("catalogos/tipo_moneda", sessionStorage.getItem("token")).then(
+      (response) => {
+        const currency = response ? response.data : [];
+        this.setState({ currency });
       }
     );
 
@@ -310,48 +325,22 @@ _saveStateVariable = async (e) => {
       },
     );
 
-  // ─────────────────────────────────────────────
-  // CONSULTAR POR ID (para edición)
-  // ─────────────────────────────────────────────
-
   getSpentById = (id) => {
     const { t } = this.props;
 
     AppUtil.getAPI(`gastos/${id}`, sessionStorage.getItem("token")).then(
       (response) => {
         if (response.codeStatus === 200) {
-          const spentData = response.data;
-
-          // Cargar detalles del gasto
-          AppUtil.getAPI(
-            `gastos_detalles/gasto/${id}`,
-            sessionStorage.getItem("token")
-          ).then((detailResponse) => {
-            const lines =
-              detailResponse && detailResponse.codeStatus === 200
-                ? detailResponse.data
-                : [];
-
-            this.setState({
-              spent: {
-                id: spentData.id,
-                Doc_Referencia: spentData.doc_Referencia,
-                Descripcion: spentData.descripcion,
-                Categoria_gasto_id: spentData.categoria_gasto_id,
-                Tipo_documento_id: spentData.tipo_documento_id,
-                Medio_pago_id: spentData.medio_pago_id,
-                Proveedor_id: spentData.proveedor_id,
-                Subtotal: spentData.subtotal,
-                Impuesto: spentData.impuesto,
-                Total: spentData.total,
-                Usuarios_Usuario_id: spentData.usuarios_Usuario_id,
-
-              },
+          const spent = response.data;
+          spent.createElectronicDoc = spent.tipo_documento_id === 6 ? 1:0; 
+          const lines = spent.gastosDetalle;
+          this.setState({
+              spent,
               lines,
               show: true,
               error: false,
             });
-          });
+
         } else {
           this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning", });
         }
@@ -359,16 +348,14 @@ _saveStateVariable = async (e) => {
     );
   };
 
-  // ─────────────────────────────────────────────
-  // GUARDAR (crear o actualizar)
-  // ─────────────────────────────────────────────
-
   saveSpent = () => {
     const { t } = this.props;
     const { spent, lines } = this.state;
 
+
+
     // Validaciones básicas
-    if (!spent.Doc_Referencia) {
+    if (!spent.doc_Referencia) {
       this.scrollToTop();
       this.setState({
         error: true,
@@ -378,7 +365,7 @@ _saveStateVariable = async (e) => {
       return;
     }
 
-    if (spent.Categoria_gasto_id === 0) {
+    if (spent.categoria_gasto_id === 0) {
       this.scrollToTop();
       this.setState({
         error: true,
@@ -388,7 +375,7 @@ _saveStateVariable = async (e) => {
       return;
     }
 
-    if (spent.Proveedor_id === 0) {
+    if (spent.proveedor_id === 0) {
       this.scrollToTop();
       this.setState({
         error: true,
@@ -410,7 +397,10 @@ _saveStateVariable = async (e) => {
 
     this.setState({ processing: true });
 
-    spent.lines = this.state.lines; //asignamos las lineas para crear 
+    spent.Gastos_Detalles = this.state.lines; //asignamos las lineas para crear 
+
+    spent.tipo_documento_id = spent.createElectronicDoc ===1 ? 6 : 12; //factura electronica de compra o GASTO sin documento
+
     if (spent.id === 0) {
       //  CREAR
       AppUtil.postAPI("gastos", spent).then((response) => {
@@ -481,10 +471,6 @@ _saveStateVariable = async (e) => {
     );
   };
 
-  // ─────────────────────────────────────────────
-  // RENDER
-  // ─────────────────────────────────────────────
-
   render() {
     const { t } = this.props;
     const {
@@ -538,18 +524,23 @@ _saveStateVariable = async (e) => {
                     Accept: "application/json",
                     "Content-Type": "application/json; charset=UTF-8",
                   },
-                  dataSrc: function (json) {
-                    return json.data || [];
-                  },
+                   dataSrc: function (json) {
+                        json.recordsTotal = json.data.recordsTotal;
+                        json.recordsFiltered = json.data.recordsFiltered;
+                        json.draw = json.data.draw;
+                        return json.data.data;
+                      },
                   dataType: "json",
                 }}
                 columns={[
-                  { data: "id",            title: t("id") },
+                  { data: "id", title: t("id") },
                   { data: "doc_Referencia", title: t("reference") },
                   { data: "proveedor",      title: t("provider") },
-                  { data: "subtotal",       title: t("subtotal") },
-                  { data: "impuesto",       title: t("tax") },
-                  { data: "total",          title: t("total") },
+                  { data: "fecha",      title: t("date") },
+                  { data: "usuario",      title: t("created_by") },
+                  { data: "subtotal", title: t("subtotal"), render:function(data, type,row){ return `${data} ${row.tipo_moneda}` } },
+                  { data: "impuesto", title: t("tax"), render:function(data, type,row){ return `${data} ${row.tipo_moneda}` }},
+                  { data: "total", title: t("total"), render:function(data, type,row){ return `${data} ${row.tipo_moneda}`} },
                   {
                     title: t("action"),
                     data: null,
@@ -560,7 +551,7 @@ _saveStateVariable = async (e) => {
                 ]}
                 className="display table cell-border compact stripe"
                 slots={{
-                  6: (cellData, rowData) => this.ActionButtons(rowData),
+                  8: (cellData, rowData) => this.ActionButtons(rowData),
                 }}
                 options={{
                   language: {
@@ -643,7 +634,7 @@ _saveStateVariable = async (e) => {
                     </Col>
                   </Row>
                   <Row className="m-2">
-                    <Col sm="12" xl="6">
+                    <Col sm="12" xl="4">
                       <label className="txt-darkblue">{t("category")}</label>
                       <Form.Group>
                         <Form.Select
@@ -662,7 +653,7 @@ _saveStateVariable = async (e) => {
                       </Form.Group>
                     </Col>
 
-  <Col sm="12" xl="6">
+  <Col sm="12" xl="4">
                       <label className="txt-darkblue">
                         {t("payment_method")}
                       </label>
@@ -681,7 +672,31 @@ _saveStateVariable = async (e) => {
                           ))}
                         </Form.Select>
                       </Form.Group>
-                    </Col>           
+                    </Col>  
+
+<Col sm="12" xl="4">
+<label className="txt-darkblue">
+                        {t("currency")}
+                      </label>
+                      <Form.Group>
+                        <Form.Select
+                          name="tipo_moneda_id"
+                          onChange={this._saveStateVariable}
+                          value={spent.tipo_moneda_id}
+                          required
+                        >
+                          <option value="">{t("select_option")}</option>
+                          {this.state.currency.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.nombre}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>  
+
+
+
                   </Row>
 
                   <Row className="m-2">
@@ -727,7 +742,7 @@ _saveStateVariable = async (e) => {
                   <div className="well mt-3">
                     <Form onSubmit={this.addLine}>
                       <Row className="m-2">
-                        <Col sm="12" xl="6">
+                        <Col sm="12" xl="4">
                           <label className="txt-darkblue">
                             {t("comercial_code")}
                           </label>
@@ -745,7 +760,7 @@ _saveStateVariable = async (e) => {
                           </Form.Group>
                         </Col>
 
-                        <Col sm="12" xl="6">
+                        <Col sm="12" xl="4">
                           <label className="txt-darkblue">{t("detail")}</label>
                           <Form.Group>
                             <Form.Control
@@ -754,6 +769,22 @@ _saveStateVariable = async (e) => {
                               name="detalle"
                               required
                               maxLength={200}
+                            
+                            />
+                          </Form.Group>
+                        </Col>
+                                 <Col sm="12" xl="4">
+                          <label className="txt-darkblue">{t("qty")}</label>
+                          <Form.Group>
+                            <Form.Control
+                              placeholder={t("qty")}
+                              type="number"
+                              name="cantidad"
+                              required
+                               min={0}
+                              step="0.01"
+                              onChange={(e)=> this._calculaInput(e)}
+                              value={AuxLine.cantidad}
                             />
                           </Form.Group>
                         </Col>
@@ -780,9 +811,9 @@ _saveStateVariable = async (e) => {
 
                         <Col sm="12" xl="4">
                           <label className="txt-darkblue">{t("tax")}</label>
-                                 <Form.Select aria-label="Roles_id" name="roles_id" onChange={(e) => this._calculaInput(e,true) } required>
+                                 <Form.Select aria-label="Impuesto" name="impuesto_id" onChange={(e) => this._calculaInput(e,true) } required>
                                    <option value="">{t("select_option")}</option>                                
-                                    {taxes?.map((item, key) =>(item.id === this.state.defaultTax  ? <option value={item.id} selected defaultValue attr={item.porcentaje} key={key}>{item.nombre}</option> :  <option attr={item.porcentaje} value={item.id} key={key}>{item.nombre}</option>))}
+                                    {taxes?.map((item, key) =>(item.id === this.state.defaultTax  ? <option value={item.id} selected attr={item.porcentaje} key={key}>{item.nombre}</option> :  <option attr={item.porcentaje} value={item.id} key={key}>{item.nombre}</option>))}
                                   </Form.Select>                          
                         </Col>
 
@@ -795,7 +826,6 @@ _saveStateVariable = async (e) => {
                               placeholder={t("discount")}
                               type="number"
                               name="descuento"
-                              required
                               min={0}
                               onChange={(e)=> this._calculaInput(e)}
                               step="0.01"
@@ -875,12 +905,12 @@ _saveStateVariable = async (e) => {
                                 lines.map((line, index) => (
                                   <tr key={index}>
                                     <td>{index + 1}</td>
-                                    <td>{line.Codigo_comercial_id}</td>
-                                    <td>{line.Detalle}</td>
-                                    <td>{line.Subtotal}</td>
-                                    <td>{line.Descuento}</td>
-                                    <td>{line.Impuesto}</td>
-                                    <td>{line.Total}</td>
+                                    <td>{line.codigo_comercial_id}</td>
+                                    <td>{line.detalle}</td>
+                                    <td>{line.subtotal}</td>
+                                    <td>{line.descuento}</td>
+                                    <td>{line.impuesto}</td>
+                                    <td>{line.total}</td>
                                     <td>
                                       <Button
                                         variant="danger"
@@ -898,10 +928,10 @@ _saveStateVariable = async (e) => {
                               <tfoot>
                                 <tr className="table-info fw-bold">
                                   <td colSpan={3}>{t("totals")}</td>
-                                  <td>{spent.Subtotal.toFixed(2)}</td>
-                                  <td>-</td>
-                                  <td>{spent.Impuesto.toFixed(2)}</td>
-                                  <td>{spent.Total.toFixed(2)}</td>
+                                  <td>{spent.subtotal.toFixed(2)}</td>
+                                  <td>{spent.descuento.toFixed(2)}</td>
+                                  <td>{spent.impuesto.toFixed(2)}</td>
+                                  <td>{spent.total.toFixed(2)}</td>
                                   <td />
                                 </tr>
                               </tfoot>

@@ -19,8 +19,12 @@ const AppUtil = {
 
       let dataRet = response.data;
       return dataRet;
-    } catch (e) {
+    } catch (e) 
+    {
+      
+      
       console.error(e);
+      console.error(e.response);
       return false;
     }
   },

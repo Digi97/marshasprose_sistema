@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
-import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form} from "react-bootstrap";
 import AppUtil from "../../../../AppUtil/AppUtil";
 import { withTranslation } from "react-i18next";
 DataTable.use(DT);
@@ -27,6 +27,7 @@ class Permissions extends Component {
       this.setState({ permissionsList });
     });
 
+   
   getPermissionsById = (id) =>
     AppUtil.getAPI(`catalogos/permisos/${id}`, sessionStorage.getItem('token')).then(response => {
       let permissions = response ? response.data : {};
@@ -119,15 +120,13 @@ class Permissions extends Component {
     return (
       <>
         <Container fluid>
-          <Row>
+          
+ <Row>
             <Col lg="6" sm="12">
               <h1>{t("permissions")}</h1>
             </Col>
             <Col lg="6" sm="12">
-              <Row>
-                <Col lg="6" sm="12">
-                  <Button className="btn-fill btn-rounded bg-blue" onClick={this.toggleShow}>{t("create")}</Button>
-                </Col>
+              <Row>               
                 <Col lg="6" sm="12">
                   <Button className="btn-fill btn-rounded bg-blue" onClick={() => this.props.navigate(-1)}>{t("cancel")}</Button>
                 </Col>
@@ -140,7 +139,7 @@ class Permissions extends Component {
               data={this.state.permissionsList}
               columns={[
                 { data: 'id', title: t("id") },
-                { data: 'Nombre', title: t("name") },
+                { data: 'nombre', title: t("name") },
                 { data: 'descripcion', title: t("description") },
                 { title: t("action"), data: null, orderable: false, searchable: false },
               ]}
@@ -161,6 +160,7 @@ class Permissions extends Component {
             />
           </Row>
 
+          
           <Modal show={this.state.show} onHide={this.toggleShow} backdrop="static" keyboard={false} size="lg" className="max-z-index">
             <Form onSubmit={this.savePermissions}>
               <Modal.Header closeButton>
