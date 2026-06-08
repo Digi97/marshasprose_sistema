@@ -2,22 +2,26 @@
 import Home from "./screen/components/Home/Home.js";
 import Users from "screen/components/Modules/Users.js";
 import Settings from "./screen/components/Settings/Settings.js";
-
 import Invoice from "./screen/components/Modules/Invoice.js";
 import Spent from "./screen/components/Modules/Spent.js";
 import Customers_Providers from "./screen/components/Modules/Customers_Providers.js";
 import Budget from "./screen/components/Modules/Budget.js";
 
 import crypto from "crypto-js";
+import permissions from "./permission.json";
 
 
-export const dashboardRoutes = (t) => [
+let dashboardRoutes = (t) =>{ 
+  const permisos = getPermisosFromToken()
+  
+  const todasLasRutas  = [
   {
     path: "/",
     name: t("home"),
     icon: "fas fa-folder",
     component: Home,
     layout: "/home",
+    permiso:null
   },
     {
     path: "/invoice",
@@ -25,6 +29,7 @@ export const dashboardRoutes = (t) => [
     icon: "fas fa-file",
     component: Invoice,
     layout: "/home",
+    permiso:ROUTE_PERMISSIONS["/invoice"],
   },
   {
     path: "/spent",
@@ -32,6 +37,8 @@ export const dashboardRoutes = (t) => [
     icon: "fas fa-file",
     component: Spent,
     layout: "/home",
+    permiso:   ROUTE_PERMISSIONS["/spent"],
+
   },
    {
     path: "/customers_providers",
@@ -39,6 +46,7 @@ export const dashboardRoutes = (t) => [
     icon: "fas fa-user",
     component: Customers_Providers,
     layout: "/home",
+    permiso:null
   },
    {
     path: "/",
@@ -46,6 +54,7 @@ export const dashboardRoutes = (t) => [
     icon: "fas fa-file",
     component: Home,
     layout: "/home/accounts",
+    permiso:null
   },
      {
     path: "/budget_management",
@@ -53,6 +62,7 @@ export const dashboardRoutes = (t) => [
     icon: "fas fa-money-bill",
     component: Budget,
     layout: "/home",
+    permiso:ROUTE_PERMISSIONS["/budget_management"]
   },
   {
     path: "/users",
@@ -60,6 +70,7 @@ export const dashboardRoutes = (t) => [
     icon: "fas fa-user",
     component: Users,
     layout: "/home",
+    permiso:   ROUTE_PERMISSIONS["/users"],
   },
   {
     path: "/settings",
@@ -67,8 +78,41 @@ export const dashboardRoutes = (t) => [
     icon: "fas fa-cog",
     component: Settings,
     layout: "/home",
+    permiso:   ROUTE_PERMISSIONS["/settings"],
   }
 ];
 
+ // Filtrar rutas según permisos del usuario
+    return todasLasRutas.filter(route =>
+        route.permiso === null ||           // rutas públicas
+        permisos.indexOf(route.permiso) !== -1  // tiene el permiso
+    );
+}
 
-//export default dashboardRoutes;
+const ROUTE_PERMISSIONS = {
+    "/invoice":              2,  // UsuarioFacturacion
+    "/spent":                6,  // UsuarioGastosFacturas
+    "/customers_providers":  7,  // UsuarioMantenimientoClientes
+    "/budget_management":    9,  // UsuarioPresupuestos
+    "/users":                1,  // AdministracionUsuarios
+    "/settings":             10, // UsuarioMantenimiento
+};
+
+
+const getPermisosFromToken = () => {
+    try {
+        const token  = sessionStorage.getItem("token");
+        if (!token) return [];
+        const payload  = JSON.parse(atob(token.split(".")[1]));
+        // El claim "permiso" puede ser string o array
+        const permisos = payload.permiso;
+        return Array.isArray(permisos)
+            ? permisos.map(Number)
+            : [Number(permisos)];
+    } catch {
+        return [];
+    }
+};
+
+
+export default dashboardRoutes;

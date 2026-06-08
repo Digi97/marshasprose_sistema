@@ -146,8 +146,8 @@ class Cost_Center extends Component {
               columns={[
                 { data: 'id', title: t("id") },
                 { data: 'codigo', title: t("code") },
-                { data: 'Nombre', title: t("name") },
-                { data: 'Seudonimo', title: t("pseudonym") },
+                { data: 'nombre', title: t("name") },
+                { data: 'seudonimo', title: t("pseudonym") },
                 { title: t("action"), data: null, orderable: false, searchable: false },
               ]}
               className="display table cell-border compact stripe"
@@ -188,13 +188,13 @@ class Cost_Center extends Component {
                   <Col sm="12" xl="6">
                     <label className="txt-darkblue">{t("name")}</label>
                     <Form.Group>
-                      <Form.Control placeholder={t("name")} type="text" onChange={this._saveStateVariable} name="Nombre" required maxLength={150} value={this.state.cost_center.Nombre} />
+                      <Form.Control placeholder={t("name")} type="text" onChange={this._saveStateVariable} name="nombre" required maxLength={150} value={this.state.cost_center.nombre} />
                     </Form.Group>
                   </Col>
                   <Col sm="12" xl="6">
                     <label className="txt-darkblue">{t("pseudonym")}</label>
                     <Form.Group>
-                      <Form.Control placeholder={t("pseudonym")} type="text" onChange={this._saveStateVariable} name="Seudonimo" required maxLength={45} value={this.state.cost_center.Seudonimo} />
+                      <Form.Control placeholder={t("pseudonym")} type="text" onChange={this._saveStateVariable} name="seudonimo" required maxLength={45} value={this.state.cost_center.seudonimo} />
                     </Form.Group>
                   </Col>
                 </Row>

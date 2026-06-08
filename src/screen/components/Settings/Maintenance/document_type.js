@@ -140,12 +140,11 @@ class Document_Type extends Component {
               data={this.state.documentTypeList}
               columns={[
                 { data: 'id', title: t("id") },
-                { data: 'Codigo_doc', title: t("code") },
                 { data: 'nombre', title: t("name") },
                 { title: t("action"), data: null, orderable: false, searchable: false },
               ]}
               className="display table cell-border compact stripe"
-              slots={{ 3: (cellData, rowData) => this.ActionButtons(rowData, cellData) }}
+              slots={{ 2: (cellData, rowData) => this.ActionButtons(rowData, cellData) }}
               options={{
                 language: {
                   zeroRecords: t("zeroRecords"),

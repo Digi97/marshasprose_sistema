@@ -163,7 +163,20 @@
      "created_by":"Creado por",
      "permissions_per_rol":"Permisos por Rol",
      "add":"Agregar",
-     "permission":"Permiso"
+     "permission":"Permiso",
+     "consecutive":"Consecutivo",
+     "exchange_rate_buy":"Tipo de Cambio Compra",
+     "exchange_rate_sale":"Tipo Cambio Venta",
+     "create_invoice":"Crear Factura",
+     "edit_invoice":"Editar Factura",
+     "email_invalid": "El formato del correo es inválido",
+"password_and_confirmation_no_match": "La contraseña y su confirmación no coinciden",
+"password_changed_successfully": "Contraseña cambiada correctamente",
+"something_went_wrong": "Algo salió mal",
+"invalid_format_Correo": "Formato de correo electrónico inválido",
+"correo_not_found": "Correo no encontrado en el sistema",
+"invalid_value_form_Contrasena": "Formato de contraseña inválido",
+"phone_required": "Por favor ingrese al menos un teléfono"
 
 
     }

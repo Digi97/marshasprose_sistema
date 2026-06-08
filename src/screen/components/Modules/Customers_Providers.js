@@ -2,16 +2,7 @@ import React, { Component, createRef  } from "react";
 
 import DataTable from "datatables.net-react";
 import DT from "datatables.net-dt";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Modal,
-  Tabs,
-  Form,
-  Tab,
-} from "react-bootstrap";
+import {Container, Row, Col, Button, Modal, Tabs, Form, Tab} from "react-bootstrap";
 import Table from "react-bootstrap/Table";
 import { url } from "screen/components/services/api";
 import crypto from "crypto-js";
@@ -19,6 +10,7 @@ import crypto from "crypto-js";
 import AppUtil from "../../../AppUtil/AppUtil";
 import Select from "react-select";
 import { withTranslation } from "react-i18next";
+import permissions from "../../../permission.json";
 DataTable.use(DT);
 
 class Customer_Provider extends Component {
@@ -54,7 +46,9 @@ class Customer_Provider extends Component {
       province: [],
       canton: [],
       district: [],
-      activityCode:[]
+      activityCode:[],
+      clientAdmin:false,
+      providerAdmin:false
     };
      this.modalTopRef = createRef();
   }
@@ -318,8 +312,27 @@ if(person !== null)
       "@marsh_contable",
     );
     this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
-    this.setState({ user: this.user, token: sessionStorage.getItem("token") });
+   const permisos = this.getPermisosFromToken(); 
+  let clientAdmin = permisos.indexOf(permissions.UsuarioMantenimientoClientes) === -1 ? false : true;
+  let providerAdmin = permisos.indexOf(permissions.UsuarioMantenimientoProveedores) === -1 ? false : true;
+    
+    this.setState({ user: this.user, token: sessionStorage.getItem("token"), clientAdmin, providerAdmin });
   };
+
+  getPermisosFromToken = () => {
+    try {
+        const token  = sessionStorage.getItem("token");
+        if (!token) return [];
+        const payload  = JSON.parse(atob(token.split(".")[1]));
+        // El claim "permiso" puede ser string o array
+        const permisos = payload.permiso;
+        return Array.isArray(permisos)
+            ? permisos.map(Number)
+            : [Number(permisos)];
+    } catch {
+        return [];
+    }
+};
 
   getCustomerProviderById = (id, isCustomer = true) => {
 
@@ -384,7 +397,8 @@ if(person !== null)
 
   render() {
     const { t } = this.props;
-    let{customer_provider, token} = this.state;
+    let{customer_provider, token, clientAdmin, providerAdmin} = this.state;
+    
     return (
       <>
         <Container fluid>
@@ -393,7 +407,7 @@ if(person !== null)
             className="mb-3 txt-blue"
             defaultActiveKey="customer"
           >
-            <Tab
+        {clientAdmin && <Tab
               eventKey="customer"
               title={t("customer")}
               className="txt-darkblue"
@@ -486,9 +500,9 @@ if(person !== null)
                   />
                 )}
               </Row>
-            </Tab>
+            </Tab>}
 
-            <Tab
+          {providerAdmin &&  <Tab
               eventKey="provider"
               title={t("provider")}
               className="txt-darkblue"
@@ -520,7 +534,7 @@ if(person !== null)
               </Row>
               <Row>
                 {/*SECCION DE PROVEEDORES */}
-                {this.state.token === "" ? (
+                {token === "" ? (
                   <div></div>
                 ) : (
                   <DataTable
@@ -547,7 +561,7 @@ if(person !== null)
                       { data: "tipo_identificacion", title: t("identification_type") },
                       { data: "nombre", title: t("name"),  render:function(data, type,row){ return `${row.nombre} ${row.apellido1} ${row.apellido2}` }  },
                       { data: "correo", title: t("email") },
-                      { data: "estado", title: t("status"), render:function(data, type,row){ return data ==1 ? t("active"): t("inactive") } },
+                      { data: "estado", title: t("status"), render:function(data, type,row){ return data ===1 ? t("active"): t("inactive") } },
                       {
                         title: t("action"),
                         data: null,
@@ -584,7 +598,7 @@ if(person !== null)
                   />
                 )}
               </Row>
-            </Tab>
+            </Tab>}
           </Tabs>
           <Modal
             show={this.state.show}

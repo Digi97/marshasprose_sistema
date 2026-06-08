@@ -140,7 +140,7 @@ class Measurement_Unity extends Component {
               data={this.state.measurementUnityList}
               columns={[
                 { data: 'id', title: t("id") },
-                { data: 'Codigo', title: t("code") },
+                { data: 'codigo', title: t("code") },
                 { data: 'nombre', title: t("name") },
                 { title: t("action"), data: null, orderable: false, searchable: false },
               ]}
@@ -174,7 +174,7 @@ class Measurement_Unity extends Component {
                   <Col sm="12" xl="12">
                     <label>{t("code")}</label>
                     <Form.Group>
-                      <Form.Control placeholder={t("code")} type="text" onChange={this._saveStateVariable} name="Codigo" required maxLength={45} value={this.state.measurement_unity.Codigo} />
+                      <Form.Control placeholder={t("code")} type="text" onChange={this._saveStateVariable} name="codigo" required maxLength={45} value={this.state.measurement_unity.codigo} />
                     </Form.Group>
                   </Col>
                 </Row>

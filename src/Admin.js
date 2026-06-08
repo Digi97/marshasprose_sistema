@@ -32,7 +32,7 @@ import Type_Accounting_Account from "./screen/components/Settings/Maintenance/ty
 
 import NotFound from "./screen/components/common/404.js";
 import { useJwt } from "react-jwt";
-import { dashboardRoutes } from "./routes.js";
+import dashboardRoutes from "./routes.js";
 import crypto from "crypto-js";
 
 import { useTranslation } from "react-i18next";

@@ -1,590 +1,1206 @@
-import React, {Component} from "react";
-
-import DataTable from 'datatables.net-react';
-import DT from 'datatables.net-dt';
-import { Container, Row, Col, Button,Modal,Tabs, Form, Tab} from "react-bootstrap";
-import Table from 'react-bootstrap/Table';
-import Select from 'react-select'
+import React, { Component, createRef } from "react";
+import DataTable from "datatables.net-react";
+import DT from "datatables.net-dt";
+import {  Container,  Row,    Col,    Button,    Modal,    Tabs,    Tab,    Form,    Alert} from "react-bootstrap";
+import Table from "react-bootstrap/Table";
+import { url } from "screen/components/services/api";
+import crypto from "crypto-js";
+import AppUtil from "../../../AppUtil/AppUtil";
+import Select from "react-select";
 import { withTranslation } from "react-i18next";
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import moment from 'moment-timezone'
+import Tooltip from 'react-bootstrap/Tooltip';
+
 DataTable.use(DT);
 
-
 class Invoice extends Component {
-constructor(props)
-  {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.state = {
-      tableData: [],
-  show:false,
-  showAcceptance:false,
-  processing: false,
-  invoice:{
-    id:0,
-    clave:"",
-    consecutivo_electronico:"",
-    fecha:"",
-    consecutivo:0,
-    tipo_moneda_id:0,
-    Estado_Factura:0,
-    tipo_documento:0,
-    subtotal:0,
-    impuesto:0,
-    total:0,
-    descuento:0,
-    impuesto_id:0,
-    cambio_venta:0,
-    cambio_compra:0,
-    cliente_id:0,
-    condicion_venta_id:0,
-    medio_pago:0,
- 
-  },
-     lines:[]
+        this.state = {
+            // ── Modal principal (crear/editar factura)
+            show: false,
 
-    }
-  }
+            // ── Modal aceptación de facturas
+            showAcceptance: false,
 
+            processing: true,
+            error: false,
+            errorMsg: "",
+            color: "",
 
+            // ── Objeto principal de la factura (campos FacturasController)
+            invoice: {
+                id: 0,
+                clave: "",
+                consecutivo_electronico: "",
+                consecutivo: 0,
+                tipo_moneda_id: 0,
+                estado_Factura_id: 1,
+                tipo_documento_id: 1,
+                subtotal: 0,
+                impuesto: 0,
+                total: 0,
+                descuento: 0,
+                impuesto_id: 0,
+                cambio_venta: 0,
+                cambio_compra: 0,
+                clientes_id: 0,
+                condicion_venta_id: 0,
+                medio_pago_id: 0,
+                usuarios_Usuario_id: 0,
+            },
 
-//#region Funciones internas
-    toggleShow = () => this.setState({show: !this.state.show})
-    toggleShowInvoiceAcceptance = () => this.setState({showAcceptance: !this.state.showAcceptance})
+            // ── Líneas de detalle (Factura_Detalles)
+            lines: [],
 
-    addLine = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+            // ── Helper para calcular línea activa
+            AuxLine: {
+                total: "",
+                subtotal: "",
+                descuento: 0,
+                impuesto: "",
+                porcentaje: 0,
+                cantidad: 1,
+            },
 
-        const formData = new FormData(e.target);
+            // ── Archivo XML de aceptación
+            archivoAceptacion: null,
 
-        const line = {
-            categories_id: formData.get("categories_id"),
-            tipo_documento: formData.get("tipo_documento"),
-            medio_pago: formData.get("medio_pago"),
-            proveedor: formData.get("proveedor"),
-            codigo_comercial: formData.get("codigo_comercial"),
-            detalle: formData.get("detalle"),
-            subtotal: parseFloat(formData.get("subtotal")) || 0,
-            impuesto: parseFloat(formData.get("impuesto")) || 0,
-            descuento: parseFloat(formData.get("descuento")) || 0,
-            total: parseFloat(formData.get("total")) || 0,
+            // ── Catálogos
+            customers: [],
+            paymentMethods: [],
+            currencies: [],
+            invoiceStates: [],
+            docTypes: [],
+            saleConditions: [],
+            taxes: [],
+            commercialCodes: [],
+            cabyCodes: [],
+            selectedCabys:[],
+
+            defaultTax: 0,
+            formatoFecha:"DD-MM-YYYY",
+            token: "",
         };
 
-        this.setState((prevState) => ({
-            lines: [...prevState.lines, line]
-        }));   
-              e.target.reset();
-
-              // agregar conexion a axios
-
+        this.modalTopRef = createRef();
+        this.user = null;
     }
 
-    removeLine = (index) =>{
-    this.setState((prevState) => ({
-        lines: prevState.lines.filter((line, i) => i !== index)
-    }));
+    // ─────────────────────────────────────────────
+    // LIFECYCLE
+    // ─────────────────────────────────────────────
 
+    componentDidMount() {
+        this.getUserInfo();
     }
 
-    _saveStateVariable = async (e) => {
-    await this.setState({
-            question: {
-              ...this.state.question,
-              [e.target.name]: e.target.value,
+    // ─────────────────────────────────────────────
+    // HELPERS INTERNOS
+    // ─────────────────────────────────────────────
+
+    scrollToTop = () => {
+        if (this.modalTopRef.current) {
+            this.modalTopRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    };
+
+    getUserInfo = () => {
+        let bytes = crypto.AES.decrypt(
+            sessionStorage.getItem("user"),
+            "@marsh_contable"
+        );
+        this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
+       let formatoFecha = this.user.formatoFecha
+      
+        
+        this.setState(
+            {
+                token: sessionStorage.getItem("token"),
+                invoice: {
+                    ...this.state.invoice,
+                    Usuarios_Usuario_id: this.user.usuario_id,
+                },
+                defaultTax: this.user.impuestoDefault,
+                formatoFecha: formatoFecha.toUpperCase()
             },
-          });
+            () => {
+                this.getCustomers();
+                this.getPaymentMethods();
+                this.getCurrencies();
+                this.getInvoiceStates();
+                
+                this.getSaleConditions();
+                this.getTaxes();
+                this.getCommercialCodes();
+                this.getCabyCodes();
+                
+            }
+        );
+    };
 
+    // Resetea el estado del modal
+    _resetInvoice = () => ({
+        id: 0,
+        clave: "",
+        consecutivo_electronico: "",
+        consecutivo: 0,
+        tipo_moneda_id: 0,
+        estado_Factura_id: 1,
+        tipo_documento_id: 1,
+        subtotal: 0,
+        impuesto: 0,
+        total: 0,
+        descuento: 0,
+        impuesto_id: 0,
+        cambio_venta: 0,
+        cambio_compra: 0,
+        clientes_id: 0,
+        condicion_venta_id: 0,
+        medio_pago_id: 0,
+        usuarios_Usuario_id: this.user ? this.user.usuario_id : 0,
+    });
+
+    toggleShow = () =>{
+        this.setState({
+            show: !this.state.show,
+            error: false,
+            errorMsg: "",
+            lines: [],
+            invoice: this._resetInvoice(),
+            AuxLine: { total: "", subtotal: "", descuento: 0, impuesto: "", porcentaje: 0, cantidad: 1 },
+        }, () => this.getClave());
     }
+    toggleShowAcceptance = () =>
+        this.setState({
+            showAcceptance: !this.state.showAcceptance,
+            archivoAceptacion: null,
+            error: false,
+            errorMsg: "",
+        });
 
+    // Actualiza campos del objeto invoice
+    _saveStateVariable = async (e) => {
+        const { name, type, checked, value } = e.target;
+        await this.setState({
+            invoice: {
+                ...this.state.invoice,
+                [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
+            },
+        });
+    };
 
-    saveSpent = () => {
-      
-    }
-
-    //#endregion fin funciones internas
-
-
-     render(){
-       const { t } = this.props;
-      return (
-    <>
-      <Container fluid>
-        <Tabs id="controlled-tab-example" className="mb-3 txt-blue" defaultActiveKey="invoice">
-          <Tab eventKey="invoice" title={t("invoice")} className="txt-darkblue">
-          <Row>
-          <Col lg="6" sm="12">
-            <h1>{t("invoice")}</h1>
-          </Col>
-          <Col lg="6" sm="12">
-            <Row>
-              <Col lg="3" sm="12">
-                <Button
-                  className="btn-fill btn-rounded bg-blue"
-                  onClick={this.toggleShow}>
-                    {t("create")}
-                </Button>
-              </Col>
-              <Col lg="2" sm="12">
-                <Button
-                className="btn-fill btn-rounded bg-blue"
-                onClick={this.toggleShow}>
-                  {t("clean")}
-              </Button>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-        <Row>
-          		<DataTable
-                data={this.state.tableData} 
-                className="display table cell-border compact stripe"
-               
-                options={{
-                language: {
-                  zeroRecords:t("zeroRecords"),
-                  emptyTable:t("emptyTable"),
-                  rowsPerPageText:t("rowsPerPageText"),
-                  rangeSeparatorText:t("rangeSeparatorText"),
-                  selectAllRowsItemText:t("selectAllRowsItemText"),
-                  search:t("search"),
-                  paginate:t("paginate"),
-                  searchPlaceholder:t("searchPlaceholder"),
-                  info:t("info"),
-                  lengthMenu: t("lengthMenu"),
-                },
-                layout:{
-                  topStart:"pageLength",
-                  topEnd:"search",
-                  bottomStart: 'info',
-                  bottomEnd:"paging"
-                }
-               }}
-              >
-              <thead>
-                <tr>
-                  <th>{t("id")}</th>
-                  <th>{t("key")}</th>
-                  <th>{t("consecutive")}</th>
-                  <th>{t("date")}</th>
-                  <th>{t("currency")}</th>
-                  <th>{t("invoice_status")}</th>
-                  <th>{t("doc_type")}</th>
-                  <th>{t("subtotal")}</th>
-                  <th>{t("tax")}</th>
-                  <th>{t("discount")}</th>
-                  <th>{t("total")}</th>
-                  <th>{t("customer")}</th>
-                  <th>{t("action")}</th>
-                </tr>
-              </thead>
-            </DataTable>
+    // Actualiza el cliente desde react-select
+    _saveCustomer = (selectedOption) => {
         
-        </Row>
-
-
-          </Tab>
         
-        <Tab eventKey="invoice_acceptance" title={t("invoice_acceptance")} className="txt-darkblue">
-                   <Row>
-          <Col lg="6" sm="12">
-            <h1>{t("invoice_acceptance")}</h1>
-          </Col>
-          <Col lg="6" sm="12">
-            <Row>
-              <Col lg="3" sm="12">
-                <Button
-                  className="btn-fill btn-rounded bg-blue"
-                  onClick={this.toggleShowInvoiceAcceptance}>
-                    {t("create")}
-                </Button>
-              </Col>
-              <Col lg="2" sm="12">
-                <Button
-                className="btn-fill btn-rounded bg-blue"
-                onClick={this.toggleShow}>
-                  {t("clean")}
-              </Button>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-        <Row>
-          		<DataTable
-                data={this.state.tableData} 
-                className="display table cell-border compact stripe"
-               
-                options={{
-                language: {
-                  zeroRecords:t("zeroRecords"),
-                  emptyTable:t("emptyTable"),
-                  rowsPerPageText:t("rowsPerPageText"),
-                  rangeSeparatorText:t("rangeSeparatorText"),
-                  selectAllRowsItemText:t("selectAllRowsItemText"),
-                  search:t("search"),
-                  paginate:t("paginate"),
-                  searchPlaceholder:t("searchPlaceholder"),
-                  info:t("info"),
-                  lengthMenu: t("lengthMenu"),
-                },
-                layout:{
-                  topStart:"pageLength",
-                  topEnd:"search",
-                  bottomStart: 'info',
-                  bottomEnd:"paging"
-                }
-               }}
-              >
-              <thead>
-                <tr>
-                  <th>{t("id")}</th>
-                  <th>{t("key")}</th>
-                  <th>{t("consecutive")}</th>
-                  <th>{t("date")}</th>
-                  <th>{t("currency")}</th>
-                  <th>{t("invoice_status")}</th>
-                  <th>{t("provider")}</th>
-                  <th>{t("action")}</th>
-                </tr>
-              </thead>
-            </DataTable>
-        
-        </Row>
-               </Tab>
-        </Tabs>
-      
+        this.setState({
+            invoice: {
+                ...this.state.invoice,
+                clientes_id: selectedOption ? selectedOption.id : 0,
+            },
+        });
+    };
 
-             <Modal
-              show={this.state.show}
-              onHide={this.toggleShow}
-              backdrop="static"
-              keyboard={false}
-              size="lg"
-              className="max-z-index"
-          >
-     
+    // ─────────────────────────────────────────────
+    // CÁLCULO DE LÍNEAS (igual que Spent)
+    // ─────────────────────────────────────────────
 
-          <Modal.Header closeButton>
-            <h3 className=" tituloFerias">{t("invoice")}</h3>
-          </Modal.Header>
-          <Modal.Body>
-          <Tabs
-            id="controlled-tab-example"
-          
-            className="mb-3 txt-blue"
-            defaultActiveKey="info"
-            >
+    _calculaInput = (e, isSelect = false) => {
+        let { name, value, selectedIndex } = e.target;
 
-               <Tab eventKey="info" title={t("invoice")} className="txt-darkblue">
-                <Row className="m-2">
-                  <Col sm="12" xl="6">
-                    <label>{t("key")}</label>
-                   <Form.Group>
-                     <Form.Control
-                        placeholder={t("key")}
-                        type="text"
-                        onChange={this.getInputData}
-                        name="clave"
-                        required
-                        maxLength={50}
-                        readOnly
-                        >
-                       </Form.Control>
-                   </Form.Group>
-                   </Col>
-
-                  <Col sm="12" xl="6">
-                    <label>{t("consecutive")}</label>
-                   <Form.Group>
-                     <Form.Control
-                        placeholder={t("consecutive")}
-                        type="text"
-                        onChange={this.getInputData}
-                        name="consecutivo"
-                        required
-                        maxLength={45}
-                        readOnly
-                        >
-                       </Form.Control>
-                   </Form.Group>
-                   </Col>
-
-
-                 </Row>
-
-                 <Row className="m-2">
-
-                    <Col sm="12" xl="6">
-                      <label className="txt-darkblue">{t("date")}</label>
-                       <Form.Group>
-                         <Form.Control
-                          placeholder={t("date")}
-                          type="date"
-                          onChange={this.getInputData}
-                          name="fecha"
-                          required
-                          readOnly
-                          
-                          />
-                       </Form.Group>
-                     </Col>
-
-                    <Col sm="12" xl="6">
-                      <label className="txt-darkblue">{t("currency")}</label>
-                     <Form.Group>
-                      <Form.Select aria-label="Tipo_Moneda_id" name="Tipo_Moneda_id" onChange={this._saveStateVariable} required>
-                              <option value="">-- Seleccione una opción --</option>
-                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                              </Form.Select>
-                     </Form.Group>
-                     </Col>
-
-                   </Row>
-
-                   <Row className="m-2">
-                     <Col sm="12" xl="12">
-                       <label className="txt-darkblue">{t("payment_method")}</label>
-                      <Form.Group>
-                         <Form.Select aria-label="Medio Pago" name="medio_pago_id" onChange={this._saveStateVariable} required>
-                              <option value="">-- Seleccione una opción --</option>
-                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                              </Form.Select>
-                      </Form.Group>
-                      </Col>
-                    </Row>
-
-                  <Row className="m-2">
-
-                     <Col sm="12" xl="12">
-                       <label className="txt-darkblue">{t("customer")}</label>
-                    <Select options={this.state.invoice.cliente_id} name="cliente_id" onChange={this._saveStateVariable} />
-                </Col>
-
-
-
-                    <div className="well">
-                      <Form onSubmit={this.addLine}>
-                        
-      
-                        <Row className="m-2">
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("comercial_code")}</label>
-                      <Form.Group>
-                         <Form.Select aria-label={t("comercial_code")} name="codigo_comercial" required>
-                              <option value="">-- Seleccione una opción --</option>
-                              <option value="1">test</option>
-                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                              </Form.Select>
-                      </Form.Group>
-                      </Col>
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("detail")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("detail")}
-                          type="text"
-                          name="detalle"
-                          required
-                          maxLength={200}
-                          />
-                      </Form.Group>
-                      </Col>
-                  
-                 
-                    </Row>
-
-                   <Row className="m-2">
-
-
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("tax_type")}</label>
-                      <Form.Group>
-                         <Form.Select aria-label={t("tax_type")} name="tipo_documento" required>
-                              <option value="">-- Seleccione una opción --</option>
-                              <option value="1">IVA</option>
-                            {/*categories?.map((item, key) =>( <option value={item.id} key={key}>{item.name}</option>))*/}
-                              </Form.Select>
-                      </Form.Group>
-                      </Col>
-
-                      <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("subtotal")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("subtotal")}
-                          type="number"
-                          name="subtotal"
-                          required
-                          maxLength={200}
-                          />
-                      </Form.Group>
-                      </Col>
-               
-
-                    </Row>
-
-              <Row className="m-2">    
-                 <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("tax")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("tax")}
-                          type="number"  
-                          name="impuesto"
-                          required
-                          maxLength={3}
-                          readOnly
-                          />
-                      </Form.Group>
-                      </Col>
-
+        if (isSelect) {
+            const optionElement = e.target.options[selectedIndex];
+            const taxOption = optionElement.getAttribute("attr");
+            name = "porcentaje";
+            value = taxOption;
+            
+        }
        
-                              
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("discount")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("discount")}
-                          type="number"       
-                          name="descuento"
-                          required
-                          maxLength={200}
-                          />
-                      </Form.Group>
-                      </Col>
-               </Row>
-
-                    
-                  <Row className="m-2">
-                     <Col sm="12" xl="6">
-                       <label className="txt-darkblue">{t("total")}</label>
-                        <Form.Group>
-                          <Form.Control
-                          placeholder={t("total")}
-                          type="number"
-                          name="total"
-                          required
-                          maxLength={200}
-                          readOnly
-                          />
-                      </Form.Group>
-                      </Col>
-                      <Col sm="12" xl="6">
-                        <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("add_line")}</Button>
-                      </Col>
+        this.setState({ AuxLine: { ...this.state.AuxLine, [name]: value } }, () => {
+            let { AuxLine } = this.state;
 
 
-                    </Row>
+            let subtotal  = isNaN(AuxLine.subtotal) || AuxLine.subtotal ==="" ? 0 : parseFloat(AuxLine.subtotal);
+            let tax       = isNaN(AuxLine.porcentaje) || AuxLine.porcentaje ==="" ? 0 : parseFloat(AuxLine.porcentaje);
+            let cantidad  = isNaN(AuxLine.cantidad) || AuxLine.cantidad ==="" ? 1 : parseFloat(AuxLine.cantidad);
+            let descuento = isNaN(AuxLine.descuento) || AuxLine.descuento === ""  ? 0 : parseFloat(AuxLine.descuento);
 
+            let impuesto = ((subtotal * cantidad) - descuento) * (tax / 100);
+            let total    = ((subtotal * cantidad) - descuento) + impuesto;
 
-                  
-                    <Row className="m-3">
-                           <Col sm="12" xl="12">
-                    <Table striped bordered hover>
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>{t("cabys_code")}</th>
-                          <th>{t("comercial_code")}</th>
-                          <th>{t("detail")}</th>
-                          <th>{t("subtotal")}</th>
-                          <th>{t("discount")}</th>
-                          <th>{t("tax")}</th>
-                          <th>{t("total")}</th>
-                          <th>{t("action")}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                       {this.state.lines.length > 0 && (
-                        this.state.lines.map((line, index) => (
-                          <tr key={index}>
-                              <td>{index +1}</td>
-                              <td>{line.codigo_cabys}</td>
-                               <td>{line.codigo_comercial}</td>
-                              <td>{line.detalle}</td>
-                              <td>{line.subtotal}</td>
-                              <td>{line.descuento}</td>
-                              <td>{line.impuesto}</td>
-                              <td>{line.total}</td>
-                              <td><Button variant="danger" className="btn-fill btn-rounded" onClick={() => this.removeLine(index)}> <i className="fas fa-trash" /></Button></td>
-                          </tr>
-                ))
-              )}
-
-
-                      </tbody>
-                </Table>
-
-                           </Col>
-                    </Row>
-
-
-                      </Form>
-                    </div>
-              </Row>
-
-               </Tab>
-   
-
-         </Tabs>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="light" className="btn-rounded" onClick={this.toggleShow}>
-              {t("close")}
-            </Button>
-            {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("save")}</Button>}
-          </Modal.Footer>
-         
-        </Modal>
-
-
-
-          <Modal
-              show={this.state.showAcceptance}
-              onHide={this.toggleShowInvoiceAcceptance}
-              backdrop="static"
-              keyboard={false}
-              size="lg"
-              className="max-z-index"
-          >
-     
-
-          <Modal.Header closeButton>
-            <h3 className=" tituloFerias">{t("invoice_acceptance")}</h3>
-          </Modal.Header>
-          <Modal.Body>    
-                <Row className="m-2">
-                  <Col sm="12" xl="6">
-                    <label>{t("xml_file")}</label>
-                   <Form.Group>
-                     <Form.Control
-                        placeholder={t("xml_file")}
-                        type="file"
-                        accept=".xml"
-                        onChange={this.getInputData}
-                        name="archivo_aceptacion"
-                        required
-                        >
-                       </Form.Control>
-                   </Form.Group>
-                   </Col>
-                 </Row>
-          </Modal.Body>
-          <Modal.Footer>
-
-            <Button variant="light" className="btn-rounded" onClick={this.toggleShowInvoiceAcceptance}>
-              {t("close")}
-            </Button>
-            {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("save")}</Button>}
-          </Modal.Footer>
-         
-        </Modal>
         
-      </Container>
-    </>
-  );
+            AuxLine.impuesto = impuesto;
+            AuxLine.total    = total;
+            this.setState({ AuxLine });
+        });
+    };
+
+    // ─────────────────────────────────────────────
+    // LÍNEAS DE DETALLE
+    // ─────────────────────────────────────────────
+
+    addLine = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const {selectedCabys} = this.state; //obtenemos el cabyscode
+        const formData = new FormData(e.target);
+        const selectComercial = e.target.elements["codigo_comercial_id"];
+        let cabys = selectedCabys.label.split(" - ")
+        console.log(cabys);
+        
+
+        const newLine = {
+            codigos_cabys_id:          parseInt(selectedCabys.value)    || 0,
+            codigos_cabys_codigo:      cabys[0] || "",
+            codigos_cabys_Impuesto_id: parseInt(selectedCabys.impuesto_id)          || 0,
+            codigo_comercial_id:       parseInt(formData.get("codigo_comercial_id"))  || 0,
+            codigo_comercial_label:    selectComercial ? selectComercial.options[selectComercial.selectedIndex].text : "",
+            detalle:                   formData.get("detalle"),
+            cantidad:                  parseFloat(formData.get("cantidad"))   || 1,
+            subtotal:                  parseFloat(formData.get("subtotal"))   || 0,
+            impuesto:                  parseFloat(formData.get("impuesto"))   || 0,
+            descuento:                 parseFloat(formData.get("descuento"))  || 0,
+            total:                     parseFloat(formData.get("total"))      || 0,
+            Unidad_medida_id:          1, // por defecto
+            Facturas_id:               0, // se asigna tras crear el encabezado
+        };
+
+        this.setState(
+            (prevState) => ({
+                lines: [...prevState.lines, newLine],
+                AuxLine: { total: "", subtotal: "", descuento: "", impuesto: "", porcentaje: 0, cantidad: 1 },
+            }),
+            () => this._recalcularTotales()
+        );
+
+        e.target.reset();
+    };
+
+    removeLine = (index) => {
+        this.setState(
+            (prevState) => ({
+                lines: prevState.lines.filter((_, i) => i !== index),
+            }),
+            () => this._recalcularTotales()
+        );
+    };
+
+    _recalcularTotales = () => {
+        const { lines } = this.state;
+        const subtotal  = lines.reduce((acc, l) => acc + l.subtotal,  0);
+        const impuesto  = lines.reduce((acc, l) => acc + l.impuesto,  0);
+        const total     = lines.reduce((acc, l) => acc + l.total,     0);
+        const descuento = lines.reduce((acc, l) => acc + l.descuento, 0);
+
+        this.setState((prevState) => ({
+            invoice: { ...prevState.invoice, subtotal, impuesto, total, descuento },
+        }));
+    };
+
+    // ─────────────────────────────────────────────
+    // CATÁLOGOS
+    // ─────────────────────────────────────────────
+
+    getCustomers = () =>
+        AppUtil.getAPI("clientes", sessionStorage.getItem("token")).then((response) => {
+            const customers      = response ? response.data.data : [];
+            this.setState({ customers, processing: false });
+        });
+
+    getPaymentMethods = () =>
+        AppUtil.getAPI("catalogos/medio_pago", sessionStorage.getItem("token")).then((response) => {
+            this.setState({ paymentMethods: response ? response.data : [] });
+        });
+
+    getCurrencies = () =>
+        AppUtil.getAPI("catalogos/tipo_moneda", sessionStorage.getItem("token")).then((response) => {
+            this.setState({ currencies: response ? response.data : [] });
+        });
+
+    getInvoiceStates = () =>
+        AppUtil.getAPI("catalogos/estado_factura", sessionStorage.getItem("token")).then((response) => {
+            this.setState({ invoiceStates: response ? response.data : [] });
+        });
 
 
-     }
+    getSaleConditions = () =>
+        AppUtil.getAPI("catalogos/condicion_venta", sessionStorage.getItem("token")).then((response) => {
+            this.setState({ saleConditions: response ? response.data : [] });
+        });
+
+    getTaxes = () =>
+        AppUtil.getAPI("catalogos/impuesto", sessionStorage.getItem("token")).then((response) => {
+            this.setState({ taxes: response ? response.data : [] });
+        });
+
+    getCommercialCodes = () =>
+        AppUtil.getAPI("catalogos/codigo_comercial", sessionStorage.getItem("token")).then((response) => {
+            this.setState({ commercialCodes: response ? response.data : [] });
+        });
+
+    getCabyCodes = (input = "") =>{
+
+        let cabyCodes = []
+
+        if(input === "")
+        {
+             AppUtil.getAPI(`catalogos/codigos_cabys`, sessionStorage.getItem("token")).then((response) => {
+            const data      = response ? response.data.data : [];
+             cabyCodes = Array.isArray(data)
+                ? data.map((c) => ({ value: c.id, label: `${c.codigo} - ${c.nombre}`, codigo: c.codigo, impuesto_id: c.impuesto_id }))
+                : [];      
+                 this.setState({ cabyCodes });         
+        }); 
+        } else{
+              AppUtil.getAPI(`catalogos/codigos_cabys?search[value]=${input}`, sessionStorage.getItem("token")).then((response) => {
+            const data      = response ? response.data.data : [];
+             cabyCodes = Array.isArray(data)
+                ? data.map((c) => ({ value: c.id, label: `${c.codigo} - ${c.nombre}`, codigo: c.codigo, impuesto_id: c.impuesto_id }))
+                : [];     
+                 this.setState({ cabyCodes });   
+            
+        });
+        }
+        
+    }
+   getClave = () =>{
+
+    if(this.state.invoice.id === 0)
+    {
+     AppUtil.getAPI("facturas/clave", sessionStorage.getItem("token")).then((response) => {
+            const data = response ? response.data : [];
+            const clave = data.clave;
+            const consecutivo_electronico = data.consecutivo;
+               this.setState((prevState) => ({ invoice: { ...prevState.invoice, clave, consecutivo_electronico } }
+               )
+    
+    );
+});
+    }
+
+   
+}
+    // ─────────────────────────────────────────────
+    // CONSULTAR POR ID (edición)
+    // ─────────────────────────────────────────────
+
+    getInvoiceById = (id) => {
+        const { t } = this.props;
+
+        AppUtil.getAPI(`facturas/${id}`, sessionStorage.getItem("token")).then((response) => {
+            if (response.codeStatus === 200) {
+                const invoiceData = response.data;
+                const lines       = invoiceData.Factura_Detalles || [];
+
+                delete invoiceData.Factura_Detalles;
+
+                this.setState({
+                    invoice: {
+                        id:                      invoiceData.id,
+                        clave:                   invoiceData.clave,
+                        consecutivo_electronico: invoiceData.consecutivo_electronico,
+                        consecutivo:             invoiceData.consecutivo,
+                        tipo_moneda_id:          invoiceData.tipo_moneda_id,
+                        estado_Factura_id:       invoiceData.estado_factura_id,
+                        tipo_documento_id:       invoiceData.tipo_documento_id,
+                        subtotal:                invoiceData.subtotal,
+                        impuesto:                invoiceData.impuesto,
+                        total:                   invoiceData.total,
+                        descuento:               invoiceData.descuento,
+                        impuesto_id:             invoiceData.impuesto_id,
+                        cambio_venta:            invoiceData.cambio_venta,
+                        cambio_compra:           invoiceData.cambio_compra,
+                        clientes_id:             invoiceData.clientes_id,
+                        condicion_venta_id:      invoiceData.condicion_venta_id,
+                        medio_pago_id:           invoiceData.medio_pago_id,
+                        usuarios_Usuario_id:     this.user.usuario_id,
+                    },
+                    lines,
+                    show:  true,
+                    error: false,
+                });
+            } else {
+                this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning" });
+            }
+        });
+    };
+
+    // ─────────────────────────────────────────────
+    // GUARDAR (crear o actualizar)
+    // ─────────────────────────────────────────────
+
+    saveInvoice = () => {
+        const { t } = this.props;
+        const { invoice, lines } = this.state;
+
+        // Validaciones
+        if (!invoice.clave) {
+            this.scrollToTop();
+            this.setState({ error: true, errorMsg: t("key_required"), color: "alert alert-warning" });
+            return;
+        }
+        if (invoice.clientes_id === 0) {
+            this.scrollToTop();
+            this.setState({ error: true, errorMsg: t("customer_required"), color: "alert alert-warning" });
+            return;
+        }
+        if (invoice.Tipo_moneda_id === 0) {
+            this.scrollToTop();
+            this.setState({ error: true, errorMsg: t("currency_required"), color: "alert alert-warning" });
+            return;
+        }
+        if (invoice.Condicion_venta_id === 0) {
+            this.scrollToTop();
+            this.setState({ error: true, errorMsg: t("sale_condition_required"), color: "alert alert-warning" });
+            return;
+        }
+        if (invoice.Medio_pago_id === 0) {
+            this.scrollToTop();
+            this.setState({ error: true, errorMsg: t("payment_method_required"), color: "alert alert-warning" });
+            return;
+        }
+        if (lines.length === 0) {
+            this.scrollToTop();
+            this.setState({ error: true, errorMsg: t("lines_required"), color: "alert alert-warning" });
+            return;
+        }
+
+        this.setState({ processing: true });
+
+        // Adjuntar líneas al payload
+        const payload = { ...invoice, Factura_Detalles: lines };
+
+        if (invoice.id === 0) {
+            // ── CREAR
+            AppUtil.postAPI("facturas", payload).then((response) => {
+                if (response.codeStatus === 200) {
+                    this.scrollToTop();
+                    this.setState({
+                        error: true,
+                        errorMsg: t("record_created_successfully"),
+                        color: "alert alert-success",
+                        processing: false,
+                    });
+                } else {
+                    this.scrollToTop();
+                    this.setState({
+                        error: true,
+                        errorMsg: t(response.message),
+                        color: "alert alert-warning",
+                        processing: false,
+                    });
+                }
+            });
+        } else {
+            // ── ACTUALIZAR
+            AppUtil.putAPI(`facturas/${invoice.id}`, payload).then((response) => {
+                if (response.codeStatus === 200) {
+                    this.scrollToTop();
+                    this.setState({
+                        error: true,
+                        errorMsg: t("updated_successfully"),
+                        color: "alert alert-success",
+                        processing: false,
+                    });
+                } else {
+                    this.scrollToTop();
+                    this.setState({
+                        error: true,
+                        errorMsg: t(response.message),
+                        color: "alert alert-warning",
+                        processing: false,
+                    });
+                }
+            });
+        }
+    };
+
+    // ─────────────────────────────────────────────
+    // ACEPTACIÓN DE FACTURAS (XML)
+    // ─────────────────────────────────────────────
+
+    _handleFileChange = (e) => {
+        this.setState({ archivoAceptacion: e.target.files[0] });
+    };
+
+    saveAcceptance = () => {
+        const { t } = this.props;
+        const { archivoAceptacion } = this.state;
+
+        if (!archivoAceptacion) {
+            this.setState({ error: true, errorMsg: t("xml_file_required"), color: "alert alert-warning" });
+            return;
+        }
+
+        this.setState({ processing: true });
+
+        const formData = new FormData();
+        formData.append("archivo", archivoAceptacion);
+
+        // Envío del XML al endpoint de aceptación
+        fetch(`${url}facturas/aceptacion`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+            body: formData,
+        })
+            .then((res) => res.json())
+            .then((response) => {
+                if (response.codeStatus === 200) {
+                    this.setState({
+                        error: true,
+                        errorMsg: t("record_created_successfully"),
+                        color: "alert alert-success",
+                        processing: false,
+                    });
+                } else {
+                    this.setState({
+                        error: true,
+                        errorMsg: t(response.message),
+                        color: "alert alert-warning",
+                        processing: false,
+                    });
+                }
+            })
+            .catch(() => {
+                this.setState({
+                    error: true,
+                    errorMsg: t("please_verify_data"),
+                    color: "alert alert-danger",
+                    processing: false,
+                });
+            });
+    };
+
+    // ─────────────────────────────────────────────
+    // BOTONES DE ACCIÓN EN LA TABLA
+    // ─────────────────────────────────────────────
+
+    ActionButtons = (rowData) => (
+        <Row className="m-2">
+            <Col lg="12" sm="12">
+                <Button
+                    variant="info"
+                    className="btn-fill btn-rounded"
+                    onClick={() => this.getInvoiceById(rowData.id)}
+                >
+                    <i className="fas fa-pen" />
+                </Button>
+            </Col>
+        </Row>
+    );
+
+    
+    OverlayBtn = (rowData) => (
+        <Row className="m-2">
+            <Col lg="12" sm="12">
+ <OverlayTrigger
+      placement="top"
+      delay={{ show: 250, hide: 400 }}
+      overlay={  <Tooltip id="button-tooltip">
+      {rowData.clave}
+    </Tooltip>}
+    >
+      <Button variant="success"><i className="fas fa-info" /></Button>
+    </OverlayTrigger>
+     </Col>
+        </Row>
+        
+    );
+
+    // ─────────────────────────────────────────────
+    // RENDER
+    // ─────────────────────────────────────────────
+
+    render() {
+        const { t } = this.props;
+
+        
+        const {
+            invoice,
+            lines,
+            customers,
+            paymentMethods,
+            currencies,
+        
+        
+            saleConditions,
+            taxes,
+            commercialCodes,
+            cabyCodes,
+            error,
+            errorMsg,
+            color,
+            processing,
+            token,
+            AuxLine,
+        } = this.state;
+
+        return (
+            <>
+                <Container fluid>
+                    <Tabs id="invoice-tabs" className="mb-3 txt-blue" defaultActiveKey="invoice">
+
+                        {/* ══════════════════════════════════════════
+                            TAB 1 — FACTURACIÓN
+                        ══════════════════════════════════════════ */}
+                        <Tab eventKey="invoice" title={t("invoice")} className="txt-darkblue">
+
+                            {/* Header */}
+                            <Row>
+                                <Col lg="6" sm="12">
+                                    <h1>{t("invoice")}</h1>
+                                </Col>
+                                <Col lg="6" sm="12">
+                                    <Row>
+                                        <Col lg="3" sm="12">
+                                            <Button className="btn-fill btn-rounded bg-blue" onClick={this.toggleShow}>
+                                                {t("create")}
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+
+                            {/* DataTable */}
+                            <Row>
+                                {token === "" ? (
+                                    <div />
+                                ) : (
+                                    <DataTable
+                                        ajax={{
+                                            url: `${url}facturas`,
+                                            type: "GET",
+                                            headers: {
+                                                Authorization: `Bearer ${token}`,
+                                                Accept: "application/json",
+                                                "Content-Type": "application/json; charset=UTF-8",
+                                            },
+                                            dataSrc: function (json) {
+                                                return json.data || [];
+                                            },
+                                            dataType: "json",
+                                        }}
+                                        columns={[
+                                            { data: "id",                      title: t("id") },
+                                            { title: t("key"), data:null, orderable: false, searchable:false, defaultContent:""},
+                                            { data: "consecutivo_electronico", title: t("consecutive") },
+                                            { data: "fecha",                   title: t("creation_date"),  render: (data, type, row) =>{ return moment(`${row.fecha}`).format(`${this.state.formatoFecha}`) } },
+                                            { data: "cliente",                 title: t("customer") },
+                                            { data: "tipo_moneda",             title: t("currency") },
+                                            { data: "estado_factura",          title: t("invoice_status") },
+                                            { data: "subtotal",                title: t("subtotal") },
+                                            { data: "impuesto",                title: t("tax") },
+                                            { data: "descuento",               title: t("discount") },
+                                            { data: "total",                   title: t("total") },
+                                            {
+                                                title: t("action"),
+                                                data: null,
+                                                orderable: false,
+                                                searchable: false,
+                                                defaultContent: "",
+                                            },
+                                        ]}
+                                        className="display table cell-border compact stripe"
+                                        slots={{ 1: (cellData, rowData) => this.OverlayBtn(cellData),  11: (cellData, rowData) => this.ActionButtons(rowData) }}
+                                        options={{
+                                            language: {
+                                                zeroRecords:       t("zeroRecords"),
+                                                emptyTable:        t("emptyTable"),
+                                                search:            t("search"),
+                                                paginate:          t("paginate"),
+                                                searchPlaceholder: t("searchPlaceholder"),
+                                                info:              t("info"),
+                                                lengthMenu:        t("lengthMenu"),
+                                            },
+                                            layout: {
+                                                topStart:    "pageLength",
+                                                topEnd:      "search",
+                                                bottomStart: "info",
+                                                bottomEnd:   "paging",
+                                            },
+                                        }}
+                                    />
+                                )}
+                            </Row>
+                        </Tab>
+
+                        {/* ══════════════════════════════════════════
+                            TAB 2 — ACEPTACIÓN DE FACTURAS
+                        ══════════════════════════════════════════ */}
+                        <Tab eventKey="invoice_acceptance" title={t("invoice_acceptance")} className="txt-darkblue">
+                            <Row>
+                                <Col lg="6" sm="12">
+                                    <h1>{t("invoice_acceptance")}</h1>
+                                </Col>
+                                <Col lg="6" sm="12">
+                                    <Row>
+                                        <Col lg="3" sm="12">
+                                            <Button className="btn-fill btn-rounded bg-blue" onClick={this.toggleShowAcceptance}>
+                                                {t("create")}
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Tab>
+
+                    </Tabs>
+
+                    {/* ══════════════════════════════════════════
+                        MODAL — CREAR / EDITAR FACTURA
+                    ══════════════════════════════════════════ */}
+                    <Modal
+                        show={this.state.show}
+                        onHide={this.toggleShow}
+                        backdrop="static"
+                        keyboard={false}
+                        size="lg"
+                        className="max-z-index"
+                        scrollable
+                    >
+                        <Modal.Header closeButton>
+                            <h3 className="tituloFerias">
+                                {invoice.id === 0 ? t("create_invoice") : t("edit_invoice")}
+                            </h3>
+                        </Modal.Header>
+
+                        <Modal.Body>
+                            {/* Ancla para scroll al tope */}
+                            <div ref={this.modalTopRef} />
+
+                            {/* Alerta */}
+                            {error && (
+                                <Alert className={color} onClose={() => this.setState({ error: false })} dismissible>
+                                    {errorMsg}
+                                </Alert>
+                            )}
+
+                            {/* ── Clave y Consecutivo electrónico ── */}
+                            <Row className="m-2">
+                                <Col sm="12" xl="6">
+                                    <label>{t("key")}</label>
+                                    <Form.Group>
+                                        <Form.Control
+                                            placeholder={t("key")}
+                                            type="text"
+                                            readOnly
+                                            onChange={this._saveStateVariable}
+                                            name="clave"
+                                            required
+                                            //maxLength={50}
+                                            value={invoice.clave}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col sm="12" xl="6">
+                                    <label>{t("consecutive")}</label>
+                                    <Form.Group>
+                                        <Form.Control
+                                            placeholder={t("consecutive")}
+                                            type="text"
+                                            readOnly
+                                            onChange={this._saveStateVariable}
+                                            name="consecutivo_electronico"
+                                            required
+                                            maxLength={45}
+                                            value={invoice.consecutivo_electronico}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            {/* ── Tipo moneda / Condición venta ── */}
+                            <Row className="m-2">
+                                <Col sm="12" xl="6">
+                                    <label className="txt-darkblue">{t("currency")}</label>
+                                    <Form.Group>
+                                        <Form.Select name="tipo_moneda_id" onChange={this._saveStateVariable} value={invoice.tipo_moneda_id} required>
+                                            <option value="">{t("select_option")}</option>
+                                            {currencies.map((item) => (
+                                                <option key={item.id} value={item.id}>{item.nombre}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                <Col sm="12" xl="6">
+                                    <label className="txt-darkblue">{t("sale_condition")}</label>
+                                    <Form.Group>
+                                        <Form.Select name="condicion_venta_id" onChange={this._saveStateVariable} value={invoice.condicion_venta_id} required>
+                                            <option value="">{t("select_option")}</option>
+                                            {saleConditions.map((item) => (
+                                                <option key={item.id} value={item.id}>{item.descripcion}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            {/* ── Medio de pago / Tipo documento ── */}
+                            <Row className="m-2">
+                                <Col sm="12" xl="12">
+                                    <label className="txt-darkblue">{t("payment_method")}</label>
+                                    <Form.Group>
+                                        <Form.Select name="medio_pago_id" onChange={this._saveStateVariable} value={invoice.medio_pago_id} required>
+                                            <option value="">{t("select_option")}</option>
+                                            {paymentMethods.map((item) => (
+                                                <option key={item.id} value={item.id}>{item.descripcion}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                      
+                            </Row>
+
+                            {/* ── Tipo de cambio ── */}
+                            <Row className="m-2">
+                                <Col sm="12" xl="6">
+                                    <label className="txt-darkblue">{t("exchange_rate_sale")}</label>
+                                    <Form.Group>
+                                        <Form.Control
+                                            placeholder={t("exchange_rate_sale")}
+                                            type="number"
+                                            name="cambio_venta"
+                                            min={0}
+                                            step="0.01"
+                                            readOnly
+                                            onChange={this._saveStateVariable}
+                                            value={invoice.cambio_venta}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col sm="12" xl="6">
+                                    <label className="txt-darkblue">{t("exchange_rate_buy")}</label>
+                                    <Form.Group>
+                                        <Form.Control
+                                            placeholder={t("exchange_rate_buy")}
+                                            type="number"
+                                            name="cambio_compra"
+                                            min={0}
+                                            step="0.01"
+                                            readOnly
+                                            onChange={this._saveStateVariable}
+                                            value={invoice.cambio_compra}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            {/* ── Cliente (react-select) ── */}
+                            <Row className="m-2">
+                                <Col sm="12" xl="12">
+                                    <label className="txt-darkblue">{t("customer")}</label>
+                                    <Select
+                                        options={customers}
+                                        onChange={this._saveCustomer}
+                                        placeholder={`${t("select_option")}`}
+                                        name="clientes_id"
+                                       // onChange={(value) => this.setState({ spent: { ...this.state.spent, proveedor_id: value.id}}) }
+                                        getOptionValue={(option) => option.id}
+                                        getOptionLabel={(option) => `${option.nombre} ${option.apellido1} ${option.apellido2}`}
+                                        defaultValue={() =>
+                                          customers?.find(
+                                            (opt) => opt.id === invoice.clientes_id,
+                                          )
+                                        }
+                                      isSearchable={true}
+
+                                    />
+                                </Col>
+                            </Row>
+
+                            {/* ══ SECCIÓN DE LÍNEAS DE DETALLE ══ */}
+                            <div className="well mt-3">
+                                <Form onSubmit={this.addLine}>
+
+                                    {/* Código CABYS / Código Comercial */}
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("cabys_code")}</label>
+                                            <Form.Group>
+                                        <Select
+                                        options={cabyCodes}
+                                        onChange={(selectedCabys) => {
+                                         this.setState({ selectedCabys })}}
+                                    
+                                        placeholder={`${t("select_option")}`}
+                                        onInputChange={(value) => this.getCabyCodes(value) }
+                                    />
+
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("comercial_code")}</label>
+                                            <Form.Group>
+                                                <Form.Select name="codigo_comercial_id" required>
+                                                    <option value="">{t("select_option")}</option>
+                                                    {commercialCodes.map((item) => (
+                                                        <option key={item.id} value={item.id}>
+                                                            {item.codigo} - {item.nombre}
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+
+                                    {/* Detalle / Cantidad */}
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="8">
+                                            <label className="txt-darkblue">{t("detail")}</label>
+                                            <Form.Group>
+                                                <Form.Control
+                                                    placeholder={t("detail")}
+                                                    type="text"
+                                                    name="detalle"
+                                                    required
+                                                    maxLength={200}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm="12" xl="4">
+                                            <label className="txt-darkblue">{t("qty")}</label>
+                                            <Form.Group>
+                                                <Form.Control
+                                                    placeholder={t("qty")}
+                                                    type="number"
+                                                    name="cantidad"
+                                                    required
+                                                    min={1}
+                                                    step="0.01"
+                                                    onChange={(e) => this._calculaInput(e)}
+                                                    value={AuxLine.cantidad}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+
+                                    {/* Subtotal / Impuesto / Descuento */}
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="4">
+                                            <label className="txt-darkblue">{t("subtotal")}</label>
+                                            <Form.Group>
+                                                <Form.Control
+                                                    placeholder={t("subtotal")}
+                                                    type="number"
+                                                    name="subtotal"
+                                                    required
+                                                    min={0}
+                                                    step="0.01"
+                                                    onChange={(e) => this._calculaInput(e)}
+                                                    value={AuxLine.subtotal}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm="12" xl="4">
+                                            <label className="txt-darkblue">{t("tax_type")}</label>
+                                            <Form.Select name="impuesto_id" onChange={(e) => this._calculaInput(e, true)} required>
+                                                <option value="">{t("select_option")}</option>
+                                                {taxes.map((item, key) =>
+                                                    item.id === this.state.defaultTax ? (
+                                                        <option key={key} value={item.id} attr={item.porcentaje} selected>
+                                                            {item.nombre}
+                                                        </option>
+                                                    ) : (
+                                                        <option key={key} value={item.id} attr={item.porcentaje}>
+                                                            {item.nombre}
+                                                        </option>
+                                                    )
+                                                )}
+                                            </Form.Select>
+                                        </Col>
+                                        <Col sm="12" xl="4">
+                                            <label className="txt-darkblue">{t("discount")}</label>
+                                            <Form.Group>
+                                                <Form.Control
+                                                    placeholder={t("discount")}
+                                                    type="number"
+                                                    name="descuento"
+                                                    min={0}
+                                                    step="0.01"
+                                                    onChange={(e) => this._calculaInput(e)}
+                                                    value={AuxLine.descuento}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+
+                                    {/* Impuesto calculado / Total */}
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("tax")}</label>
+                                            <Form.Group>
+                                                <Form.Control
+                                                    placeholder={t("tax")}
+                                                    type="number"
+                                                    name="impuesto"
+                                                    readOnly
+                                                    min={0}
+                                                    step="0.01"
+                                                    value={AuxLine.impuesto}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("total")}</label>
+                                            <Form.Group>
+                                                <Form.Control
+                                                    placeholder={t("total")}
+                                                    type="number"
+                                                    name="total"
+                                                    readOnly
+                                                    min={0}
+                                                    step="0.01"
+                                                    value={AuxLine.total}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="12">
+                                            <Button variant="primary" className="btn-fill btn-rounded" type="submit">
+                                                {t("add_line")}
+                                            </Button>
+                                        </Col>
+                                    </Row>
+
+                                    {/* Tabla de líneas */}
+                                    <Row className="m-3">
+                                        <Col sm="12" xl="12">
+                                            <Table striped bordered hover>
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>{t("cabys_code")}</th>
+                                                        <th>{t("comercial_code")}</th>
+                                                        <th>{t("detail")}</th>
+                                                        <th>{t("qty")}</th>
+                                                        <th>{t("subtotal")}</th>
+                                                        <th>{t("discount")}</th>
+                                                        <th>{t("tax")}</th>
+                                                        <th>{t("total")}</th>
+                                                        <th>{t("action")}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {lines.length > 0 &&
+                                                        lines.map((line, index) => (
+                                                            <tr key={index}>
+                                                                <td>{index + 1}</td>
+                                                                <td>{line.codigos_cabys_codigo}</td>
+                                                                <td>{line.codigo_comercial_label}</td>
+                                                                <td>{line.detalle}</td>
+                                                                <td>{line.cantidad}</td>
+                                                                <td>{line.subtotal}</td>
+                                                                <td>{line.descuento}</td>
+                                                                <td>{line.impuesto}</td>
+                                                                <td>{line.total}</td>
+                                                                <td>
+                                                                    <Button
+                                                                        variant="danger"
+                                                                        className="btn-fill btn-rounded"
+                                                                        onClick={() => this.removeLine(index)}
+                                                                    >
+                                                                        <i className="fas fa-trash" />
+                                                                    </Button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                </tbody>
+                                                {lines.length > 0 && (
+                                                    <tfoot>
+                                                        <tr className="table-info fw-bold">
+                                                            <td colSpan={5}>{t("totals")}</td>
+                                                            <td>{(invoice.subtotal || 0).toFixed(2)}</td>
+                                                            <td>{(invoice.descuento || 0).toFixed(2)}</td>
+                                                            <td>{(invoice.impuesto || 0).toFixed(2)}</td>
+                                                            <td>{(invoice.total || 0).toFixed(2)}</td>
+                                                            <td />
+                                                        </tr>
+                                                    </tfoot>
+                                                )}
+                                            </Table>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </div>
+                        </Modal.Body>
+
+                        <Modal.Footer>
+                            <Button variant="light" className="btn-rounded" onClick={this.toggleShow}>
+                                {t("close")}
+                            </Button>
+                            {processing ? (
+                                <div className="lds-dual-ring-2" />
+                            ) : (
+                                <Button variant="primary" className="btn-fill btn-rounded" onClick={this.saveInvoice}>
+                                    {t("save")}
+                                </Button>
+                            )}
+                        </Modal.Footer>
+                    </Modal>
+
+                    {/* ══════════════════════════════════════════
+                        MODAL — ACEPTACIÓN DE FACTURAS (XML)
+                    ══════════════════════════════════════════ */}
+                    <Modal
+                        show={this.state.showAcceptance}
+                        onHide={this.toggleShowAcceptance}
+                        backdrop="static"
+                        keyboard={false}
+                        size="lg"
+                        className="max-z-index"
+                    >
+                        <Modal.Header closeButton>
+                            <h3 className="tituloFerias">{t("invoice_acceptance")}</h3>
+                        </Modal.Header>
+
+                        <Modal.Body>
+                            <div ref={this.modalTopRef} />
+                            {error && (
+                                <Alert className={color} onClose={() => this.setState({ error: false })} dismissible>
+                                    {errorMsg}
+                                </Alert>
+                            )}
+
+                            <Row className="m-2">
+                                <Col sm="12" xl="12">
+                                    <label>{t("xml_file")}</label>
+                                    <Form.Group>
+                                        <Form.Control
+                                            type="file"
+                                            accept=".xml"
+                                            name="archivo_aceptacion"
+                                            onChange={this._handleFileChange}
+                                            required
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                        </Modal.Body>
+
+                        <Modal.Footer>
+                            <Button variant="light" className="btn-rounded" onClick={this.toggleShowAcceptance}>
+                                {t("close")}
+                            </Button>
+                            {processing ? (
+                                <div className="lds-dual-ring-2" />
+                            ) : (
+                                <Button variant="primary" className="btn-fill btn-rounded" onClick={this.saveAcceptance}>
+                                    {t("save")}
+                                </Button>
+                            )}
+                        </Modal.Footer>
+                    </Modal>
+
+                </Container>
+            </>
+        );
+    }
 }
 
- export default withTranslation()(Invoice)
+export default withTranslation()(Invoice);
