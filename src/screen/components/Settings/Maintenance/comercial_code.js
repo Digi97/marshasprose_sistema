@@ -22,13 +22,13 @@ class Comercial_Code extends Component {
   }
 
   getComercialCode = () =>
-    AppUtil.getAPI(`catalogos/codigo_comercial`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/codigo_comercial`).then(response => {
       let comercialCodeList = response ? response.data : [];
       this.setState({ comercialCodeList });
     });
 
   getComercialCodeById = (id) =>
-    AppUtil.getAPI(`catalogos/codigo_comercial/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/codigo_comercial/${id}`).then(response => {
       let comercialCode = response ? response.data : {};
       this.setState({ comercialCode, show: true });
     });

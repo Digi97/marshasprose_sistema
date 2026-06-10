@@ -21,13 +21,13 @@ class Expenses_Category extends Component {
   }
 
   getExpensesCategory = () =>
-    AppUtil.getAPI(`catalogos/categoria_gasto`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/categoria_gasto`).then(response => {
       let expensesCategoryList = response ? response.data : [];
       this.setState({ expensesCategoryList });
     });
 
   getExpensesCategoryById = (id) =>
-    AppUtil.getAPI(`catalogos/categoria_gasto/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/categoria_gasto/${id}`).then(response => {
       let expenses_category = response ? response.data : {};
       this.setState({ expenses_category, show: true });
     });

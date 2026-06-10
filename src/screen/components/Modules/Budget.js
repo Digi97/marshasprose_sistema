@@ -170,7 +170,7 @@ if(response.codeStatus === 200)
       }
 
     getBudget = () =>{
-      AppUtil.getAPI(`gestion_presupuestaria`, sessionStorage.getItem('token')).then(response => {
+      AppUtil.getAPI(`gestion_presupuestaria`).then(response => {
       let budgets = response ? response.data : [];
       this.setState({budgets});
     });
@@ -179,7 +179,7 @@ if(response.codeStatus === 200)
   getBudgetById = (id) =>
   {
 
-        AppUtil.getAPI(`gestion_presupuestaria/${id}`, sessionStorage.getItem('token')).then(response => {
+        AppUtil.getAPI(`gestion_presupuestaria/${id}`).then(response => {
         
       let budget = response ? response.data : [];      
       this.setState({budget, show:true}, ()=>{this.getCostCenter(); this.getCategories()});
@@ -188,12 +188,12 @@ if(response.codeStatus === 200)
   }
 
 
-  getCategories = () => AppUtil.getAPI(`catalogos/categoria_presupuestaria`, sessionStorage.getItem('token')).then(response => {
+  getCategories = () => AppUtil.getAPI(`catalogos/categoria_presupuestaria`).then(response => {
       let presupuestary_category = response ? response.data : [];
       this.setState({presupuestary_category});
     });
 
-      getCostCenter = () => AppUtil.getAPI(`catalogos/centro_costos`, sessionStorage.getItem('token')).then(response => {
+      getCostCenter = () => AppUtil.getAPI(`catalogos/centro_costos`).then(response => {
       let cost_center = response ? response.data : [];
       this.setState({cost_center});
     });
@@ -222,7 +222,7 @@ if(response.codeStatus === 200)
         "@marsh_contable",
       );
       this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
-      this.setState({ user: this.user, token: sessionStorage.getItem("token") });
+      this.setState({ user: this.user, token: sessionStorage.getItem("sessionId") });
     };
 
     //#endregion fin funciones internas

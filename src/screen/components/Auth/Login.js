@@ -81,21 +81,19 @@ class Login extends Component {
           // Configuration Object
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json",
-            "Access-Control-Allow-Origin": host,
-            "Access-Control-Allow-Credentials": "true",
+            Accept: "application/json"
           },
         })
         .then((response) => {
           if (response.status === 200) {
             if (response.data.codeStatus === 200) {
               //se guarda el usuario en session
-              //y se encripta la informacion del usuario prueba31@test.comn
+              //y se encripta la informacion del usuario prueba31@test.com
               let user = crypto.AES.encrypt(
                 JSON.stringify(response.data.data),
                 "@marsh_contable",
               ).toString();
-              sessionStorage.setItem("token", response.data.message);
+              sessionStorage.setItem("sessionId", response.data.message);
               sessionStorage.setItem("user", user);
               //se redirecciona a main
 

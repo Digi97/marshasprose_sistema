@@ -39,28 +39,28 @@ class Accounting_account extends Component {
   }
 
   getAccountingAccount = () =>
-    AppUtil.getAPI(`catalogos/cuentas_contables`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/cuentas_contables`).then(response => {
       let accountingAccountList = response ? response.data : [];
     
       
       this.setState({ accountingAccountList });
     });
      getCurrency = () =>
-    AppUtil.getAPI(`catalogos/tipo_moneda`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_moneda`).then(response => {
       let currencyList = response ? response.data : [];
       
       this.setState({ currencyList });
     });
 
         getType = () =>
-    AppUtil.getAPI(`catalogos/tipo_cuenta_contable`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_cuenta_contable`).then(response => {
       let typeAAList = response ? response.data : [];
       
       this.setState({ typeAAList });
     });
 
   getAccountingAccountById = (id) =>
-    AppUtil.getAPI(`catalogos/cuentas_contables/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/cuentas_contables/${id}`).then(response => {
       let accountingAccount = response ? response.data : {};
       this.setState({ accountingAccount, show: true });
     });

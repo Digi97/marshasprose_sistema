@@ -21,13 +21,13 @@ class Invoice_Status extends Component {
   }
 
   getInvoiceStatus = () =>
-    AppUtil.getAPI(`catalogos/estado_factura`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/estado_factura`).then(response => {
       let invoiceStatusList = response ? response.data : [];
       this.setState({ invoiceStatusList });
     });
 
   getInvoiceStatusById = (id) =>
-    AppUtil.getAPI(`catalogos/estado_factura/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/estado_factura/${id}`).then(response => {
       let invoice_status = response ? response.data : {};
       this.setState({ invoice_status, show: true });
     });

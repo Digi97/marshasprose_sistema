@@ -29,7 +29,7 @@ class Cabys_Code extends Component {
 
 
      getTaxType = () =>
-    AppUtil.getAPI(`catalogos/impuesto`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`catalogos/impuesto`).then(
       (response) => {
         let taxes = response ? response.data : [];
         this.setState({ taxes });
@@ -37,7 +37,7 @@ class Cabys_Code extends Component {
     );
 
   getCabysCodeById = (id) =>
-    AppUtil.getAPI(`catalogos/codigos_cabys/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/codigos_cabys/${id}`).then(response => {
       let cabys_code = response ? response.data : {};
       this.setState({ cabys_code, show: true });
     });
@@ -109,7 +109,7 @@ class Cabys_Code extends Component {
 
   componentDidMount() {
    // this.getCabysCode();
-    let token = sessionStorage.getItem("token");
+    let token = sessionStorage.getItem("sessionId");
     this.setState({token});
     this.getTaxType()
   }
@@ -128,6 +128,7 @@ class Cabys_Code extends Component {
 
   render() {
     const { t } = this.props;
+    let {token} = this.state;
     return (
       <>
         <Container fluid>
@@ -148,13 +149,14 @@ class Cabys_Code extends Component {
           </Row>
 
           <Row>
-           {this.state.token === "" ? <div></div> :<DataTable
+           {token === "" ? <div></div> :<DataTable
               ajax={{url:`${url}catalogos/codigos_cabys`,
                 type:'GET',
               
-                headers:{'Authorization':`Bearer ${this.state.token}`,    
+                headers:{
                 'Accept': "application/json",
-               "Content-Type": "application/json; charset=UTF-8",  
+               "Content-Type": "application/json; charset=UTF-8", 
+                 "X-Session-Id": token 
               },
          
                 dataSrc: function(json){     

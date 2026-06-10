@@ -163,7 +163,7 @@ if(response.codeStatus === 200)
       }
 
     getUsers = () =>{
-      AppUtil.getAPI(`users`, sessionStorage.getItem('token')).then(response => {
+      AppUtil.getAPI(`users`).then(response => {
       let users = response ? response.data : [];
       this.setState({users});
     });
@@ -174,8 +174,8 @@ if(response.codeStatus === 200)
 
     
     
-        AppUtil.getAPI(`users/${id}`, sessionStorage.getItem('token')).then(response => {
-          console.log(response);
+        AppUtil.getAPI(`users/${id}`).then(response => {
+      
           
       let user = response ? response.data : [];      
       this.setState({user, show:true}, ()=>{this.getRoles()});
@@ -184,7 +184,7 @@ if(response.codeStatus === 200)
   }
 
 
-  getRoles = () => AppUtil.getAPI(`roles`, sessionStorage.getItem('token')).then(response => {
+  getRoles = () => AppUtil.getAPI(`roles`).then(response => {
       let roles = response ? response.data : [];
       this.setState({roles});
     });

@@ -54,7 +54,7 @@ class Settings extends Component {
   getEmpresaById = () => {
     const { t } = this.props;
 
-    AppUtil.getAPI(`empresa/1`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`empresa/1`).then(
       (response) => {
         if (response) {
           if (response.codeStatus === 200) {
@@ -74,7 +74,7 @@ class Settings extends Component {
   };
 
   getTaxes = () =>
-    AppUtil.getAPI(`catalogos/impuesto`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`catalogos/impuesto`).then(
       (response) => {
         let taxes = response ? response.data : [];
         this.setState({ taxes });
@@ -82,7 +82,7 @@ class Settings extends Component {
     );
 
   getIdentificationType = () =>
-    AppUtil.getAPI(`tipo_identificacion`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`tipo_identificacion`).then(
       (response) => {
         let identificationType = response ? response.data : [];
         this.setState({ identificationType });
@@ -91,8 +91,7 @@ class Settings extends Component {
 
   getActivityCode = () =>
     AppUtil.getAPI(
-      `catalogos/codigo_actividad`,
-      sessionStorage.getItem("token"),
+      `catalogos/codigo_actividad`
     ).then((response) => {
       let activityCode = response ? response.data : [];
       this.setState({ activityCode });

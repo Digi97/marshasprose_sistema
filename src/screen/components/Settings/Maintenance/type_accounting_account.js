@@ -22,13 +22,13 @@ class Type_Accounting_Account extends Component {
   }
 
   getTypeAccountingAccount = () =>
-    AppUtil.getAPI(`catalogos/tipo_cuenta_contable`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_cuenta_contable`).then(response => {
       let typeAccountingAccountList = response ? response.data : [];
       this.setState({ typeAccountingAccountList });
     });
 
   getTypeAccountingAccountById = (id) =>
-    AppUtil.getAPI(`catalogos/tipo_cuenta_contable/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_cuenta_contable/${id}`).then(response => {
       let type_accounting_account = response ? response.data : {};
       this.setState({ type_accounting_account, show: true });
     });

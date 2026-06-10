@@ -22,13 +22,13 @@ class Measurement_Unity extends Component {
   }
 
   getMeasurementUnity = () =>
-    AppUtil.getAPI(`catalogos/unidad_medida`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/unidad_medida`).then(response => {
       let measurementUnityList = response ? response.data : [];
       this.setState({ measurementUnityList });
     });
 
   getMeasurementUnityById = (id) =>
-    AppUtil.getAPI(`catalogos/unidad_medida/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/unidad_medida/${id}`).then(response => {
       let measurement_unity = response ? response.data : {};
       this.setState({ measurement_unity, show: true });
     });

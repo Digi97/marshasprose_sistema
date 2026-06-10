@@ -34,7 +34,7 @@ class Rol extends Component {
     }
 
     getRol = () =>
-        AppUtil.getAPI(`catalogos/roles`, sessionStorage.getItem("token")).then(
+        AppUtil.getAPI(`catalogos/roles`).then(
             (response) => {
                 let rolList = response ? response.data : [];
                 this.setState({ rolList });
@@ -43,8 +43,7 @@ class Rol extends Component {
 
     getPermissions = () =>
         AppUtil.getAPI(
-            `catalogos/permisos`,
-            sessionStorage.getItem("token")
+            `catalogos/permisos`
         ).then((response) => {
             let permissions = response ? response.data : [];
             this.setState({ permissions });
@@ -52,8 +51,7 @@ class Rol extends Component {
 
     getPermissionsPerRol = (id) =>
         AppUtil.getAPI(
-            `catalogos/permisos_x_rol/${id}`,
-            sessionStorage.getItem("token")
+            `catalogos/permisos_x_rol/${id}`
         ).then((response) => {
             let permission_x_rol = response ? response.data : [];
             this.setState({ permission_x_rol });
@@ -61,8 +59,7 @@ class Rol extends Component {
 
     getRolById = (id) =>
         AppUtil.getAPI(
-            `catalogos/roles/${id}`,
-            sessionStorage.getItem("token")
+            `catalogos/roles/${id}`
         ).then((response) => {
             let rol = response ? response.data : {};
             let permission_x_rol = rol.permisosRol;

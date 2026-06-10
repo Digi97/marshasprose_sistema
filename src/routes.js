@@ -100,15 +100,25 @@ const ROUTE_PERMISSIONS = {
 
 
 const getPermisosFromToken = () => {
+  
     try {
-        const token  = sessionStorage.getItem("token");
+
+  let bytes = crypto.AES.decrypt(
+      sessionStorage.getItem("user"),
+      "@marsh_contable",
+    );
+    const user = JSON.parse(bytes.toString(crypto.enc.Utf8));
+ 
+   return user.permisos; 
+/*
+        const token  = sessionStorage.getItem("");
         if (!token) return [];
         const payload  = JSON.parse(atob(token.split(".")[1]));
         // El claim "permiso" puede ser string o array
         const permisos = payload.permiso;
         return Array.isArray(permisos)
             ? permisos.map(Number)
-            : [Number(permisos)];
+            : [Number(permisos)];*/
     } catch {
         return [];
     }

@@ -62,13 +62,11 @@ class ChangePassword extends Component {
         contrasena,
         contrasena_confirma
       }
-
-      console.log(send);
       
       axios
         .post(`${url}login/confirm-change-password`, send)
         .then((response) => {
-                console.log(response);
+             
           if (response.data.codeStatus ===200) 
             {
         this.setState({

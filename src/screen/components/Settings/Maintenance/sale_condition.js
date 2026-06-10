@@ -22,13 +22,13 @@ class Sale_Condition extends Component {
   }
 
   getSaleCondition = () =>
-    AppUtil.getAPI(`catalogos/condicion_venta`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/condicion_venta`).then(response => {
       let saleConditionList = response ? response.data : [];
       this.setState({ saleConditionList });
     });
 
   getSaleConditionById = (id) =>
-    AppUtil.getAPI(`catalogos/condicion_venta/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/condicion_venta/${id}`).then(response => {
       let sale_condition = response ? response.data : {};
       this.setState({ sale_condition, show: true });
     });

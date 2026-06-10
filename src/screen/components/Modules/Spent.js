@@ -97,7 +97,7 @@ class Spent extends Component {
     );
     this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
     this.setState({
-      token: sessionStorage.getItem("token"),
+      token: sessionStorage.getItem("sessionId"),
       spent: {
         ...this.state.spent,
         usuarios_Usuario_id: this.user.usuario_id,
@@ -260,7 +260,7 @@ _saveStateVariable = async (e) => {
   }
 
   getCategories = () =>
-    AppUtil.getAPI("catalogos/categoria_gasto", sessionStorage.getItem("token")).then(
+    AppUtil.getAPI("catalogos/categoria_gasto").then(
       (response) => {
         const categories = response ? response.data : [];
         this.setState({ categories });
@@ -270,7 +270,7 @@ _saveStateVariable = async (e) => {
 
 
   getPaymentMethods = () =>
-    AppUtil.getAPI("catalogos/medio_pago", sessionStorage.getItem("token")).then(
+    AppUtil.getAPI("catalogos/medio_pago").then(
       (response) => {
         const paymentMethods = response ? response.data : [];
         this.setState({ paymentMethods });
@@ -279,7 +279,7 @@ _saveStateVariable = async (e) => {
 
 
     getCurrency = () =>
-    AppUtil.getAPI("catalogos/tipo_moneda", sessionStorage.getItem("token")).then(
+    AppUtil.getAPI("catalogos/tipo_moneda").then(
       (response) => {
         const currency = response ? response.data : [];
         this.setState({ currency });
@@ -289,7 +289,7 @@ _saveStateVariable = async (e) => {
   getProviders = () =>{
        const { t } = this.props;
 
-    AppUtil.getAPI("proveedor", sessionStorage.getItem("token")).then(
+    AppUtil.getAPI("proveedor").then(
       (response) => {
 
         if(response)
@@ -308,7 +308,7 @@ _saveStateVariable = async (e) => {
   }
 
   getCommercialCodes = () =>
-    AppUtil.getAPI("catalogos/codigo_comercial", sessionStorage.getItem("token")).then(
+    AppUtil.getAPI("catalogos/codigo_comercial").then(
       (response) => {
       
         
@@ -318,7 +318,7 @@ _saveStateVariable = async (e) => {
     );
 
     getTaxes = () =>
-    AppUtil.getAPI(`catalogos/impuesto`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`catalogos/impuesto`).then(
       (response) => {
         let taxes = response ? response.data : [];
         this.setState({ taxes });
@@ -328,7 +328,7 @@ _saveStateVariable = async (e) => {
   getSpentById = (id) => {
     const { t } = this.props;
 
-    AppUtil.getAPI(`gastos/${id}`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`gastos/${id}`).then(
       (response) => {
         if (response.codeStatus === 200) {
           const spent = response.data;
@@ -520,9 +520,9 @@ _saveStateVariable = async (e) => {
                   url: `${url}gastos`,
                   type: "GET",
                   headers: {
-                    Authorization: `Bearer ${token}`,
                     Accept: "application/json",
                     "Content-Type": "application/json; charset=UTF-8",
+                      "X-Session-Id": token
                   },
                    dataSrc: function (json) {
                         json.recordsTotal = json.data.recordsTotal;

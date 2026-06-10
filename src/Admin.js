@@ -43,7 +43,7 @@ function Admin() {
 
   const mainPanel = React.useRef(null);
   const location = useLocation();
-
+/*
   //se valida si el token es valido aun
   const { decodedToken, isExpired } = useJwt(sessionStorage.getItem("token"));
   let dateNow = new Date();
@@ -57,7 +57,7 @@ function Admin() {
       window.location.replace("/");
     }
   }
-
+*/
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/home") {

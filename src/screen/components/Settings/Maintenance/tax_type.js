@@ -25,7 +25,7 @@ class Tax_Type extends Component {
   }
 
   getTaxType = () =>
-    AppUtil.getAPI(`catalogos/impuesto`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`catalogos/impuesto`).then(
       (response) => {
         let taxTypeList = response ? response.data : [];
         this.setState({ taxTypeList });
@@ -35,7 +35,6 @@ class Tax_Type extends Component {
   getTaxTypeById = (id) =>
     AppUtil.getAPI(
       `catalogos/impuesto/${id}`,
-      sessionStorage.getItem("token"),
     ).then((response) => {
       let tax_type = response ? response.data : {};
       this.setState({ tax_type, show: true });
@@ -66,7 +65,7 @@ class Tax_Type extends Component {
       if (this.state.tax_type.id === 0) {
         AppUtil.postAPI(`catalogos/impuesto`, this.state.tax_type).then(
           (response) => {
-            console.log("post", response);
+            
             if (response) {
               let data = response ? response.data : [];
               if (Number.isInteger(data)) {
@@ -101,7 +100,7 @@ class Tax_Type extends Component {
           `catalogos/impuesto/${this.state.tax_type.id}`,
           this.state.tax_type,
         ).then((response) => {
-          console.log("put", response);
+          
 
           if (response) {
             let data = response ? response.data : [];

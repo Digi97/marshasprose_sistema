@@ -22,13 +22,13 @@ class Presupuestary_Category extends Component {
   }
 
   getPresupuestaryCategory = () =>
-    AppUtil.getAPI(`catalogos/categoria_presupuestaria`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/categoria_presupuestaria`).then(response => {
       let presupuestaryCategoryList = response ? response.data : [];
       this.setState({ presupuestaryCategoryList });
     });
 
   getPresupuestaryCategoryById = (id) =>
-    AppUtil.getAPI(`catalogos/categoria_presupuestaria/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/categoria_presupuestaria/${id}`).then(response => {
       let presupuestary_category = response ? response.data : {};
       this.setState({ presupuestary_category, show: true });
     });

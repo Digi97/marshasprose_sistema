@@ -118,7 +118,7 @@ class Invoice extends Component {
         
         this.setState(
             {
-                token: sessionStorage.getItem("token"),
+                token: sessionStorage.getItem("sessionId"),
                 invoice: {
                     ...this.state.invoice,
                     Usuarios_Usuario_id: this.user.usuario_id,
@@ -250,7 +250,7 @@ class Invoice extends Component {
         const formData = new FormData(e.target);
         const selectComercial = e.target.elements["codigo_comercial_id"];
         let cabys = selectedCabys.label.split(" - ")
-        console.log(cabys);
+      
         
 
         const newLine = {
@@ -306,39 +306,39 @@ class Invoice extends Component {
     // ─────────────────────────────────────────────
 
     getCustomers = () =>
-        AppUtil.getAPI("clientes", sessionStorage.getItem("token")).then((response) => {
+        AppUtil.getAPI("clientes", ).then((response) => {
             const customers      = response ? response.data.data : [];
             this.setState({ customers, processing: false });
         });
 
     getPaymentMethods = () =>
-        AppUtil.getAPI("catalogos/medio_pago", sessionStorage.getItem("token")).then((response) => {
+        AppUtil.getAPI("catalogos/medio_pago", ).then((response) => {
             this.setState({ paymentMethods: response ? response.data : [] });
         });
 
     getCurrencies = () =>
-        AppUtil.getAPI("catalogos/tipo_moneda", sessionStorage.getItem("token")).then((response) => {
+        AppUtil.getAPI("catalogos/tipo_moneda").then((response) => {
             this.setState({ currencies: response ? response.data : [] });
         });
 
     getInvoiceStates = () =>
-        AppUtil.getAPI("catalogos/estado_factura", sessionStorage.getItem("token")).then((response) => {
+        AppUtil.getAPI("catalogos/estado_factura").then((response) => {
             this.setState({ invoiceStates: response ? response.data : [] });
         });
 
 
     getSaleConditions = () =>
-        AppUtil.getAPI("catalogos/condicion_venta", sessionStorage.getItem("token")).then((response) => {
+        AppUtil.getAPI("catalogos/condicion_venta").then((response) => {
             this.setState({ saleConditions: response ? response.data : [] });
         });
 
     getTaxes = () =>
-        AppUtil.getAPI("catalogos/impuesto", sessionStorage.getItem("token")).then((response) => {
+        AppUtil.getAPI("catalogos/impuesto").then((response) => {
             this.setState({ taxes: response ? response.data : [] });
         });
 
     getCommercialCodes = () =>
-        AppUtil.getAPI("catalogos/codigo_comercial", sessionStorage.getItem("token")).then((response) => {
+        AppUtil.getAPI("catalogos/codigo_comercial").then((response) => {
             this.setState({ commercialCodes: response ? response.data : [] });
         });
 
@@ -348,7 +348,7 @@ class Invoice extends Component {
 
         if(input === "")
         {
-             AppUtil.getAPI(`catalogos/codigos_cabys`, sessionStorage.getItem("token")).then((response) => {
+             AppUtil.getAPI(`catalogos/codigos_cabys`).then((response) => {
             const data      = response ? response.data.data : [];
              cabyCodes = Array.isArray(data)
                 ? data.map((c) => ({ value: c.id, label: `${c.codigo} - ${c.nombre}`, codigo: c.codigo, impuesto_id: c.impuesto_id }))
@@ -356,7 +356,7 @@ class Invoice extends Component {
                  this.setState({ cabyCodes });         
         }); 
         } else{
-              AppUtil.getAPI(`catalogos/codigos_cabys?search[value]=${input}`, sessionStorage.getItem("token")).then((response) => {
+              AppUtil.getAPI(`catalogos/codigos_cabys?search[value]=${input}`).then((response) => {
             const data      = response ? response.data.data : [];
              cabyCodes = Array.isArray(data)
                 ? data.map((c) => ({ value: c.id, label: `${c.codigo} - ${c.nombre}`, codigo: c.codigo, impuesto_id: c.impuesto_id }))
@@ -371,7 +371,7 @@ class Invoice extends Component {
 
     if(this.state.invoice.id === 0)
     {
-     AppUtil.getAPI("facturas/clave", sessionStorage.getItem("token")).then((response) => {
+     AppUtil.getAPI("facturas/clave").then((response) => {
             const data = response ? response.data : [];
             const clave = data.clave;
             const consecutivo_electronico = data.consecutivo;
@@ -391,7 +391,7 @@ class Invoice extends Component {
     getInvoiceById = (id) => {
         const { t } = this.props;
 
-        AppUtil.getAPI(`facturas/${id}`, sessionStorage.getItem("token")).then((response) => {
+        AppUtil.getAPI(`facturas/${id}`, ).then((response) => {
             if (response.codeStatus === 200) {
                 const invoiceData = response.data;
                 const lines       = invoiceData.Factura_Detalles || [];
@@ -544,7 +544,7 @@ class Invoice extends Component {
         // Envío del XML al endpoint de aceptación
         fetch(`${url}facturas/aceptacion`, {
             method: "POST",
-            headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+         
             body: formData,
         })
             .then((res) => res.json())
@@ -675,9 +675,9 @@ class Invoice extends Component {
                                             url: `${url}facturas`,
                                             type: "GET",
                                             headers: {
-                                                Authorization: `Bearer ${token}`,
                                                 Accept: "application/json",
                                                 "Content-Type": "application/json; charset=UTF-8",
+                                                "X-Session-Id": token,
                                             },
                                             dataSrc: function (json) {
                                                 return json.data || [];

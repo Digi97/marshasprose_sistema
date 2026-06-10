@@ -23,13 +23,13 @@ class Cost_Center extends Component {
   }
 
   getCostCenter = () =>
-    AppUtil.getAPI(`catalogos/centro_costos`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/centro_costos`).then(response => {
       let costCenterList = response ? response.data : [];
       this.setState({ costCenterList });
     });
 
   getCostCenterById = (id) =>
-    AppUtil.getAPI(`catalogos/centro_costos/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/centro_costos/${id}`).then(response => {
       let cost_center = response ? response.data : {};
       this.setState({ cost_center, show: true });
     });

@@ -105,8 +105,7 @@ class Customer_Provider extends Component {
       telefono_principal: formData.get("telefono_principal") == 'on' ? 1: 0
     };
 
-    console.log(telefonos);
-    
+  
     this.setState((prevState) => ({
       telefonos: [...prevState.telefonos, telefonos],
     }));
@@ -205,7 +204,7 @@ if(response.codeStatus === 200)
   };
 
   getIdentificationType = () =>
-    AppUtil.getAPI(`tipo_identificacion`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`tipo_identificacion`).then(
       (response) => {
         let identificationType = response ? response.data : [];
         this.setState({ identificationType }); 
@@ -218,7 +217,7 @@ if(response.codeStatus === 200)
       if(customer_provider.tipo_identificacion_id == 1)//buscamos sunicamente fisicos
       {
 
- AppUtil.getAPI(`catalogos/padron/${customer_provider.identificacion}`, sessionStorage.getItem("token")).then(
+ AppUtil.getAPI(`catalogos/padron/${customer_provider.identificacion}`).then(
       (response) => {
         let person = response ? response.data : [];
 if(person !== null)
@@ -240,14 +239,14 @@ if(person !== null)
 
     }    
   getActivityCode = () =>
-    AppUtil.getAPI(`catalogos/codigo_actividad`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`catalogos/codigo_actividad`).then(
       (response) => {
         let activityCode = response ? response.data : [];
         this.setState({ activityCode, processing:false });
       },
     );
   getProvincia = () =>
-    AppUtil.getAPI(`ubicacion/provincia`, sessionStorage.getItem("token")).then(
+    AppUtil.getAPI(`ubicacion/provincia`).then(
       (response) => {
         let province = response ? response.data : [];
         this.setState({ province });
@@ -256,8 +255,7 @@ if(person !== null)
 
   getCanton = (id = 1) =>
     AppUtil.getAPI(
-      `ubicacion/canton/provincia/${id}`,
-      sessionStorage.getItem("token"),
+      `ubicacion/canton/provincia/${id}`
     ).then((response) => {
       let canton = response ? response.data : [];
       this.setState({ canton });
@@ -265,8 +263,7 @@ if(person !== null)
 
   getDistrito = (id = 1) =>
     AppUtil.getAPI(
-      `ubicacion/distrito/canton/${id}`,
-      sessionStorage.getItem("token"),
+      `ubicacion/distrito/canton/${id}`
     ).then((response) => {
       let district = response ? response.data : [];
       this.setState({ district });
@@ -312,27 +309,13 @@ if(person !== null)
       "@marsh_contable",
     );
     this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
-   const permisos = this.getPermisosFromToken(); 
+   const permisos = this.user.permisos; 
   let clientAdmin = permisos.indexOf(permissions.UsuarioMantenimientoClientes) === -1 ? false : true;
   let providerAdmin = permisos.indexOf(permissions.UsuarioMantenimientoProveedores) === -1 ? false : true;
     
-    this.setState({ user: this.user, token: sessionStorage.getItem("token"), clientAdmin, providerAdmin });
+    this.setState({ user: this.user, token: sessionStorage.getItem("sessionId"), clientAdmin, providerAdmin });
   };
 
-  getPermisosFromToken = () => {
-    try {
-        const token  = sessionStorage.getItem("token");
-        if (!token) return [];
-        const payload  = JSON.parse(atob(token.split(".")[1]));
-        // El claim "permiso" puede ser string o array
-        const permisos = payload.permiso;
-        return Array.isArray(permisos)
-            ? permisos.map(Number)
-            : [Number(permisos)];
-    } catch {
-        return [];
-    }
-};
 
   getCustomerProviderById = (id, isCustomer = true) => {
 
@@ -341,7 +324,7 @@ if(person !== null)
       let url = isCustomer ? `clientes/${id}` : `proveedor/${id}`;
 
 
-        AppUtil.getAPI(url, sessionStorage.getItem('token')).then(response => {
+        AppUtil.getAPI(url).then(response => {
           if(response.codeStatus === 200)
           {
           let customer_provider = response ? response.data : [];  
@@ -436,7 +419,7 @@ if(person !== null)
               </Row>
               <Row>
                 {/*SECCION DE CLIENTES */}
-                {this.state.token === "" ? (
+                {token === "" ? (
                   <div></div>
                 ) : (
                   <DataTable
@@ -444,9 +427,9 @@ if(person !== null)
                       url: `${url}clientes`,
                       type: "GET",
                       headers: {
-                        Authorization: `Bearer ${this.state.token}`,
                         Accept: "application/json",
                         "Content-Type": "application/json; charset=UTF-8",
+                          "X-Session-Id": token
                       },
                       dataSrc: function (json) {
                         json.recordsTotal = json.data.recordsTotal;
@@ -542,9 +525,9 @@ if(person !== null)
                       url: `${url}proveedor`,
                       type: "GET",
                       headers: {
-                        Authorization: `Bearer ${this.state.token}`,
                         Accept: "application/json",
                         "Content-Type": "application/json; charset=UTF-8",
+                          "X-Session-Id": token
                       },
                       dataSrc: function (json) {
                         json.recordsTotal = json.data.recordsTotal;

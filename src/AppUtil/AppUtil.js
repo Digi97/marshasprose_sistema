@@ -2,18 +2,16 @@ import Axios from "axios";
 
 import { url, host } from "screen/components/services/api";
 //const proxy = ""; //"https://cors-anywhere.herokuapp.com/";
-const token = sessionStorage.getItem("token");
+const sessionId = sessionStorage.getItem("sessionId");
 
 const AppUtil = {
-  postAPI: async function postAPI(endpoint, dataPost, tokenSent = token) {
+  postAPI: async function postAPI(endpoint, dataPost) {
     try {
       let response = await Axios.post(`${url}${endpoint}`, dataPost, {
         headers: {
-          Authorization: `Bearer ${tokenSent}`,
           Accept: "application/json",
           "Content-Type": "application/json; charset=UTF-8",
-          "Access-Control-Allow-Origin": host,
-          "Access-Control-Allow-Credentials": "true",
+          "X-Session-Id": sessionId
         },
       });
 
@@ -32,11 +30,10 @@ const AppUtil = {
     try {
       let response = await Axios.put(`${url}${endpoint}`, dataPost, {
         headers: {
-          Authorization: `Bearer ${token}`,
           Accept: "application/json",
           "Content-Type": "application/json; charset=UTF-8",
-          "Access-Control-Allow-Origin": host,
-          "Access-Control-Allow-Credentials": "true",
+          
+          "X-Session-Id": sessionId
         },
       });
 
@@ -52,18 +49,17 @@ const AppUtil = {
     try {
       let response = await Axios.get(`${url}${endpoint}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          "X-Session-Id": sessionId,
           Accept: "application/json",
-          "Content-Type": "application/json; charset=UTF-8",
-          "Access-Control-Allow-Origin": host,
-          "Access-Control-Allow-Credentials": "true",
-        },
+          "Content-Type": "application/json; charset=UTF-8",        
+         },
       });
 
       let dataRet = response.data;
       return dataRet;
     } catch (e) {
       console.error(e);
+      
       return false;
     }
   },
@@ -71,7 +67,7 @@ const AppUtil = {
     try {
       let response = await Axios.delete(`${url}${endpoint}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          "X-Session-Id": sessionId,
           Accept: "application/json",
           "Content-Type": "application/json; charset=UTF-8",
         },

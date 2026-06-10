@@ -22,14 +22,14 @@ class Permissions extends Component {
   }
 
   getPermissions = () =>
-    AppUtil.getAPI(`catalogos/permisos`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/permisos`).then(response => {
       let permissionsList = response ? response.data : [];
       this.setState({ permissionsList });
     });
 
    
   getPermissionsById = (id) =>
-    AppUtil.getAPI(`catalogos/permisos/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/permisos/${id}`).then(response => {
       let permissions = response ? response.data : {};
       this.setState({ permissions, show: true });
     });

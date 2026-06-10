@@ -26,14 +26,14 @@ constructor(props)
 
 
   
-   getActivityCode = () => AppUtil.getAPI(`catalogos/codigo_actividad`, sessionStorage.getItem('token')).then(response => {
+   getActivityCode = () => AppUtil.getAPI(`catalogos/codigo_actividad`).then(response => {
       let activityCodeList = response ? response.data : [];
       this.setState({activityCodeList});
     });
 
     
   
-   getActivityCodeById = (id) => AppUtil.getAPI(`catalogos/codigo_actividad/${id}`, sessionStorage.getItem('token')).then(response => {
+   getActivityCodeById = (id) => AppUtil.getAPI(`catalogos/codigo_actividad/${id}`).then(response => {
       let activityCode = response ? response.data : [];
 
       
@@ -149,7 +149,7 @@ AppUtil.putAPI(`catalogos/codigo_actividad/${this.state.activityCode.id}`, this.
     validateForm = (t) =>
     {
       let {activityCode} = this.state;
-      console.log(activityCode);
+      
       
       if(activityCode.codigo_actividad1.length > 6 || !AppUtil.isNumberEntero(activityCode.codigo_actividad1))
       {

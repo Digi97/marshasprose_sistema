@@ -22,13 +22,13 @@ class Payment_Method extends Component {
   }
 
   getPaymentMethod = () =>
-    AppUtil.getAPI(`catalogos/medio_pago`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/medio_pago`).then(response => {
       let paymentMethodList = response ? response.data : [];
       this.setState({ paymentMethodList });
     });
 
   getPaymentMethodById = (id) =>
-    AppUtil.getAPI(`catalogos/medio_pago/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/medio_pago/${id}`).then(response => {
       let payment_method = response ? response.data : {};
       this.setState({ payment_method, show: true });
     });

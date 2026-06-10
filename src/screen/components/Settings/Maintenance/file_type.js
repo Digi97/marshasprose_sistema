@@ -21,13 +21,13 @@ class File_Type extends Component {
   }
 
   getFileType = () =>
-    AppUtil.getAPI(`catalogos/tipo_archivo`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_archivo`).then(response => {
       let fileTypeList = response ? response.data : [];
       this.setState({ fileTypeList });
     });
 
   getFileTypeById = (id) =>
-    AppUtil.getAPI(`catalogos/tipo_archivo/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_archivo/${id}`).then(response => {
       let file_type = response ? response.data : {};
       this.setState({ file_type, show: true });
     });

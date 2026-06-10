@@ -22,13 +22,13 @@ class Document_Type extends Component {
   }
 
   getDocumentType = () =>
-    AppUtil.getAPI(`catalogos/tipo_documento`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_documento`).then(response => {
       let documentTypeList = response ? response.data : [];
       this.setState({ documentTypeList });
     });
 
   getDocumentTypeById = (id) =>
-    AppUtil.getAPI(`catalogos/tipo_documento/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_documento/${id}`).then(response => {
       let document_type = response ? response.data : {};
       this.setState({ document_type, show: true });
     });

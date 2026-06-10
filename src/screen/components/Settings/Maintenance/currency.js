@@ -22,15 +22,15 @@ class Currency extends Component {
   }
 
   getCurrency = () =>
-    AppUtil.getAPI(`catalogos/tipo_moneda`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_moneda`).then(response => {
       let currencyList = response ? response.data : [];
-      console.log(currencyList);
+    
       
       this.setState({ currencyList });
     });
 
   getCurrencyById = (id) =>
-    AppUtil.getAPI(`catalogos/tipo_moneda/${id}`, sessionStorage.getItem('token')).then(response => {
+    AppUtil.getAPI(`catalogos/tipo_moneda/${id}`).then(response => {
       let currency = response ? response.data : {};
       this.setState({ currency, show: true });
     });
