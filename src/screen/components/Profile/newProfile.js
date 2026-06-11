@@ -1415,42 +1415,15 @@ this.setState({ updating: true});
 
   render() {
     let {
-      show,
+      
       showStudent,
       showJudge,
       showProfessor,
       showAdmin,
       showCampus,
-      post,
-      key,
+   
     } = this.state;
 
-    const columnsStudents= [
-      {dataField: 'users.name', text:'Nombre', formatter: this.renderStudentEdit  },
-      {dataField: 'id', text:'Eliminar',  formatter: this.renderStudentDelete }
-    ];
-
-    const columnsJudges= [
-      {dataField: 'users.name', text:'Nombre', formatter: this.renderJudgeEdit },
-      {dataField: 'id', text:'Eliminar',  formatter: this.renderJudgeDelete }
-    ];
-
-    const columnsProfessors= [
-      {dataField: 'name', text:'Nombre', formatter:this.renderProfessorEdit  },
-      {dataField: 'id', text:'Eliminar',  formatter: this.renderProfessorDelete  }
-    ];
-
-    const columnsOptions= [
-      {dataField: 'name', text:'Nombre', formatter:this.renderOptionEdit  },
-      {dataField: 'id', text:'Eliminar',  formatter: this.renderOptionDelete  }
-    ];
-
-
-    const columnsProfiles= [
-      {dataField: 'name', text:'Nombre', formatter:this.renderProfileEdit  },
-      {dataField: 'rol[0]', text:'Rol', formatter:this.renderProfileEdit  },
-      {dataField: 'id', text:'Eliminar',  formatter: this.renderProfileDelete  }
-    ];
 
     return (
       <>

@@ -122,6 +122,25 @@ const AppUtil = {
       window.location.reload(false);
     }, 3000);
   },
+  formatNumber: function formatNumber(number, isInteger = false){
+     if (number === null || number === undefined || isNaN(number)) return "0.00";
+
+    return parseFloat(number).toLocaleString("en-US", {
+        minimumFractionDigits: (isInteger ? 0: 2),
+        maximumFractionDigits:(isInteger ? 0: 2),
+    });
+  },
+  randomHexColor:function randomHexColor (opacity = 0.6) {
+    return  Array.from({ length: 1 }, () => {
+        const r = Math.floor(Math.random() * 255);
+        const g = Math.floor(Math.random() * 255);
+        const b = Math.floor(Math.random() * 255);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+        
+    });
+
+}
 };
 
 export default AppUtil;

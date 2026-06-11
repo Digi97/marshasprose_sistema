@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Navbar, Container, Nav, Dropdown, Button } from "react-bootstrap";
 import crypto from "crypto-js";
-import routes from "../../../routes.js";
 
 function Header() {
   const location   = useLocation();
@@ -10,7 +9,6 @@ function Header() {
 
   const [user, setUser] = useState({
     nombre:    "",
-    apellido1: "",
     correo:    "",
     roles_id:  0,
   });
@@ -24,7 +22,6 @@ function Header() {
         const userData = JSON.parse(bytes.toString(crypto.enc.Utf8));
         setUser({
           nombre:    userData.nombre    || "",
-          apellido1: userData.apellido1 || "",
           correo:    userData.correo    || "",
           roles_id:  userData.roles_id  || 0,
         });
@@ -107,7 +104,7 @@ function Header() {
                   <i className="nc-icon nc-single-02 mr-1"></i>
                   {/* Mostrar nombre del usuario del state */}
                   <span className="ml-1">
-                    {user.nombre} {user.apellido1}
+                    {user.nombre} 
                   </span>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>

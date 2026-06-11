@@ -170,10 +170,7 @@ if(response.codeStatus === 200)
   }
 
   getUserById = (id) =>
-  {
-
-    
-    
+  { 
         AppUtil.getAPI(`users/${id}`).then(response => {
       
           

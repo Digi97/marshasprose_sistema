@@ -15,7 +15,8 @@ class Currency extends Component {
       currency: {
         id: 0,
         codigo_moneda: "",
-        nombre: ""
+        nombre: "",
+        simbolo:""
       },
       currencyList: []
     };
@@ -144,6 +145,7 @@ class Currency extends Component {
                 { data: 'id', title: t("id") },
                 { data: 'codigo_moneda', title: t("code") },
                 { data: 'nombre', title: t("currency") },
+                { data: 'simbolo', title: t("symbol") },
                 { title: t("action"), data: null, orderable: false, searchable: false },
               ]}
               className="display table cell-border compact stripe"
@@ -173,10 +175,16 @@ class Currency extends Component {
               )}
               <Modal.Body>
                 <Row className="m-2">
-                  <Col sm="12" xl="12">
+                  <Col sm="12" xl="6">
                     <label>{t("code")}</label>
                     <Form.Group>
                       <Form.Control placeholder={t("code")} type="text" onChange={this._saveStateVariable} name="codigo_moneda" required maxLength={3} value={this.state.currency.codigo_moneda} />
+                    </Form.Group>
+                  </Col>
+                  <Col sm="12" xl="6">
+                    <label>{t("symbol")}</label>
+                    <Form.Group>
+                      <Form.Control placeholder={t("symbol")} type="text" onChange={this._saveStateVariable} name="simbolo" required maxLength={3} value={this.state.currency.simbolo} />
                     </Form.Group>
                   </Col>
                 </Row>

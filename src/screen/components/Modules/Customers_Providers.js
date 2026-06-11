@@ -60,16 +60,7 @@ class Customer_Provider extends Component {
             this.modalTopRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }
-    _saveStateVariable = async (e) => {
-    const { name, type, checked, value } = e.target;
 
-    await this.setState({
-      customer_provider: {
-        ...this.state.customer_provider,
-        [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
-      },
-    });
-  };
   toggleShow = (isCustomer = true) =>
     this.setState({ show: !this.state.show,    
       isCustomer,

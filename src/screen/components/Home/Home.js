@@ -1,206 +1,273 @@
-import React, {useState} from "react";
+import React, {Component} from "react";
+import { withTranslation } from "react-i18next";
+import { Card, Container, Row, Col} from "react-bootstrap";
+import crypto from "crypto-js";
+import AppUtil from "../../../AppUtil/AppUtil";
 
-// react-bootstrap components
-import {
-  Button,
-  Card,
-  Container,
-  Row,
-  Col,
-  Form,
-  Modal,
-  Tabs,
-  Tab
-} from "react-bootstrap";
+import { PieChart } from 'react-minimal-pie-chart';
 
 
+class Home extends Component { 
+
+constructor(props) {
+        super(props);
+
+        this.state = {
+          dashboardInfo:{}
+        };
+
+        this.user = null;
+    }
+    componentDidMount() {  this.getUserInfo(); }
+getDashboardInfo(){
+  AppUtil.getAPI("home/dashboard").then((response) => {
+        if (response && response.codeStatus === 200) 
+          {
+
+            let dashboardInfo = response.data;
+          let arrayPonerColor = dashboardInfo.facturas_por_tipo_documento;
+
+          for(let i = 0; i< arrayPonerColor.length; i++)
+          {
+            arrayPonerColor[i].color = AppUtil.randomHexColor()
+          }
+          
+          dashboardInfo.facturas_por_tipo_documento = arrayPonerColor;
+            
+            this.setState({ dashboardInfo });
+        }
+    });
+}
+
+    getUserInfo = () => {
+        let bytes = crypto.AES.decrypt(
+            sessionStorage.getItem("user"),
+            "@marsh_contable"
+        );
+        this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
+        this.getDashboardInfo()
+      
+      }
 
 
-function Home() {
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-    const [key, setKey] = useState('info');
-  return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col lg="6" sm="12">
-            <h1>Inicio </h1>
-          </Col>
 
-        </Row>
+render(){
+    
+        const { t } = this.props;
+        let {dashboardInfo} = this.state;
+  return(
+<>
+<Container fluid>
+<Row className="m-2">
 
-        <Row>
-        
-        </Row>
-        <Modal
-          show={show}
-          onHide={handleClose}
-          backdrop="static"
-          keyboard={false}
-          size="lg
-          centered"
-          >
-          <Modal.Header closeButton>
-            <Modal.Title><h2 className="text-align-center">Nueva Feria de Negocios</h2></Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-          <Tabs
-            id="controlled-tab-example"
-            activeKey={key}
-            onSelect={(k) => setKey(k)}
-            className="mb-3"
-            defaultActiveKey="info"
-            >
-           <Tab eventKey="info" title="Información General">
-            <Row>
-              <Col sm="12" xl="6">
-                <label>Nombre de la feria de negocios</label>
-               <Form.Group>
-                 <Form.Control
-                    placeholder="Nombre de la feria de negocios"
-                    type="text">
-                   </Form.Control>
-               </Form.Group>
-               </Col>
-               <Col sm="12" xl="6">
-                 <label>Creador de la feria</label>
-                  <Form.Group>
-                    <Form.Control
-                      placeholder="Creador de la feria"
-                      type="text">
-                    </Form.Control>
-                  </Form.Group>
+                {/* ── Card Usuarios ── */}
+                <Col lg="4" sm="6" className="mb-3">
+                    <Card className="shadow-sm border-0">
+                        <Card.Body>
+                            <Row className="align-items-center">
+                                <Col xs="8">
+                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                                        {t("total_users")}
+                                    </p>
+                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_usuarios, true)}</h3>
+                                </Col>
+                                <Col xs="4" className="text-end">
+                                    <div style={{
+                                        backgroundColor: "#4e73df20",
+                                        borderRadius: "50%",
+                                        width: "50px",
+                                        height: "50px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginLeft: "auto"
+                                    }}>
+                                        <i className="fas fa-users" style={{ color: "#4e73df", fontSize: "20px" }} />
+                                    </div>
+                                </Col>
+                            </Row>
+                            <hr className="my-2" />
+                            <small className="text-success">
+
+                                {t("active_system")}
+                            </small>
+                        </Card.Body>
+                    </Card>
                 </Col>
-             </Row>
 
-             <Row>
-               <Col sm="12" xl="6">
-                 <label>Categoría</label>
-                <Form.Group>
-                  <Form.Control
-                     placeholder="Categoría"
-                     type="text">
-                    </Form.Control>
-                </Form.Group>
+                {/* ── Card Clientes ── */}
+                <Col lg="4" sm="6" className="mb-3">
+                    <Card className="shadow-sm border-0">
+                        <Card.Body>
+                            <Row className="align-items-center">
+                                <Col xs="8">
+                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                                        {t("total_customers")}
+                                    </p>
+                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_clientes, true)}</h3>
+                                </Col>
+                                <Col xs="4" className="text-end">
+                                    <div style={{
+                                        backgroundColor: "#1cc88a20",
+                                        borderRadius: "50%",
+                                        width: "50px",
+                                        height: "50px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginLeft: "auto"
+                                    }}>
+                                        <i className="fas fa-user-tie" style={{ color: "#1cc88a", fontSize: "20px" }} />
+                                    </div>
+                                </Col>
+                            </Row>
+                            <hr className="my-2" />
+                            <small className="text-success">                              
+                                {dashboardInfo.totalClientesMesActual} {t("this_month")}
+                            </small>
+                        </Card.Body>
+                    </Card>
                 </Col>
-                <Col sm="12" xl="6">
-                  <label>Fecha de inicio</label>
-                   <Form.Group>
-                     <Form.Control
-                       placeholder="Fecha de inicio"
-                       type="text">
-                     </Form.Control>
-                   </Form.Group>
-                 </Col>
-              </Row>
-              <Row>
-                <Col sm="12" xl="6">
-                  <label>Fecha de fin</label>
-                 <Form.Group>
-                   <Form.Control
-                      placeholder="Fecha de fin"
-                      type="text">
-                     </Form.Control>
-                 </Form.Group>
-                 </Col>
-                 <Col sm="12" xl="6">
-                   <label>Archivo</label>
-                    <Form.Group>
-                      <Form.Control
-                        placeholder="Archivo"
-                        type="text">
-                      </Form.Control>
-                    </Form.Group>
-                  </Col>
-               </Row>
 
-               <Row>
-                 <Col sm="12" xl="12">
-                   <label>Descripción de la feria</label>
-                  <Form.Group>
-                    <Form.Control
-                       placeholder="Descripción de la feria"
-                       type="text">
-                      </Form.Control>
-                  </Form.Group>
-                  </Col>
-                </Row>
-
-           </Tab>
-           <Tab eventKey="config" title="Configuración">
-             <Row>
-               <Col sm="12" xl="12">
-                <Form.Group>
-                  <Form.Check
-                    type="switch"
-                    id="foro-preguntas"
-                    label="Foro de preguntas y respuestas de los diferentes usuarios"
-                  />
-                  </Form.Group>
+                {/* ── Card Facturas ── */}
+                <Col lg="4" sm="6" className="mb-3">
+                    <Card className="shadow-sm border-0">
+                        <Card.Body>
+                            <Row className="align-items-center">
+                                <Col xs="8">
+                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                                        {t("total_invoice")}
+                                    </p>
+                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_facturas, true)}</h3>
+                                </Col>
+                                <Col xs="4" className="text-end">
+                                    <div style={{
+                                        backgroundColor: "#36b9cc20",
+                                        borderRadius: "50%",
+                                        width: "50px",
+                                        height: "50px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginLeft: "auto"
+                                    }}>
+                                        <i className="fas fa-file-invoice" style={{ color: "#36b9cc", fontSize: "20px" }} />
+                                    </div>
+                                </Col>
+                            </Row>
+                            <hr className="my-2" />
+                            <small className="text-info">
+                                <i className="fas fa-calendar me-1" />
+                                {t("single_electronic_invoice")}
+                            </small>
+                        </Card.Body>
+                    </Card>
                 </Col>
-              </Row>
-              <Row>
-                <Col sm="12" xl="12">
-                 <Form.Group>
-                   <Form.Check
-                     type="switch"
-                     id="fechas-foro"
-                     label="Fechas de respuesta de foro"
-                   />
-                   </Form.Group>
-                 </Col>
-               </Row>
 
-               <Row>
-                 <Col sm="12" xl="12">
-                  <Form.Group>
-                    <Form.Check
-                      type="switch"
-                      id="foro"
-                      label="Foro"
-                    />
-                    </Form.Group>
-                  </Col>
-                </Row>
+                {/* ── Card Ganancias ── */}
+                <Col lg="4" sm="6" className="mb-3">
+                    <Card className="shadow-sm border-0">
+                        <Card.Body>
+                            <Row className="align-items-center">
+                                <Col xs="8">
+                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                                        {t("monthly_gains")}
+                                    </p>
+                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_ganancias_mes)}</h3>
+                                </Col>
+                                <Col xs="4" className="text-end">
+                                    <div style={{
+                                        backgroundColor: "#f6c23e20",
+                                        borderRadius: "50%",
+                                        width: "50px",
+                                        height: "50px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginLeft: "auto"
+                                    }}>
+                                        <i className="fas fa-coins" style={{ color: "#f6c23e", fontSize: "20px" }} />
+                                    </div>
+                                </Col>
+                            </Row>
+                            <hr className="my-2" />
+                            <small className="text-warning">
+                                <i className="fas fa-chart-line me-1" />
+                                {t("current_month")}
+                            </small>
+                        </Card.Body>
+                    </Card>
+                </Col>
 
-                <Row>
-                  <Col sm="12" xl="12">
-                   <Form.Group>
-                     <Form.Check
-                       type="switch"
-                       id="ideas-negocio"
-                       label="Ideas de negocios"
-                     />
-                     </Form.Group>
-                   </Col>
-                 </Row>
-                 <Row>
-                   <Col sm="12" xl="12">
-                    <Form.Group>
-                      <Form.Check
-                        type="switch"
-                        id="evaluacion"
-                        label="Evaluación"
-                      />
-                      </Form.Group>
-                    </Col>
-                  </Row>
+                {/* ── Card Gastos ── */}
+                <Col lg="4" sm="6" className="mb-3">
+                    <Card className="shadow-sm border-0">
+                        <Card.Body>
+                            <Row className="align-items-center">
+                                <Col xs="8">
+                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                                        {t("monthly_spent")}
+                                    </p>
+                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_gastos_mes)}</h3>
+                                </Col>
+                                <Col xs="4" className="text-end">
+                                    <div style={{
+                                        backgroundColor: "#e74a3b20",
+                                        borderRadius: "50%",
+                                        width: "50px",
+                                        height: "50px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginLeft: "auto"
+                                    }}>
+                                        <i className="fas fa-receipt" style={{ color: "#e74a3b", fontSize: "20px" }} />
+                                    </div>
+                                </Col>
+                            </Row>
+                            <hr className="my-2" />
+                            <small className="text-danger">
+                                <i className="fas fa-calendar me-1" />
+                                {t("current_month")}
+                            </small>
+                        </Card.Body>
+                    </Card>
+                </Col>
 
-           </Tab>
-         </Tabs>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="light" onClick={handleClose}>
-              Cerrar
-            </Button>
-            <Button variant="success" className="btn-fill">Guardar</Button>
-          </Modal.Footer>
-        </Modal>
-      </Container>
-    </>
+                <Col lg="4" sm="6" className="mb-3">
+                <Card className="shadow-sm border-0">
+<Card.Body>
+    <Row className="align-items-center">
+        <Col xs="8" >
+                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                                        {t("total_electronic_documents")}
+                                    </p>
+                                  
+                                </Col>
+                                  <Col lg="12" className="text-end">
+          <PieChart
+  data={dashboardInfo?.facturas_por_tipo_documento}
+  animate={true}
+  animationDuration={3}
+  labelStyle={{fontSize:4}}
+  label={({ dataEntry }) => {return dataEntry.percentage === 0 ? "": dataEntry.title}}
+/>
+</Col>
+</Row>
+</Card.Body>
+                </Card>
+      
+                </Col>
+
+            </Row>
+</Container>
+
+
+</>
+
   );
 }
 
-export default Home;
+}
+
+export default withTranslation()(Home);

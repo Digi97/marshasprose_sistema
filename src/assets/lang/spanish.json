@@ -176,7 +176,18 @@
 "invalid_format_Correo": "Formato de correo electrónico inválido",
 "correo_not_found": "Correo no encontrado en el sistema",
 "invalid_value_form_Contrasena": "Formato de contraseña inválido",
-"phone_required": "Por favor ingrese al menos un teléfono"
+"phone_required": "Por favor ingrese al menos un teléfono",
+"total_users":"TOTAL USUARIOS",
+"total_customers":"TOTAL CLIENTES",
+"total_invoice":"TOTAL FACTURAS",
+"monthly_gains":"GANANCIAS DEL MES",
+"monthly_spent":"GASTOS DEL MES",
+"current_month":"Mes actual",
+"single_electronic_invoice":"Factura Electrónica",
+"active_system":"Activos en sistema",
+"this_month":"Este mes",
+"total_electronic_documents":"Total de documentos electrónicos",
+"symbol":"Símbolo"
 
 
     }
