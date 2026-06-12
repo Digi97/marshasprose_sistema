@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Navbar, Container, Nav, Dropdown, Button } from "react-bootstrap";
 import crypto from "crypto-js";
+import { useDarkMode } from '../common/useDarkMode';
+
+
 
 function Header() {
-  const location   = useLocation();
+  let { isDark } = useDarkMode();
   const navigate   = useNavigate();
 
   const [user, setUser] = useState({
@@ -50,9 +53,10 @@ function Header() {
     };
     document.body.appendChild(node);
   };
+console.log(isDark);
 
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar expand="lg">
       <Container fluid>
         <div className="d-flex justify-content-center align-items-center ml-lg-0">
           <Button

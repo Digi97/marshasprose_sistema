@@ -1,10 +1,13 @@
 import React, { Component } from "react";
 import { Container } from "react-bootstrap";
+import { useDarkMode } from '../common/useDarkMode';
 
-class Footer extends Component {
-  render() {
+
+function Footer() {
+  const { isDark } = useDarkMode();
+
     return (
-      <footer className="footer px-0 px-lg-3">
+      <footer className="footer px-0 px-lg-3" data-theme={isDark? "dark":"light"}>
         <Container fluid>
           <nav>
 
@@ -16,7 +19,6 @@ class Footer extends Component {
         </Container>
       </footer>
     );
-  }
 }
 
 export default Footer;

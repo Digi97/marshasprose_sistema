@@ -2,7 +2,7 @@ import React, { Component, createRef  } from "react";
 
 import DataTable from "datatables.net-react";
 import DT from "datatables.net-dt";
-import {Container, Row, Col, Button, Modal, Tabs, Form, Tab} from "react-bootstrap";
+import {Container, Row, Col, Button, Modal, Tabs, Form, Tab, Alert} from "react-bootstrap";
 import Table from "react-bootstrap/Table";
 import { url } from "screen/components/services/api";
 import crypto from "crypto-js";
@@ -345,14 +345,11 @@ if(person !== null)
 
 
   }
-
-
-
    ActionButtonsCustomers = (rowData) => {
       return (
           <Row className="m-2">
             <Col lg="12" sm="12">
-                 <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getCustomerProviderById(rowData.id)}><i className="fas fa-pen" /></Button>
+                 <Button variant="info" onClick={() => this.getCustomerProviderById(rowData.id)}><i className="fas fa-pen" /></Button>
             </Col>
           </Row>
       );
@@ -363,9 +360,19 @@ if(person !== null)
       return (
           <Row className="m-2">
             <Col lg="12" sm="12">
-                 <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getCustomerProviderById(rowData.id,false)}><i className="fas fa-pen" /></Button>
+                 <Button variant="info" onClick={() => this.getCustomerProviderById(rowData.id,false)}><i className="fas fa-pen" /></Button>
             </Col>
           </Row>
+      );
+  };
+
+     renderActive = (rowData, t) => {
+   
+      return (
+        <span className={`badge_status ${rowData.estado ===1  ? "badge-active":"badge-inactive"}`} >
+          <i className={rowData.estado ===1 ? "fas fa-circle-check": "fas fa-circle-minus"} aria-hidden="true"></i> {rowData.estado ===1 ? t("active"): t("inactive") }
+          </span>
+     
       );
   };
 
@@ -413,7 +420,7 @@ if(person !== null)
                 {token === "" ? (
                   <div></div>
                 ) : (
-                  <DataTable
+                  <DataTable          
                     ajax={{
                       url: `${url}clientes`,
                       type: "GET",
@@ -437,7 +444,7 @@ if(person !== null)
                       { data: "tipo_identificacion", title: t("identification_type")},
                       { data: "nombre", title: t("name"),  render:function(data, type,row){ return `${row.nombre} ${row.apellido1} ${row.apellido2}` }  },
                      { data: "correo", title: t("email") },
-                      { data: "estado", title: t("status"), render:function(data, type,row){ return data ==1 ? t("active"): t("inactive") } },
+                      { title: t("status"), defaultContent:"", data:null, orderable:false, searchable:false },
                       {
                         title: t("action"),
                         data: null,
@@ -448,8 +455,8 @@ if(person !== null)
                     ]}
                     className="display table cell-border compact stripe"
                     slots={{
-                      6: (cellData, rowData) =>
-                        this.ActionButtonsCustomers(rowData, cellData),
+                      6: (cellData, rowData) =>   this.ActionButtonsCustomers(rowData, cellData),
+                      5: (cellData, rowData) => this.renderActive(rowData, t),
                     }}
                     options={{
                       language: {
@@ -535,7 +542,7 @@ if(person !== null)
                       { data: "tipo_identificacion", title: t("identification_type") },
                       { data: "nombre", title: t("name"),  render:function(data, type,row){ return `${row.nombre} ${row.apellido1} ${row.apellido2}` }  },
                       { data: "correo", title: t("email") },
-                      { data: "estado", title: t("status"), render:function(data, type,row){ return data ===1 ? t("active"): t("inactive") } },
+                      { data: null, title: t("status"), orderable:false, searchable:false, defaultContent:""},
                       {
                         title: t("action"),
                         data: null,
@@ -546,8 +553,8 @@ if(person !== null)
                     ]}
                     className="display table cell-border compact stripe"
                     slots={{
-                      6: (cellData, rowData) =>
-                        this.ActionButtonsProviders(rowData, cellData),
+                      6: (cellData, rowData) => this.ActionButtonsProviders(rowData, cellData),
+                      5: (cellData, rowData) => this.renderActive(rowData, t),
                     }}
                     options={{
                       language: {

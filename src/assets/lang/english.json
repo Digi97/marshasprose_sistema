@@ -155,6 +155,17 @@
     "invalid_format_Correo":"Invalid format of Email",
     "correo_not_found":"Email not found on our system",
     "invalid_value_form_Contrasena":"Invalid format for Password",
-    "phone_required":"Please enter at least one phone"
+    "phone_required":"Please enter at least one phone",
+    "total_users": "TOTAL USERS",
+"total_customers": "TOTAL CUSTOMERS",
+"total_invoice": "TOTAL INVOICES",
+"monthly_gains": "MONTHLY EARNINGS",
+"monthly_spent": "MONTHLY EXPENSES",
+"current_month": "Current month",
+"single_electronic_invoice": "Electronic Invoice",
+"active_system": "Active in system",
+"this_month": "This month",
+"total_electronic_documents": "Total electronic documents",
+"symbol": "Symbol"
   }
 }

@@ -16,11 +16,18 @@ import ChangePassword from "./screen/components/Auth/ChangePassword";
 
 import NotFound from './screen/components/common/404.js'
 
+import { useDarkMode } from './screen/components/common/useDarkMode';
 
 function App() {
-
+  const { isDark, toggle } = useDarkMode();
   return (
   <BrowserRouter>
+  <div>
+      <button onClick={toggle}>
+        {isDark ? '☀️ Light' : '🌙 Dark'}
+      </button>
+      {/* resto de tu app */}
+    </div>
     <Routes>
       <Route path="/" exact element={ <Login />}  />
       <Route path="/recovery" exact  element={ <Recovery   />}  />

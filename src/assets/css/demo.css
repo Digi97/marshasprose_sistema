@@ -437,3 +437,147 @@ width: 250px;
 .max-z-index{
   z-index: 10000;
 }
+/* En tu archivo .css o .module.css */
+
+/* Wrapper general */
+.dt-container {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+}
+
+/* Header de columnas */
+table.dataTable thead th {
+  background-color: #f8f9fa;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Filas */
+table.dataTable tbody tr {
+  transition: background 0.1s;
+}
+table.dataTable tbody tr:hover {
+  background-color: #f9fafb !important;
+}
+table.dataTable tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+
+/* Barra de búsqueda y selector de entries */
+.dt-search input,
+.dt-length select {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  outline: none;
+}
+.dt-search input:focus {
+  border-color: #185FA5;
+  box-shadow: 0 0 0 2px rgba(24, 95, 165, 0.15);
+}
+
+/* Paginación */
+.dt-paging .dt-paging-button {
+  border-radius: 6px !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 4px 10px !important;
+  font-size: 12px;
+}
+.dt-paging .dt-paging-button.current {
+  background: #185FA5 !important;
+  color: white !important;
+  border-color: #185FA5 !important;
+}
+
+  .badge_status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500;  }
+  .badge-active { background: #EAF3DE; color: #3B6D11; }
+  .badge-inactive { background: #F1EFE8; color: #5F5E5A; }
+
+/* Colores base (light) por data-color */
+.sidebar[data-color="blue"] {
+  background-color: #1e40af;
+  color: #ffffff;
+}
+
+.sidebar[data-color="green"] {
+  background-color: #166534;
+  color: #ffffff;
+}
+
+.sidebar[data-color="red"] {
+  background-color: #991b1b;
+  color: #ffffff;
+}
+
+/* Dark mode: versión más oscura/apagada de cada color */
+.sidebar[data-color="blue"][data-theme="dark"] {
+  background-color: #1e293b;   /* azul más apagado */
+  color: #93c5fd;
+}
+
+.sidebar[data-color="green"][data-theme="dark"] {
+  background-color: #14532d;
+  color: #86efac;
+}
+
+.sidebar[data-color="red"][data-theme="dark"] {
+  background-color: #450a0a;
+  color: #fca5a5;
+}
+
+.footer {
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  padding: 16px 0;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.footer .copyright {
+  color: #6b7280;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Dark mode */
+.footer[data-theme="dark"] {
+  background-color: #212529;
+  border-top-color: #212529;
+}
+
+.footer[data-theme="dark"] .copyright {
+  color: #94a3b8;
+}
+
+/*datatable*/
+
+/* CustomerTable.css */
+[data-theme="dark"] table.dataTable thead th {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] table.dataTable tbody td {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] table.dataTable tbody tr:hover td {
+  background-color: var(--table-hover) !important;
+}
+
+[data-theme="dark"] .dt-search input,
+[data-theme="dark"] .dt-length select {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}

@@ -5,16 +5,22 @@ import { Nav } from "react-bootstrap";
 
 import { useTranslation } from "react-i18next";
 
-
+import { useDarkMode } from '../common/useDarkMode';
 
 function Sidebar({ color, image, routes }) {
-    const { t, i18n } = useTranslation();
+  const { isDark } = useDarkMode();
+
+  
+    const { t } = useTranslation();
   const location = useLocation();
   const activeRoute = (routeName) => {
-    return location.pathname.indexOf(routeName) > -1 ? "active" : "";
+    
+    return location.pathname === routeName ? "active" : "";
   };
+
+  
   return (
-    <div className="sidebar" data-image={image} data-color={color}>
+    <div className="sidebar" data-image={image} data-color={isDark ? "black":"white"} data-theme={isDark? "dark":"light"}>
       <div
         className="sidebar-background"
 

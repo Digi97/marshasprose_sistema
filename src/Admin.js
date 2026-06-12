@@ -27,7 +27,7 @@ import Rol from "./screen/components/Settings/Maintenance/rol";
 import Sale_Condition from "./screen/components/Settings/Maintenance/sale_condition";
 import Tax_Type from "./screen/components/Settings/Maintenance/tax_type";
 import Type_Accounting_Account from "./screen/components/Settings/Maintenance/type_accounting_account";
-
+import { useDarkMode } from './screen/components/common/useDarkMode';
 //#endregion
 
 import NotFound from "./screen/components/common/404.js";
@@ -43,6 +43,7 @@ function Admin() {
 
   const mainPanel = React.useRef(null);
   const location = useLocation();
+  const { isDark } = useDarkMode();
 /*
   //se valida si el token es valido aun
   const { decodedToken, isExpired } = useJwt(sessionStorage.getItem("token"));
@@ -92,7 +93,7 @@ function Admin() {
   return (
     <>
       <div className="wrapper">
-        <Sidebar color={"white"} routes={routes} />
+        <Sidebar color={isDark === "dark" ? "black":"white"} routes={routes} />
         <div className="main-panel" ref={mainPanel}>
           <AdminNavbar />
           <div className="content">
