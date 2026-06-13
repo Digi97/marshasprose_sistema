@@ -1629,7 +1629,7 @@ this.setState({ updating: true});
                   size="lg"
                   type="submit"
                   onClick={this.saveStudent}
-                  className="bg-blue btn-lg btn-rounded txt-white-btn"
+                  className=" btn-lg btn-rounded txt-white-btn"
                 >
                   Crear Nuevo
                 </button>
@@ -1639,7 +1639,7 @@ this.setState({ updating: true});
                   size="lg"
                   type="submit"
                   onClick={this.updateStudents}
-                  className="bg-blue btn-lg btn-rounded txt-white-btn"
+                  className=" btn-lg btn-rounded txt-white-btn"
                 >
                   Actualizar
                 </button>
@@ -1650,7 +1650,7 @@ this.setState({ updating: true});
                 <button
                   size="lg"
                   type="submit"
-                  className="bg-blue btn-lg btn-rounded txt-white-btn"
+                  className=" btn-lg btn-rounded txt-white-btn"
                 >
                   <div className="lds-dual-ring"></div>
                 </button>
@@ -1760,7 +1760,7 @@ this.setState({ updating: true});
                   size="lg"
                   type="submit"
                   onClick={this.saveJudge}
-                  className="bg-blue btn-lg btn-rounded txt-white-btn"
+                  className=" btn-lg btn-rounded txt-white-btn"
                 >
                   Crear Nuevo
                 </button>
@@ -1770,7 +1770,7 @@ this.setState({ updating: true});
                   size="lg"
                   type="submit"
                   onClick={this.updateJudges}
-                  className="bg-blue btn-lg btn-rounded txt-white-btn"
+                  className=" btn-lg btn-rounded txt-white-btn"
                 >
                   Actualizar
                 </button>
@@ -1781,7 +1781,7 @@ this.setState({ updating: true});
                 <button
                   size="lg"
                   type="submit"
-                  className="bg-blue btn-lg btn-rounded txt-white-btn"
+                  className=" btn-lg btn-rounded txt-white-btn"
                 >
                   <div className="lds-dual-ring"></div>
                 </button>
@@ -1860,7 +1860,7 @@ this.setState({ updating: true});
                       size="lg"
                       type="submit"
                       onClick={this.saveProfessor}
-                      className="bg-blue btn-lg btn-rounded txt-white-btn"
+                      className=" btn-lg btn-rounded txt-white-btn"
                     >
                       Crear Nuevo
                     </button>
@@ -1870,7 +1870,7 @@ this.setState({ updating: true});
                       size="lg"
                       type="submit"
                       onClick={this.updateProfessor}
-                      className="bg-blue btn-lg btn-rounded txt-white-btn"
+                      className=" btn-lg btn-rounded txt-white-btn"
                     >
                       Actualizar
                     </button>
@@ -1882,7 +1882,7 @@ this.setState({ updating: true});
                 <button
                   size="lg"
                   type="submit"
-                  className="bg-blue btn-lg btn-rounded txt-white-btn"
+                  className=" btn-lg btn-rounded txt-white-btn"
                 >
                   <div className="lds-dual-ring"></div>
                 </button>
@@ -1994,7 +1994,7 @@ this.setState({ updating: true});
                       size="lg"
                       type="submit"
                       onClick={this.saveAdmin}
-                      className="bg-blue btn-lg btn-rounded txt-white-btn"
+                      className=" btn-lg btn-rounded txt-white-btn"
                     >
                       Crear Nuevo
                     </button>
@@ -2004,7 +2004,7 @@ this.setState({ updating: true});
                       size="lg"
                       type="submit"
                       onClick={this.updateAdmin}
-                      className="bg-blue btn-lg btn-rounded txt-white-btn"
+                      className=" btn-lg btn-rounded txt-white-btn"
                     >
                       Actualizar
                     </button>
@@ -2015,7 +2015,7 @@ this.setState({ updating: true});
                 <button
                   size="lg"
                   type="submit"
-                  className="bg-blue btn-lg btn-rounded txt-white-btn"
+                  className=" btn-lg btn-rounded txt-white-btn"
                 >
                   <div className="lds-dual-ring"></div>
                 </button>
@@ -2068,7 +2068,7 @@ this.setState({ updating: true});
                       size="lg"
                       type="submit"
                       onClick={this.saveCampus}
-                      className="bg-blue btn-lg btn-rounded txt-white-btn"
+                      className=" btn-lg btn-rounded txt-white-btn"
                     >
                       Crear Nuevo
                     </button>
@@ -2078,7 +2078,7 @@ this.setState({ updating: true});
                       size="lg"
                       type="submit"
                       onClick={this.updateCampus}
-                      className="bg-blue btn-lg btn-rounded txt-white-btn"
+                      className=" btn-lg btn-rounded txt-white-btn"
                     >
                       Actualizar
                     </button>
@@ -2089,7 +2089,7 @@ this.setState({ updating: true});
                 <button
                   size="lg"
                   type="submit"
-                  className="bg-blue btn-lg btn-rounded txt-white-btn"
+                  className=" btn-lg btn-rounded txt-white-btn"
                 >
                   <div className="lds-dual-ring"></div>
                 </button>

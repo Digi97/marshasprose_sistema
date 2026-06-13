@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
-      "*": ["src/*"]
+      "common": ["./src/screen/components/common/index.js"]
     }
   }
 }

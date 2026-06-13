@@ -11,6 +11,7 @@ import { withTranslation } from "react-i18next";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import moment from 'moment-timezone'
 import Tooltip from 'react-bootstrap/Tooltip';
+import alertSuccess from "../common/SweetAlert";
 
 DataTable.use(DT);
 
@@ -26,9 +27,7 @@ class Invoice extends Component {
             showAcceptance: false,
 
             processing: true,
-            error: false,
-            errorMsg: "",
-            color: "",
+   
 
             // ── Objeto principal de la factura (campos FacturasController)
             invoice: {
@@ -85,27 +84,13 @@ class Invoice extends Component {
             token: "",
         };
 
-        this.modalTopRef = createRef();
+        this.datatableRef = createRef();
         this.user = null;
     }
-
-    // ─────────────────────────────────────────────
-    // LIFECYCLE
-    // ─────────────────────────────────────────────
 
     componentDidMount() {
         this.getUserInfo();
     }
-
-    // ─────────────────────────────────────────────
-    // HELPERS INTERNOS
-    // ─────────────────────────────────────────────
-
-    scrollToTop = () => {
-        if (this.modalTopRef.current) {
-            this.modalTopRef.current.scrollIntoView({ behavior: "smooth" });
-        }
-    };
 
     getUserInfo = () => {
         let bytes = crypto.AES.decrypt(
@@ -166,8 +151,7 @@ class Invoice extends Component {
     toggleShow = () =>{
         this.setState({
             show: !this.state.show,
-            error: false,
-            errorMsg: "",
+          
             lines: [],
             invoice: this._resetInvoice(),
             AuxLine: { total: "", subtotal: "", descuento: 0, impuesto: "", porcentaje: 0, cantidad: 1 },
@@ -177,8 +161,7 @@ class Invoice extends Component {
         this.setState({
             showAcceptance: !this.state.showAcceptance,
             archivoAceptacion: null,
-            error: false,
-            errorMsg: "",
+          
         });
 
     // Actualiza campos del objeto invoice
@@ -421,51 +404,44 @@ class Invoice extends Component {
                     },
                     lines,
                     show:  true,
-                    error: false,
+                    
                 });
             } else {
-                this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning" });
+                alertSuccess(t(response.message),"error",t);
             }
         });
     };
-
-    // ─────────────────────────────────────────────
-    // GUARDAR (crear o actualizar)
-    // ─────────────────────────────────────────────
-
     saveInvoice = () => {
         const { t } = this.props;
         const { invoice, lines } = this.state;
 
         // Validaciones
         if (!invoice.clave) {
-            this.scrollToTop();
-            this.setState({ error: true, errorMsg: t("key_required"), color: "alert alert-warning" });
+            alertSuccess(t("key_required"),"warning",t);
             return;
         }
         if (invoice.clientes_id === 0) {
-            this.scrollToTop();
-            this.setState({ error: true, errorMsg: t("customer_required"), color: "alert alert-warning" });
+            alertSuccess(t("customer_required"),"warning",t);
+      
             return;
         }
         if (invoice.Tipo_moneda_id === 0) {
-            this.scrollToTop();
-            this.setState({ error: true, errorMsg: t("currency_required"), color: "alert alert-warning" });
+        
+            alertSuccess(t("currency_required"),"warning",t);
             return;
         }
         if (invoice.Condicion_venta_id === 0) {
-            this.scrollToTop();
-            this.setState({ error: true, errorMsg: t("sale_condition_required"), color: "alert alert-warning" });
+            alertSuccess(t("sale_condition_required"),"warning",t);
+
             return;
         }
         if (invoice.Medio_pago_id === 0) {
-            this.scrollToTop();
-            this.setState({ error: true, errorMsg: t("payment_method_required"), color: "alert alert-warning" });
+            alertSuccess(t("payment_method_required"),"warning",t);
+
             return;
         }
         if (lines.length === 0) {
-            this.scrollToTop();
-            this.setState({ error: true, errorMsg: t("lines_required"), color: "alert alert-warning" });
+            alertSuccess(t("lines_required"),"warning",t);
             return;
         }
 
@@ -478,42 +454,36 @@ class Invoice extends Component {
             // ── CREAR
             AppUtil.postAPI("facturas", payload).then((response) => {
                 if (response.codeStatus === 200) {
-                    this.scrollToTop();
-                    this.setState({
-                        error: true,
-                        errorMsg: t("record_created_successfully"),
-                        color: "alert alert-success",
-                        processing: false,
-                    });
+
+                     alertSuccess(t("updated_successfully"),"success",t);
+          this.toggleShow()
+            this.setState({ processing: false });
+          // Guardar los detalles con el id del gasto recién creado
+        if (this.datatableRef.current?.dt()) 
+          {
+             this.datatableRef.current.dt().ajax.reload(null, false);
+        }
                 } else {
-                    this.scrollToTop();
-                    this.setState({
-                        error: true,
-                        errorMsg: t(response.message),
-                        color: "alert alert-warning",
-                        processing: false,
-                    });
+             alertSuccess(t(response.message),"error",t);
                 }
             });
         } else {
             // ── ACTUALIZAR
             AppUtil.putAPI(`facturas/${invoice.id}`, payload).then((response) => {
                 if (response.codeStatus === 200) {
-                    this.scrollToTop();
-                    this.setState({
-                        error: true,
-                        errorMsg: t("updated_successfully"),
-                        color: "alert alert-success",
-                        processing: false,
-                    });
+                    
+                    alertSuccess(t("updated_successfully"),"success",t);
+                              this.toggleShow()
+            this.setState({ processing: false });
+          // Guardar los detalles con el id del gasto recién creado
+        if (this.datatableRef.current?.dt()) 
+          {
+             this.datatableRef.current.dt().ajax.reload(null, false);
+        }
                 } else {
-                    this.scrollToTop();
-                    this.setState({
-                        error: true,
-                        errorMsg: t(response.message),
-                        color: "alert alert-warning",
-                        processing: false,
-                    });
+
+                    alertSuccess(t(response.message),"error",t);
+            
                 }
             });
         }
@@ -532,7 +502,7 @@ class Invoice extends Component {
         const { archivoAceptacion } = this.state;
 
         if (!archivoAceptacion) {
-            this.setState({ error: true, errorMsg: t("xml_file_required"), color: "alert alert-warning" });
+             alertSuccess(t("xml_file_required"),"error",t);
             return;
         }
 
@@ -550,28 +520,16 @@ class Invoice extends Component {
             .then((res) => res.json())
             .then((response) => {
                 if (response.codeStatus === 200) {
-                    this.setState({
-                        error: true,
-                        errorMsg: t("record_created_successfully"),
-                        color: "alert alert-success",
-                        processing: false,
-                    });
+                      alertSuccess(t("record_created_successfully"),"error",t);
+           
                 } else {
-                    this.setState({
-                        error: true,
-                        errorMsg: t(response.message),
-                        color: "alert alert-warning",
-                        processing: false,
-                    });
+alertSuccess(t(response.message),"error",t);
+        
                 }
             })
             .catch(() => {
-                this.setState({
-                    error: true,
-                    errorMsg: t("please_verify_data"),
-                    color: "alert alert-danger",
-                    processing: false,
-                });
+                alertSuccess(t("please_verify_data"),"error",t);
+        
             });
     };
 
@@ -584,7 +542,7 @@ class Invoice extends Component {
             <Col lg="12" sm="12">
                 <Button
                     variant="info"
-                    className="btn-fill btn-rounded"
+                    className=""
                     onClick={() => this.getInvoiceById(rowData.id)}
                 >
                     <i className="fas fa-pen" />
@@ -657,7 +615,7 @@ class Invoice extends Component {
                                 <Col lg="6" sm="12">
                                     <Row>
                                         <Col lg="3" sm="12">
-                                            <Button className="btn-fill btn-rounded bg-blue" onClick={this.toggleShow}>
+                                            <Button className=" " onClick={this.toggleShow}>
                                                 {t("create")}
                                             </Button>
                                         </Col>
@@ -671,6 +629,7 @@ class Invoice extends Component {
                                     <div />
                                 ) : (
                                     <DataTable
+                                    ref={ this.datatableRef}
                                         ajax={{
                                             url: `${url}facturas`,
                                             type: "GET",
@@ -683,6 +642,13 @@ class Invoice extends Component {
                                                 return json.data || [];
                                             },
                                             dataType: "json",
+                                                error: function (xhr) {
+                  if (xhr.status === 401) {
+                sessionStorage.setItem("expired", true);
+
+                    window.location.href = "/";
+                  }
+                },
                                         }}
                                         columns={[
                                             { data: "id",                      title: t("id") },
@@ -739,7 +705,7 @@ class Invoice extends Component {
                                 <Col lg="6" sm="12">
                                     <Row>
                                         <Col lg="3" sm="12">
-                                            <Button className="btn-fill btn-rounded bg-blue" onClick={this.toggleShowAcceptance}>
+                                            <Button className=" " onClick={this.toggleShowAcceptance}>
                                                 {t("create")}
                                             </Button>
                                         </Col>
@@ -759,7 +725,7 @@ class Invoice extends Component {
                         backdrop="static"
                         keyboard={false}
                         size="lg"
-                        className="max-z-index"
+                        
                         scrollable
                     >
                         <Modal.Header closeButton>
@@ -769,16 +735,9 @@ class Invoice extends Component {
                         </Modal.Header>
 
                         <Modal.Body>
-                            {/* Ancla para scroll al tope */}
-                            <div ref={this.modalTopRef} />
+                  
 
-                            {/* Alerta */}
-                            {error && (
-                                <Alert className={color} onClose={() => this.setState({ error: false })} dismissible>
-                                    {errorMsg}
-                                </Alert>
-                            )}
-
+                  
                             {/* ── Clave y Consecutivo electrónico ── */}
                             <Row className="m-2">
                                 <Col sm="12" xl="6">
@@ -1062,7 +1021,7 @@ class Invoice extends Component {
 
                                     <Row className="m-2">
                                         <Col sm="12" xl="12">
-                                            <Button variant="primary" className="btn-fill btn-rounded" type="submit">
+                                            <Button variant="primary" className="" type="submit">
                                                 {t("add_line")}
                                             </Button>
                                         </Col>
@@ -1102,7 +1061,7 @@ class Invoice extends Component {
                                                                 <td>
                                                                     <Button
                                                                         variant="danger"
-                                                                        className="btn-fill btn-rounded"
+                                                                        className=""
                                                                         onClick={() => this.removeLine(index)}
                                                                     >
                                                                         <i className="fas fa-trash" />
@@ -1137,7 +1096,7 @@ class Invoice extends Component {
                             {processing ? (
                                 <div className="lds-dual-ring-2" />
                             ) : (
-                                <Button variant="primary" className="btn-fill btn-rounded" onClick={this.saveInvoice}>
+                                <Button variant="primary" className="" onClick={this.saveInvoice}>
                                     {t("save")}
                                 </Button>
                             )}
@@ -1153,7 +1112,7 @@ class Invoice extends Component {
                         backdrop="static"
                         keyboard={false}
                         size="lg"
-                        className="max-z-index"
+                        
                     >
                         <Modal.Header closeButton>
                             <h3 className="tituloFerias">{t("invoice_acceptance")}</h3>
@@ -1161,11 +1120,7 @@ class Invoice extends Component {
 
                         <Modal.Body>
                             <div ref={this.modalTopRef} />
-                            {error && (
-                                <Alert className={color} onClose={() => this.setState({ error: false })} dismissible>
-                                    {errorMsg}
-                                </Alert>
-                            )}
+                   
 
                             <Row className="m-2">
                                 <Col sm="12" xl="12">
@@ -1190,7 +1145,7 @@ class Invoice extends Component {
                             {processing ? (
                                 <div className="lds-dual-ring-2" />
                             ) : (
-                                <Button variant="primary" className="btn-fill btn-rounded" onClick={this.saveAcceptance}>
+                                <Button variant="primary" className="" onClick={this.saveAcceptance}>
                                     {t("save")}
                                 </Button>
                             )}

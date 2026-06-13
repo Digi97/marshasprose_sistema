@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap";
 import AppUtil from "../../../../AppUtil/AppUtil";
 import { withTranslation } from "react-i18next";
+import ActionButtons from '../../common/ActionButtons'
 
 DataTable.use(DT);
 //TODO: agregar rol por permiso
@@ -207,21 +208,13 @@ class Rol extends Component {
         this.getPermissions();
     }
 
-    ActionButtons = (rowData) => {
-        return (
-            <Row className="m-2">
-                <Col lg="12" sm="12">
-                    <Button
-                        variant="info"
-                        className="btn-fill btn-rounded"
-                        onClick={() => this.getRolById(rowData.id)}
-                    >
-                        <i className="fas fa-pen" />
-                    </Button>
-                </Col>
-            </Row>
-        );
-    };
+              ActionButtons = (rowData) => (
+      <ActionButtons 
+      editAction={() => this.getRolById(rowData.id)}
+      />
+    );
+
+
 
     render() {
         const { t } = this.props;
@@ -237,7 +230,7 @@ class Rol extends Component {
                             <Row>
                                 <Col lg="6" sm="12">
                                     <Button
-                                        className="btn-fill btn-rounded bg-blue"
+                                        className=" "
                                         onClick={this.toggleShow}
                                     >
                                         {t("create")}
@@ -245,7 +238,7 @@ class Rol extends Component {
                                 </Col>
                                 <Col lg="6" sm="12">
                                     <Button
-                                        className="btn-fill btn-rounded bg-blue"
+                                        className=" "
                                         onClick={() => this.props.navigate(-1)}
                                     >
                                         {t("cancel")}
@@ -299,7 +292,7 @@ class Rol extends Component {
                         backdrop="static"
                         keyboard={false}
                         size="lg"
-                        className="max-z-index"
+                        
                     >
                         <Modal.Header closeButton>
                             <h3 className="tituloFerias">{t("rol")}</h3>
@@ -372,7 +365,7 @@ class Rol extends Component {
                                     <Col sm="12" xl="12">
                                         <Button
                                             variant="primary"
-                                            className="btn-fill btn-rounded"
+                                            className=""
                                             type="submit"
                                         >
                                             {t("add")}
@@ -406,7 +399,7 @@ class Rol extends Component {
                                                             <td>
                                                                 <Button
                                                                     variant="danger"
-                                                                    className="btn-fill btn-rounded"
+                                                                    className=""
                                                                     onClick={() =>
                                                                         this.removeLine(
                                                                             index
@@ -437,7 +430,7 @@ class Rol extends Component {
                             ) : (
                                 <Button
                                     variant="primary"
-                                    className="btn-fill btn-rounded"
+                                    className=""
                                     onClick={this.saveRol}
                                 >
                                     {t("save")}

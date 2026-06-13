@@ -4,6 +4,7 @@ import DT from "datatables.net-dt";
 import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
 import AppUtil from "../../../../AppUtil/AppUtil";
 import { withTranslation } from "react-i18next";
+import ActionButtons from '../../common/ActionButtons'
 DataTable.use(DT);
 
 class Tax_Type extends Component {
@@ -160,21 +161,13 @@ class Tax_Type extends Component {
     this.getTaxType();
   }
 
-  ActionButtons = (rowData) => {
-    return (
-      <Row className="m-2">
-        <Col lg="12" sm="12">
-          <Button
-            variant="info"
-            className="btn-fill btn-rounded"
-            onClick={() => this.getTaxTypeById(rowData.id)}
-          >
-            <i className="fas fa-pen" />
-          </Button>
-        </Col>
-      </Row>
+
+                ActionButtons = (rowData) => (
+      <ActionButtons 
+      editAction={() => this.getTaxTypeById(rowData.id)}
+      />
     );
-  };
+
 
   render() {
     const { t } = this.props;
@@ -189,7 +182,7 @@ class Tax_Type extends Component {
               <Row>
                 <Col lg="6" sm="12">
                   <Button
-                    className="btn-fill btn-rounded bg-blue"
+                    className=" "
                     onClick={this.toggleShow}
                   >
                     {t("create")}
@@ -197,7 +190,7 @@ class Tax_Type extends Component {
                 </Col>
                 <Col lg="6" sm="12">
                   <Button
-                    className="btn-fill btn-rounded bg-blue"
+                    className=" "
                     onClick={() => this.props.navigate(-1)}
                   >
                     {t("cancel")}
@@ -254,7 +247,7 @@ class Tax_Type extends Component {
             backdrop="static"
             keyboard={false}
             size="lg"
-            className="max-z-index"
+            
           >
             <Form onSubmit={this.saveTaxType}>
               <Modal.Header closeButton>
@@ -351,7 +344,7 @@ class Tax_Type extends Component {
                 ) : (
                   <Button
                     variant="primary"
-                    className="btn-fill btn-rounded"
+                    className=""
                     type="submit"
                   >
                     {t("save")}

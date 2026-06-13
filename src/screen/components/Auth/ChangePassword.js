@@ -4,6 +4,8 @@ import axios from "axios";
 import { url } from "../services/api";
 import logo from "../../../assets/PNG/LogoOficial.jpg";
 import { withTranslation } from 'react-i18next';
+import alertSuccess from "../common/SweetAlert";
+
 class ChangePassword extends Component {
   constructor(props) {
     super(props);
@@ -11,9 +13,7 @@ class ChangePassword extends Component {
       correo:"",
       contrasena:"",
       contrasena_confirma:"",
-      error: false,
-      errorMsg: "",
-      color: "",
+  
       charging: false
     };
   }
@@ -34,23 +34,18 @@ class ChangePassword extends Component {
 
     if(correo === "")
     {
-        this.setState({
-          error: true,
-          errorMsg: t("invalid_format_Correo"),
-          color: "alert alert-warning",
 
-        });
+            alertSuccess(t("invalid_format_Correo"), "error", t);
+
         return;
     }
 
 
     if ( contrasena !== contrasena_confirma) 
       {
-          this.setState({
-          error: true,
-          errorMsg: t("password_and_confirmation_no_match"),
-          color: "alert alert-warning",
-        });
+            alertSuccess(t("password_and_confirmation_no_match"), "error", t);
+
+ 
         return;
       }
 
@@ -69,35 +64,24 @@ class ChangePassword extends Component {
              
           if (response.data.codeStatus ===200) 
             {
-        this.setState({
-  error: true,
-  errorMsg: t("password_changed_successfully"),
-  color: "alert alert-success",
-  charging: true
-}, ()=>{setTimeout(() => {
-  window.location.href = "/";
-}, 3000); });
+
+            alertSuccess(t("password_changed_successfully"), "success", t);
+              setTimeout(() => { window.location.href = "/"; }, 3000);
+     
 
 
             window.location.href = "/";
           } else {
-            this.setState({
-              error: true,
-              errorMsg: t(response.data.message),
-              color: "alert alert-danger",
-              charging: false
-            });
+            alertSuccess(t(response.data.message), "error", t);
+
+            this.setState({ charging: false });
           }
         })
         .catch((error) => {
-          console.error(error);
+          alertSuccess(t("something_went_wrong"), "error", t);
+
           
-          this.setState({
-            error: true,
-            errorMsg: t("something_went_wrong"),
-            color: "alert alert-danger",
-            charging: false
-          });
+        
         });
 
 
@@ -148,11 +132,7 @@ sessionStorage.removeItem("correo")
             <div>
               <div>
               </div>
-              {this.state.error === true &&
-                <div className={this.state.color} role="alert">
-                  {this.state.errorMsg}
-                </div>
-              }
+        
               <div className="card-text">
                 {/* <div className="alert alert-danger alert-dismissible fade show" role="alert">Incorrect username or password.</div> */}
                 <form onSubmit={this.preventSubmit}>

@@ -6,14 +6,14 @@ import { url } from "../services/api";
 import logo from "../../../assets/PNG/LogoOficial.jpg";
 import { Navigate, redirect } from "react-router-dom";
 import { withTranslation } from 'react-i18next';
+import alertSuccess from "../common/SweetAlert";
 
 // clase de recuperacion contraseña (se ingresa el corrreo)
 class Recovery extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      error: false,
-      errorMsg: "",
+    
       nextPage: false,
       charging: false,
       correo:"",
@@ -43,40 +43,34 @@ class Recovery extends Component {
           {
             if (response.data.codeStatus ===200)
             {
+
+
               this.setState({
-                nextPage: true,
-                error: false,
-                errorMsg: "",
+                nextPage: true,      
                 charging: false,
                 maskedCorreo:response.data.data.correo
               })
             }
             else 
             {
-            this.setState({
-              error: true,
-              errorMsg: t(response.data.message),
-              charging: false
-            });
+
+            alertSuccess(t(response.data.message), "error", t);
+        this.setState({charging: false  })
+
+
           } 
           
           }
         })
         .catch((error) => {
-          console.error(error);
-          
-          this.setState({
-            error: true,
-            errorMsg: "Ha ocurrido un problema favor intentelo nuevamente",
-            charging: false
-          });
+            alertSuccess(t(error.message), "error", t);
+      this.setState({charging: false  })
+
         });
     } else {
-      this.setState({
-        error: true,
-        errorMsg: "Debe llenar el campo de correo electrónico",
-        charging: false
-      })
+            alertSuccess(t("email_invalid"), "error", t);
+
+      this.setState({charging: false  })
     }
   };
 
@@ -99,24 +93,25 @@ class Recovery extends Component {
               sessionStorage.setItem("correo", this.state.correo)
               this.setState({redirect: true});
           } else {
+            alertSuccess(t(response.data.message), "error", t);
+
             this.setState({
-              error: true,
-              errorMsg: t(response.data.message),
+           
               charging: false
             });
           }
         })
         .catch((error) => {
+            alertSuccess(t(error.message), "error", t);
+
           this.setState({
-            error: true,
-            errorMsg: "Ha ocurrido un problema favor intentelo nuevamente",
             charging: false
           });
         });
     } else {
+            alertSuccess(t("code_required"), "error", t);
+
       this.setState({
-        error: true,
-        errorMsg: "El campo de código de verificación es requerido",
         charging: false
       })
     }
@@ -152,11 +147,7 @@ class Recovery extends Component {
                     {t("mail_to_restablish")}
                   </small >
                 </div>
-                {this.state.error === true &&
-                  <div className="alert alert-danger" role="alert">
-                    {this.state.errorMsg}
-                  </div>
-                }
+           
                 <div className="card-text">
                   {/* <div className="alert alert-danger alert-dismissible fade show" role="alert">Incorrect username or password.</div> */}
                   <form onSubmit={this.preventSubmit}>
@@ -209,11 +200,7 @@ class Recovery extends Component {
                     {t("mail_change_pwd")} {this.state.maskedCorreo}
                   </p>
                 </div>
-                {this.state.error === true &&
-                  <div className="alert alert-danger" role="alert">
-                    {this.state.errorMsg}
-                  </div>
-                }
+          
                 <div className="form-group">
                   <label htmlFor="exampleInputEmail1">
                     {t("verification_code")}

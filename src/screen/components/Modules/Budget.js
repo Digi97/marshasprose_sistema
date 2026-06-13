@@ -6,6 +6,9 @@ import { withTranslation } from "react-i18next";
 import crypto from "crypto-js";
 import moment from 'moment-timezone'
 import AppUtil from "../../../AppUtil/AppUtil";
+import alertSuccess from "../common/SweetAlert";
+import RenderActive from '../common/renderActive'
+import ActionButtons from '../common/ActionButtons'
 
 DataTable.use(DT);
 
@@ -40,13 +43,10 @@ constructor(props)
   },
   cost_center:[],
   presupuestary_category:[],
-  //manejo de alertas
-      error: false,
-      errorMsg: "",
-      color:"",
+ 
       user:{}
     }
-       this.modalTopRef = createRef();
+this.datatableRef = createRef();
 
        
   }
@@ -54,11 +54,6 @@ constructor(props)
 
 
 //#region Funciones internas
-  scrollToTop = () => {
-        if (this.modalTopRef.current) {
-            this.modalTopRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }
 
     toggleShow = () => this.setState({show: !this.state.show,budget:{
     id:0,
@@ -111,18 +106,21 @@ if(response.codeStatus === 200)
    let budget = response ? response.data : [];
     if(Number.isInteger(budget))
                 {
-                    this.setState({
-                  error: true,
-                  errorMsg: t("record_created_successfully"),
-                  color:"alert alert-success"
-                }, () => { window.location.reload(); });
+
+                  alertSuccess(t("record_created_successfully"),"success",t);
+            this.toggleShow()
+            this.setState({ processing: false });
+            this.getBudget()
+          // Guardar los detalles con el id del gasto recién creado
+      
+
               
           } 
 
 } else
   {
-     this.setState({ error: true, errorMsg: t(response.message), color:"alert alert-warning" });
-    this.scrollToTop();
+     alertSuccess(t(response.message),"error",t);
+    
     }
 
             
@@ -140,25 +138,20 @@ if(response.codeStatus === 200)
 
                 if(Number.isInteger(budget))
                 {
-                    this.setState({
-                  error: true,
-                  errorMsg: t("updated_successfully"),
-                  color:"alert alert-success"
-                }, () => { window.location.reload(); });
+                  alertSuccess(t("updated_successfully"),"success",t);
+                  this.getBudget()
+                  this.toggleShow()
+               
                 } 
                 else
                   {
-              this.setState({ error: true, errorMsg: t(response.message),  color:"alert alert-success" });
+                     alertSuccess(t(response.message),"error",t);
                 }
         } 
         else
         {
-                  
-        this.setState({
-          error: true,
-          errorMsg: t('please_verify_data'),
-          color:"alert alert-danger"
-        });
+          alertSuccess(t("please_verify_data"),"error",t);
+     
         }
 
            })
@@ -199,15 +192,17 @@ if(response.codeStatus === 200)
     });
 
 
-  ActionButtons = (rowData) => {
-    return (
-        <Row className="m-2">
-          <Col lg="12" sm="12">
-               <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getBudgetById(rowData.id)}><i className="fas fa-pen" /></Button>
-          </Col>
-        </Row>
+  ActionButtons = (rowData) => (
+
+      <ActionButtons
+        viewAction={() => this.getBudgetById(rowData.id)}
+        editAction={() => this.getBudgetById(rowData.id)}
+      />
+
+   
     );
-};
+
+
 
   componentDidMount(){
     this.getUserInfo();
@@ -242,7 +237,6 @@ if(response.codeStatus === 200)
           <Row>
             <Col lg="3" sm="12">
               <Button
-                className="btn-fill btn-rounded bg-blue"
                 onClick={this.toggleShow}>
                   {t("create")}
               </Button>
@@ -267,13 +261,15 @@ if(response.codeStatus === 200)
                   {data:'periodo_fin', title:t("end_period"),  render: (data, type, row) =>{ return moment(`${data}`).format(`${row.formato}`) }},
                   {data:'categoria_presupuestaria', title:t("category")},
                   {data:'centro_costo', title:t("cost_center")},
-                  {data:'estado', title:t("status"), render: (data, type, row) => { return row.estado ===1 ? t('active'):t("inactive") }},
+                  {data:'estado', title:t("status")},
                   {title:t("action"), data:null, orderable: false, searchable:false, 
-                 //   render:(data, type, row)=> {return `<Button variant="danger" className="btn-fill btn-rounded" onClick={this.removeLine(${row.usuario_id})}><i className="fas fa-trash" /></Button>` }
+                 //   render:(data, type, row)=> {return `<Button variant="danger" className="" onClick={this.removeLine(${row.usuario_id})}><i className="fas fa-trash" /></Button>` }
                  },
                 ]}
                 className="display table cell-border compact stripe"     
-                slots={{9: (cellData, rowData) => this.ActionButtons(rowData, cellData)}}
+                slots={{
+                  8: (cellData, rowData) => RenderActive(cellData, t),
+                  9: (cellData, rowData) => this.ActionButtons(rowData, cellData)}}
                 options={{
                 language: {
                   zeroRecords:t("zeroRecords"),
@@ -306,17 +302,13 @@ if(response.codeStatus === 200)
               backdrop="static"
               keyboard={false}
               size="lg"
-              className="max-z-index"
+              
           >
      <Form onSubmit={this.saveBudget}>
 
           <Modal.Header closeButton>
             <h3 className=" tituloFerias">{t("budget_management")}</h3>
-               {this.state.error === true && (
-              <div className={this.state.color} role="alert">
-                {this.state.errorMsg}
-              </div>
-            )}
+          
           </Modal.Header>
           <Modal.Body>
           
@@ -580,7 +572,7 @@ if(response.codeStatus === 200)
             <Button variant="light" className="btn-rounded" onClick={this.toggleShow}>
               {t("close")}
             </Button>
-            {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("save")}</Button>}
+            {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="" type="submit">{t("save")}</Button>}
           </Modal.Footer>
          </Form>
         </Modal>

@@ -581,3 +581,13 @@ table.dataTable tbody td {
   color: var(--text-primary);
   border-color: var(--border-color);
 }
+
+/* Swal sobre Bootstrap Modal */
+.swal-above-modal {
+  z-index: 9999 !important;
+}
+
+/* El backdrop de Swal también debe estar sobre el modal */
+.swal2-backdrop-show {
+  z-index: 9998 !important;
+}

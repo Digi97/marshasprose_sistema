@@ -4,6 +4,10 @@ import AppUtil from "../../../AppUtil/AppUtil.js";
 import Toast from "../common/Toast.js";
 import Select from "react-select";
 import { withTranslation } from "react-i18next";
+
+import alertSuccess from "../common/SweetAlert.js";
+
+
 //TODO: agregar informacion de conexion a smtp para obtener facturas
 class Settings extends Component {
   constructor(props) {
@@ -37,9 +41,7 @@ class Settings extends Component {
       taxes: [],
       identificationType: [],
       activityCode: [],
-      error: false,
-      errorMsg: "",
-      color:"",
+
     };
     this.modalTopRef = createRef();
   }
@@ -62,11 +64,8 @@ class Settings extends Component {
 
             this.setState({ empresa, processing: false });
           } else {
-            this.setState({
-              error: true,
-              errorMsg: t(response.message),
-              color: "alert alert-warning",
-            });
+            alertSuccess(t(response.message), "error", t);
+
           }
         }
       },
@@ -126,21 +125,16 @@ class Settings extends Component {
         let user = response ? response.data : [];
 
         if (Number.isInteger(user)) {
-          this.setState(
-            {
-              error: true,
-              errorMsg: t("updated_successfully"),
-              color: "alert alert-success",
-            });
+            alertSuccess(t("updated_successfully"), "success", t);
+
         } else {
-          this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning", });
+            alertSuccess(t(response.message), "error", t);
+
         }
       } else {
-        this.setState({
-          error: true,
-          errorMsg: t("please_verify_data"),
-          color: "alert alert-danger",
-        });
+
+            alertSuccess(t("please_verify_data"), "error", t);
+
       }
 
       // this.setState({user});
@@ -177,11 +171,7 @@ class Settings extends Component {
         />
 
         <Container fluid>
-           {this.state.error === true && (
-              <div className={this.state.color} role="alert">
-                {this.state.errorMsg}
-              </div>
-            )}
+      
           <Form onSubmit={this.saveEmpresa}>
             <Tabs className="mb-3">
               <Tab

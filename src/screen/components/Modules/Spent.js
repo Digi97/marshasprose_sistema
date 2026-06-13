@@ -1,24 +1,17 @@
-import React, { Component, createRef } from "react";
+import React, { Component,createRef } from "react";
 
 import DataTable from "datatables.net-react";
 import DT from "datatables.net-dt";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Modal,
-  
-  Form,
-  
-  Alert,
-} from "react-bootstrap";
+import {Container, Row, Col,  Button, Modal, Form, Alert} from "react-bootstrap";
 import Table from "react-bootstrap/Table";
 import { url } from "screen/components/services/api";
 import crypto from "crypto-js";
 import AppUtil from "../../../AppUtil/AppUtil";
 import Select from "react-select";
 import { withTranslation } from "react-i18next";
+import moment from 'moment-timezone'
+import alertSuccess from "../common/SweetAlert";
+import ActionButtons from '../common/ActionButtons'
 
 DataTable.use(DT);
 
@@ -30,9 +23,7 @@ class Spent extends Component {
       tableData: [],
       show: false,
       processing: true,
-      error: false,
-      errorMsg: "",
-      color: "",
+     
 
       // Objeto principal del gasto
       spent: {
@@ -73,9 +64,8 @@ class Spent extends Component {
       currency:[],
       token: "",
     };
-
-    this.modalTopRef = createRef();
     this.user = null;
+    this.datatableRef = createRef();
   }
 
 
@@ -84,11 +74,6 @@ class Spent extends Component {
   
   }
 
-  scrollToTop = () => {
-    if (this.modalTopRef.current) {
-      this.modalTopRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   getUserInfo = () => {
     let bytes = crypto.AES.decrypt(
@@ -96,6 +81,8 @@ class Spent extends Component {
       "@marsh_contable"
     );
     this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
+
+    
     this.setState({
       token: sessionStorage.getItem("sessionId"),
       spent: {
@@ -117,8 +104,7 @@ this.getCurrency();
   toggleShow = () =>
     this.setState({
       show: !this.state.show,
-      error: false,
-      errorMsg: "",
+    
       lines: [],
       spent: {
         id: 0,
@@ -299,7 +285,8 @@ _saveStateVariable = async (e) => {
         
           this.setState({ providers, processing: false });
         } else{
-          this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning", });
+             alertSuccess(t(response.message),"error",t);
+  
         }
 
       
@@ -334,15 +321,17 @@ _saveStateVariable = async (e) => {
           const spent = response.data;
           spent.createElectronicDoc = spent.tipo_documento_id === 6 ? 1:0; 
           const lines = spent.gastosDetalle;
+          console.log(spent);
+          
           this.setState({
               spent,
               lines,
               show: true,
-              error: false,
             });
 
         } else {
-          this.setState({ error: true, errorMsg: t(response.message), color: "alert alert-warning", });
+             alertSuccess(t(response.message),"error",t);
+
         }
       }
     );
@@ -356,42 +345,29 @@ _saveStateVariable = async (e) => {
 
     // Validaciones básicas
     if (!spent.doc_Referencia) {
-      this.scrollToTop();
-      this.setState({
-        error: true,
-        errorMsg: t("reference_required"),
-        color: "alert alert-warning",
-      });
+      alertSuccess(t("reference_required"),"warning",t);
       return;
     }
 
     if (spent.categoria_gasto_id === 0) {
-      this.scrollToTop();
-      this.setState({
-        error: true,
-        errorMsg: t("category_required"),
-        color: "alert alert-warning",
-      });
+    
+      alertSuccess(t("category_required"),"warning",t);
       return;
     }
 
     if (spent.proveedor_id === 0) {
-      this.scrollToTop();
-      this.setState({
-        error: true,
-        errorMsg: t("provider_required"),
-        color: "alert alert-warning",
-      });
+  
+           alertSuccess(t("provider_required"),"warning",t);
+      
       return;
     }
 
     if (lines.length === 0) {
-      this.scrollToTop();
-      this.setState({
-        error: true,
-        errorMsg: t("lines_required"),
-        color: "alert alert-warning",
-      });
+   
+
+               alertSuccess(t("lines_required"),"warning",t);
+      
+
       return;
     }
 
@@ -406,24 +382,19 @@ _saveStateVariable = async (e) => {
       AppUtil.postAPI("gastos", spent).then((response) => {
         if (response.codeStatus === 200) {
       
+          alertSuccess(t("record_created_successfully"),"success",t);
+          this.toggleShow()
+            this.setState({ processing: false });
           // Guardar los detalles con el id del gasto recién creado
-       this.scrollToTop();
-          this.setState({
-            error: true,
-            errorMsg: t("record_created_successfully"),
-            color: "alert alert-success",
-            processing: false,
-          });
+        if (this.datatableRef.current?.dt()) 
+          {
+             this.datatableRef.current.dt().ajax.reload(null, false);
+        }
 
-          //this._saveDetails(detallesConId, true);
         } else {
-          this.scrollToTop();
-          this.setState({
-            error: true,
-            errorMsg: t(response.message),
-            color: "alert alert-warning",
-            processing: false,
-          });
+
+           alertSuccess(t(response.message),"error",t);
+  
         }
       });
     } else {
@@ -432,23 +403,22 @@ _saveStateVariable = async (e) => {
         if (response.codeStatus === 200) 
           {
           
-             this.scrollToTop();
-          this.setState({
-            error: true,
-            errorMsg: t("record_created_successfully"),
-            color: "alert alert-success",
-            processing: false,
-          });
+                     alertSuccess(t("record_created_successfully"),"success",t);
+ 
+          this.toggleShow()
+            this.setState({ processing: false });
+          // Guardar los detalles con el id del gasto recién creado
+        if (this.datatableRef.current?.dt()) 
+          {
+             this.datatableRef.current.dt().ajax.reload(null, false);
+        }
+    
 
           //this._saveDetails(detallesConId, false);
         } else {
-          this.scrollToTop();
-          this.setState({
-            error: true,
-            errorMsg: t(response.message),
-            color: "alert alert-warning",
-            processing: false,
-          });
+
+                       alertSuccess(t(response.message),"error",t);
+      
         }
       });
     }
@@ -457,17 +427,11 @@ _saveStateVariable = async (e) => {
   
   ActionButtons = (rowData) => {
     return (
-      <Row className="m-2">
-        <Col lg="12" sm="12">
-          <Button
-            variant="info"
-            className="btn-fill btn-rounded"
-            onClick={() => this.getSpentById(rowData.id)}
-          >
-            <i className="fas fa-pen" />
-          </Button>
-        </Col>
-      </Row>
+
+      <ActionButtons
+        viewAction={() => this.getSpentById(rowData.id)}
+        editAction={() => this.getSpentById(rowData.id)}
+      />
     );
   };
 
@@ -493,21 +457,18 @@ _saveStateVariable = async (e) => {
       <>
         <Container fluid>
 
-          <Row>
+          <Row className="m-2">
             <Col lg="6" sm="12">
               <h1>{t("spent")}</h1>
             </Col>
             <Col lg="6" sm="12">
-              <Row>
-                <Col lg="3" sm="12">
+             
                   <Button
-                    className="btn-fill btn-rounded bg-blue"
                     onClick={this.toggleShow}
                   >
                     {t("create")}
                   </Button>
-                </Col>
-              </Row>
+                
             </Col>
           </Row>
 
@@ -516,6 +477,7 @@ _saveStateVariable = async (e) => {
               <div />
             ) : (
               <DataTable
+              ref={this.datatableRef}
                 ajax={{
                   url: `${url}gastos`,
                   type: "GET",
@@ -536,11 +498,11 @@ _saveStateVariable = async (e) => {
                   { data: "id", title: t("id") },
                   { data: "doc_Referencia", title: t("reference") },
                   { data: "proveedor",      title: t("provider") },
-                  { data: "fecha",      title: t("date") },
+                  { data: "fecha",      title: t("date"), render: (data, type, row) =>{ return moment(`${row.fecha}`).format(`${this.user.formatoFecha.toUpperCase()}`)} },
                   { data: "usuario",      title: t("created_by") },
-                  { data: "subtotal", title: t("subtotal"), render:function(data, type,row){ return `${data} ${row.tipo_moneda}` } },
-                  { data: "impuesto", title: t("tax"), render:function(data, type,row){ return `${data} ${row.tipo_moneda}` }},
-                  { data: "total", title: t("total"), render:function(data, type,row){ return `${data} ${row.tipo_moneda}`} },
+                  { data: "subtotal", title: t("subtotal"), render:function(data, type,row){ return `${row.tipo_moneda} ${data}` } },
+                  { data: "impuesto", title: t("tax"), render:function(data, type,row){ return `${row.tipo_moneda} ${data}` }},
+                  { data: "total", title: t("total"), render:function(data, type,row){ return `${row.tipo_moneda} ${data}` } },
                   {
                     title: t("action"),
                     data: null,
@@ -579,7 +541,7 @@ _saveStateVariable = async (e) => {
             backdrop="static"
             keyboard={false}
             size="lg"
-            className="max-z-index"
+            
             scrollable
           >
             <Modal.Header closeButton>
@@ -589,17 +551,8 @@ _saveStateVariable = async (e) => {
             </Modal.Header>
 
             <Modal.Body>
-              {/* Ref al tope para scroll en error */}
-              <div ref={this.modalTopRef} />
-              {error && (
-                <Alert
-                  className={color}
-                  onClose={() => this.setState({ error: false })}
-                  dismissible
-                >
-                  {errorMsg}
-                </Alert>
-              )}
+    
+          
 
                   <Row className="m-2">
                     <Col sm="12" xl="6">
@@ -876,7 +829,7 @@ _saveStateVariable = async (e) => {
                         <Col sm="12" xl="12">
                           <Button
                             variant="primary"
-                            className="btn-fill btn-rounded"
+                            className=""
                             type="submit"
                           >
                             {t("add_line")}
@@ -914,7 +867,7 @@ _saveStateVariable = async (e) => {
                                     <td>
                                       <Button
                                         variant="danger"
-                                        className="btn-fill btn-rounded"
+                                        className=""
                                         onClick={() => this.removeLine(index)}
                                       >
                                         <i className="fas fa-trash" />
@@ -957,7 +910,7 @@ _saveStateVariable = async (e) => {
               ) : (
                 <Button
                   variant="primary"
-                  className="btn-fill btn-rounded"
+                  className=""
                   onClick={this.saveSpent}
                 >
                   {t("save")}

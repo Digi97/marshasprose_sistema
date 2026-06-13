@@ -5,6 +5,7 @@ import { url, host } from "../services/api";
 import logo from "../../../assets/PNG/LogoOficial.jpg";
 import crypto from "crypto-js";
 import { withTranslation } from "react-i18next";
+import alertSuccess from "../common/SweetAlert";
 
 class Login extends Component {
   constructor(props) {
@@ -14,9 +15,7 @@ class Login extends Component {
         Correo: "",
         Contrasena: "",
       },
-      error: false,
-      errorMsg: "",
-      color: "",
+     
       charging: false,
     };
   }
@@ -38,31 +37,20 @@ class Login extends Component {
   };
 
   componentDidMount() {
+      const { t } = this.props;
     let exp = sessionStorage.getItem("expired");
     if (exp) {
       sessionStorage.removeItem("expired");
-      this.setState({
-        error: true,
-        errorMsg: "Su sesión ha caducado",
-        color: "alert alert-danger",
-      });
+            alertSuccess(t("session_expired"), "warning", t);
+   
     }
     let closed = sessionStorage.getItem("closed");
     if (closed) {
       sessionStorage.removeItem("closed");
-      this.setState({
-        error: true,
-        errorMsg: "Su sesión se ha cerrado con éxito",
-        color: "alert alert-success",
-      });
+
+      alertSuccess(t("session_ended"), "success", t);
+   
     }
-    setTimeout(() => {
-      this.setState({
-        error: false,
-        errorMsg: "",
-        color: "",
-      });
-    }, "3000");
   }
 
   //se maneja la autenticacion del usuario
@@ -99,37 +87,23 @@ class Login extends Component {
 
               window.location.href = "/home/";
             } else {
-              this.setState({
-                error: true,
-                errorMsg: t(response.data.message),
-                charging: false,
-                color: "alert alert-danger",
-              });
+      alertSuccess(t(response.data.message), "error", t);
+
             }
           } else {
-            this.setState({
-              error: true,
-              errorMsg: t("invalid_username_or_password"),
-              charging: false,
-              color: "alert alert-danger",
-            });
+      alertSuccess(t("invalid_username_or_password"), "error", t);
+
+
           }
         })
         .catch((error) => {
-          this.setState({
-            error: true,
-            errorMsg: error.message,
-            color: "alert alert-danger",
-            charging: false,
-          });
+            alertSuccess(t(error.message), "error", t);
+   
         });
     } else {
-      this.setState({
-        error: true,
-        errorMsg: t("all_inputs_required"),
-        charging: false,
-        color: "alert alert-danger",
-      });
+
+        alertSuccess(t("all_inputs_required"), "error", t);
+ 
     }
   };
 
@@ -147,11 +121,7 @@ class Login extends Component {
             </h4>
             <br></br>
             <hr className="hr-login"></hr>
-            {this.state.error === true && (
-              <div className={this.state.color} role="alert">
-                {this.state.errorMsg}
-              </div>
-            )}
+      
             <div className="card-text">
               {/* <div className="alert alert-danger alert-dismissible fade show" role="alert">Incorrect username or password.</div> */}
               <form onSubmit={this.preventSubmit}>

@@ -6,7 +6,7 @@ import AppUtil from "../../../../AppUtil/AppUtil";
 import 'moment/locale/es';
 import crypto from "crypto-js";
 import { withTranslation } from "react-i18next";
-
+import ActionButtons from '../../common/ActionButtons'
 DataTable.use(DT);
 //TODO ARREGLAR NUEVO CAMPO DE TIPO MONEDA 
 
@@ -156,17 +156,13 @@ class Accounting_account extends Component {
         });
   }
 
-  ActionButtons = (rowData) => {
-    return (
-      <Row className="m-2">
-        <Col lg="12" sm="12">
-          <Button variant="info" className="btn-fill btn-rounded" onClick={() => this.getAccountingAccountById(rowData.id)}>
-            <i className="fas fa-pen" />
-          </Button>
-        </Col>
-      </Row>
+
+  ActionButtons = (rowData) => (
+      <ActionButtons 
+      editAction={() => this.getAccountingAccountById(rowData.id)}
+      />
     );
-  };
+  
 
   render() {
     const { t } = this.props;
@@ -180,10 +176,10 @@ class Accounting_account extends Component {
             <Col lg="6" sm="12">
               <Row>
                 <Col lg="6" sm="12">
-                  <Button className="btn-fill btn-rounded bg-blue" onClick={this.toggleShow}>{t("create")}</Button>
+                  <Button className=" " onClick={this.toggleShow}>{t("create")}</Button>
                 </Col>
                 <Col lg="6" sm="12">
-                  <Button className="btn-fill btn-rounded bg-blue" onClick={() => this.props.navigate(-1)}>{t("cancel")}</Button>
+                  <Button className=" " onClick={() => this.props.navigate(-1)}>{t("cancel")}</Button>
                 </Col>
               </Row>
             </Col>
@@ -220,7 +216,7 @@ class Accounting_account extends Component {
             />
           </Row>
 
-          <Modal show={this.state.show} onHide={this.toggleShow} backdrop="static" keyboard={false} size="lg" className="max-z-index">
+          <Modal show={this.state.show} onHide={this.toggleShow} backdrop="static" keyboard={false} size="lg" >
             <Form onSubmit={this.saveAccountingAccount}>
               <Modal.Header closeButton>
                 <h3 className="tituloFerias">{t("accounting_account")}</h3>
@@ -288,7 +284,7 @@ class Accounting_account extends Component {
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="light" className="btn-rounded" onClick={this.toggleShow}>{t("close")}</Button>
-                {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="btn-fill btn-rounded" type="submit">{t("save")}</Button>}
+                {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="" type="submit">{t("save")}</Button>}
               </Modal.Footer>
             </Form>
           </Modal>
