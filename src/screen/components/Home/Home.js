@@ -25,6 +25,8 @@ getDashboardInfo(){
           {
 
             let dashboardInfo = response.data;
+            console.log(dashboardInfo);
+            
           let arrayPonerColor = dashboardInfo.facturas_por_tipo_documento;
 
           for(let i = 0; i< arrayPonerColor.length; i++)
@@ -33,6 +35,9 @@ getDashboardInfo(){
           }
           
           dashboardInfo.facturas_por_tipo_documento = arrayPonerColor;
+
+              localStorage.setItem("dolar_compra", dashboardInfo.tipo_cambio?.compra)
+              localStorage.setItem("dolar_venta", dashboardInfo.tipo_cambio?.venta)
             
             this.setState({ dashboardInfo });
         }
@@ -44,6 +49,8 @@ getDashboardInfo(){
             sessionStorage.getItem("user"),
             "@marsh_contable"
         );
+
+    
         this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
         this.getDashboardInfo()
       
@@ -186,7 +193,7 @@ render(){
                                         justifyContent: "center",
                                         marginLeft: "auto"
                                     }}>
-                                        <i className="fas fa-coins" style={{ color: "#f6c23e", fontSize: "20px" }} />
+                                        <i className="fas fa-chart-area" style={{ color: "#f6c23e", fontSize: "20px" }} />
                                     </div>
                                 </Col>
                             </Row>
@@ -234,7 +241,48 @@ render(){
                     </Card>
                 </Col>
 
+                                {/* ── Card Tipo Cambio ── */}
                 <Col lg="4" sm="6" className="mb-3">
+                    <Card className="shadow-sm border-0">
+                        <Card.Body>
+                            <Row className="align-items-center">
+                                <Col xs="8">
+                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                                        {t("exchange_rate_buy")}
+                                    </p>
+                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.tipo_cambio?.compra)}</h3>
+                                </Col>
+                                <Col xs="8">
+                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                                        {t("exchange_rate_sale")}
+                                    </p>
+                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.tipo_cambio?.venta)}</h3>
+                                </Col>
+                                <Col xs="4" className="text-end">
+                                    <div style={{
+                                        backgroundColor: "#e74a3b20",
+                                        borderRadius: "50%",
+                                        width: "50px",
+                                        height: "50px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginLeft: "auto"
+                                    }}>
+                                        <i className="fas fa-coins" style={{ color: "#e74a3b", fontSize: "20px" }} />
+                                    </div>
+                                </Col>
+                            </Row>
+                            <hr className="my-2" />
+                            <small className="text-danger">
+                                <i className="fas fa-calendar me-1" />
+                                {t("today")}
+                            </small>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+                <Col lg="6" sm="6" className="mb-3">
                 <Card className="shadow-sm border-0">
 <Card.Body>
     <Row className="align-items-center">

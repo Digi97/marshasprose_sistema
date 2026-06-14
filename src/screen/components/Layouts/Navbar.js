@@ -53,7 +53,7 @@ function Header() {
     };
     document.body.appendChild(node);
   };
-console.log(isDark);
+
 
   return (
     <Navbar expand="lg">

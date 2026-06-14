@@ -19,6 +19,7 @@ constructor(props)
 
     this.state = {
       tableData: [],
+      isView:false,
   show:false,
   processing: false,
   budgets:[],
@@ -46,6 +47,7 @@ constructor(props)
  
       user:{}
     }
+     this.user = null
 this.datatableRef = createRef();
 
        
@@ -169,13 +171,13 @@ if(response.codeStatus === 200)
     });
   }
 
-  getBudgetById = (id) =>
+  getBudgetById = (id, isView = false) =>
   {
 
         AppUtil.getAPI(`gestion_presupuestaria/${id}`).then(response => {
         
       let budget = response ? response.data : [];      
-      this.setState({budget, show:true}, ()=>{this.getCostCenter(); this.getCategories()});
+      this.setState({budget, show:true, isView}, ()=>{this.getCostCenter(); this.getCategories()});
     });
 
   }
@@ -195,7 +197,7 @@ if(response.codeStatus === 200)
   ActionButtons = (rowData) => (
 
       <ActionButtons
-        viewAction={() => this.getBudgetById(rowData.id)}
+        viewAction={() => this.getBudgetById(rowData.id,true)}
         editAction={() => this.getBudgetById(rowData.id)}
       />
 
@@ -217,6 +219,7 @@ if(response.codeStatus === 200)
         "@marsh_contable",
       );
       this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
+      
       this.setState({ user: this.user, token: sessionStorage.getItem("sessionId") });
     };
 
@@ -225,7 +228,7 @@ if(response.codeStatus === 200)
 
      render(){
        const { t } = this.props;
-       let {cost_center, budget, budgets, presupuestary_category} = this.state;
+       let {cost_center, budget, budgets, presupuestary_category, isView} = this.state;
       return (
     <>
       <Container fluid>
@@ -324,6 +327,8 @@ if(response.codeStatus === 200)
                         required
                         value={budget.codigo}
                         maxLength={100}
+                        disabled={isView}
+
                         >
                        </Form.Control>
                    </Form.Group>
@@ -340,6 +345,7 @@ if(response.codeStatus === 200)
                         required
                         maxLength={100}
                         value={budget.nombre}
+                        disabled={isView}
                         >
                        </Form.Control>
                    </Form.Group>
@@ -358,6 +364,8 @@ if(response.codeStatus === 200)
                         required
                         maxLength={100}
                         value={budget.descripcion}
+                        disabled={isView}
+
                         >
                        </Form.Control>
                    </Form.Group>
@@ -375,6 +383,8 @@ if(response.codeStatus === 200)
                         required
                         maxLength={100}
                         value={budget.anio_presupuesto}
+                        disabled={isView}
+
                         >
                        </Form.Control>
                    </Form.Group>
@@ -394,6 +404,8 @@ if(response.codeStatus === 200)
                         required
                         maxLength={20}
                         value={moment(budget.periodo_inicio).format("YYYY-MM-DD")}
+                        disabled={isView}
+
                         >
                        </Form.Control>
                    </Form.Group>
@@ -411,6 +423,8 @@ if(response.codeStatus === 200)
                         required
                         maxLength={20}
                         value={moment(budget.periodo_fin).format("YYYY-MM-DD")}
+                        disabled={isView}
+
                         >
                        </Form.Control>
                        </Form.Group>
@@ -426,6 +440,8 @@ if(response.codeStatus === 200)
                                           onChange={this._saveStateVariable}
                                           name="categoria_presupuestaria_id"
                                           required
+                        disabled={isView}
+
                                         >
                                           <option value="">{t("select_option")}</option>
                                           {presupuestary_category?.map((item, key) =>
@@ -457,6 +473,8 @@ if(response.codeStatus === 200)
                                           onChange={this._saveStateVariable}
                                           name="centro_Costos_id"
                                           required
+                        disabled={isView}
+
                                         >
                                           <option value="">{t("select_option")}</option>
                                           {cost_center?.map((item, key) =>
@@ -492,6 +510,8 @@ if(response.codeStatus === 200)
                         name="monto_aprobado"
                         required
                         value={budget.monto_aprobado}
+                        disabled={isView}
+
                         >
                        </Form.Control>
                        </Form.Group>
@@ -508,6 +528,8 @@ if(response.codeStatus === 200)
                         name="monto_modificado"
                         required
                         value={budget.monto_modificado}
+                        disabled={isView}
+
                         >
                        </Form.Control>
                        </Form.Group>
@@ -524,6 +546,8 @@ if(response.codeStatus === 200)
                         name="monto_comprometido"
                         required
                         value={budget.monto_comprometido}
+                        disabled={isView}
+
                         >
                        </Form.Control>
                        </Form.Group>
@@ -542,6 +566,8 @@ if(response.codeStatus === 200)
                         name="monto_ejecutado"
                         required
                         value={budget.monto_ejecutado}
+                        disabled={isView}
+
                         >
                        </Form.Control>
                        </Form.Group>
@@ -560,6 +586,8 @@ if(response.codeStatus === 200)
                               name="estado"
                               onChange={this._saveStateVariable}
                               checked={budget.estado ===1 ? true :false}
+                        disabled={isView}
+
                               />
                       </Form.Group>
                    </Col>
@@ -572,7 +600,7 @@ if(response.codeStatus === 200)
             <Button variant="light" className="btn-rounded" onClick={this.toggleShow}>
               {t("close")}
             </Button>
-            {this.state.processing ? <div className="lds-dual-ring-2"></div> : <Button variant="primary" className="" type="submit">{t("save")}</Button>}
+            {this.state.processing ? <div className="lds-dual-ring-2"></div> : !isView && <Button variant="primary" className="" type="submit">{t("save")}</Button>}
           </Modal.Footer>
          </Form>
         </Modal>

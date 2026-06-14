@@ -1,6 +1,6 @@
 import Axios from "axios";
 
-import { url, host } from "screen/components/services/api";
+import { url } from "screen/components/services/api";
 //const proxy = ""; //"https://cors-anywhere.herokuapp.com/";
 const sessionId = sessionStorage.getItem("sessionId");
 
@@ -55,6 +55,8 @@ const AppUtil = {
         }
     },
     getAPI: async function getAPI(endpoint) {
+  
+        
         try {
             let response = await Axios.get(`${url}${endpoint}`, {
                 headers: {
@@ -67,6 +69,8 @@ const AppUtil = {
             let dataRet = response.data;
             return dataRet;
         } catch (e) {
+            console.log(e); 
+            
             if (e.response?.status === 401) {
                 sessionStorage.setItem("expired", true);
 
@@ -74,7 +78,7 @@ const AppUtil = {
                 return;
             }
 
-            console.error(e);
+            console.error(e.response); 
 
             return false;
         }

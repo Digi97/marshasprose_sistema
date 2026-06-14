@@ -35,6 +35,7 @@ class Customer_Provider extends Component {
             tableData: [],
             show: false,
             isProvider: false,
+            isView:false,
             processing: true,
             customer_provider: {
                 id: 0,
@@ -309,7 +310,7 @@ class Customer_Provider extends Component {
         });
     };
 
-    getCustomerProviderById = (id, isCustomer = true) => {
+    getCustomerProviderById = (id, isCustomer = true, isView = false) => {
         const { t } = this.props;
         let url = isCustomer ? `clientes/${id}` : `proveedor/${id}`;
 
@@ -319,9 +320,8 @@ class Customer_Provider extends Component {
                 let telefonos = customer_provider.telefonos;
 
                 customer_provider.exonerado =
-                    customer_provider.exonerado == 1 ? true : false;
-                customer_provider.estado =
-                    customer_provider.estado == 1 ? true : false;
+                    customer_provider.exonerado === 1 ? true : false;
+                customer_provider.estado = customer_provider.estado === 1 ? true : false;
 
                 delete customer_provider.telefonos;
 
@@ -331,6 +331,8 @@ class Customer_Provider extends Component {
                         telefonos,
                         show: true,
                         isProvider: !isCustomer,
+                        isView
+                    
                     },
                     () => {
                         this.getActivityCode();
@@ -346,8 +348,8 @@ class Customer_Provider extends Component {
     ActionButtonsCustomers = (rowData) => {
         return (
             <ActionButtons
-                editAction={() => this.getCustomerProviderById(rowData.id)}
-                viewAction={() => this.getCustomerProviderById(rowData.id)}
+                editAction={() => this.getCustomerProviderById(rowData.id, true)}
+                viewAction={() => this.getCustomerProviderById(rowData.id, true, true)}
             />
         );
     };
@@ -359,7 +361,7 @@ class Customer_Provider extends Component {
                     this.getCustomerProviderById(rowData.id, false)
                 }
                 viewAction={() =>
-                    this.getCustomerProviderById(rowData.id, false)
+                    this.getCustomerProviderById(rowData.id, false, true)
                 }
             />
         );
@@ -367,7 +369,7 @@ class Customer_Provider extends Component {
 
     render() {
         const { t } = this.props;
-        let { customer_provider, token, clientAdmin, providerAdmin } =
+        let { customer_provider, token, clientAdmin, providerAdmin, isView } =
             this.state;
 
         return (
@@ -683,6 +685,7 @@ class Customer_Provider extends Component {
                                             onChange={this._saveStateVariable}
                                             name="tipo_identificacion_id"
                                             required
+                                            disabled={isView}
                                         >
                                             <option value="">
                                                 {t("select_option")}
@@ -721,6 +724,8 @@ class Customer_Provider extends Component {
                                             name="identificacion"
                                             required
                                             maxLength={20}
+                                            disabled={isView}
+
                                             value={
                                                 customer_provider.identificacion
                                             }
@@ -740,6 +745,8 @@ class Customer_Provider extends Component {
                                     ) : (
                                         <Select
                                             options={this.state.activityCode}
+                                            disabled={isView}
+
                                             name="codigo_actividad_id"
                                             onChange={(value) =>
                                                 this.setState({
@@ -782,6 +789,8 @@ class Customer_Provider extends Component {
                                             value={customer_provider.nombre}
                                             required
                                             maxLength={250}
+                                            disabled={isView}
+
                                         ></Form.Control>
                                     </Form.Group>
                                 </Col>
@@ -798,6 +807,8 @@ class Customer_Provider extends Component {
                                             required
                                             value={customer_provider.apellido1}
                                             maxLength={100}
+                                            disabled={isView}
+
                                         ></Form.Control>
                                     </Form.Group>
                                 </Col>
@@ -812,6 +823,8 @@ class Customer_Provider extends Component {
                                             name="Apellido2"
                                             required
                                             maxLength={100}
+                                            disabled={isView}
+
                                             value={customer_provider.apellido2}
                                         ></Form.Control>
                                     </Form.Group>
@@ -830,6 +843,8 @@ class Customer_Provider extends Component {
                                             onChange={this._saveStateVariable}
                                             name="correo"
                                             required
+                                            disabled={isView}
+
                                             value={customer_provider.correo}
                                         />
                                     </Form.Group>
@@ -847,6 +862,8 @@ class Customer_Provider extends Component {
                                             onChange={this._saveStateVariable}
                                             name="provincia_id"
                                             required
+                                            disabled={isView}
+
                                         >
                                             <option value="">
                                                 {t("select_option")}
@@ -887,6 +904,8 @@ class Customer_Provider extends Component {
                                             onChange={this._saveStateVariable}
                                             name="canton_id"
                                             required
+                                            disabled={isView}
+
                                         >
                                             <option value="">
                                                 {t("select_option")}
@@ -927,6 +946,8 @@ class Customer_Provider extends Component {
                                             onChange={this._saveStateVariable}
                                             name="distrito_id"
                                             required
+                                            disabled={isView}
+
                                         >
                                             <option value="">
                                                 {t("select_option")}
@@ -971,6 +992,8 @@ class Customer_Provider extends Component {
                                             name="otrasSenas"
                                             required
                                             value={customer_provider.otrasSenas}
+                                            disabled={isView}
+
                                         />
                                     </Form.Group>
                                 </Col>
@@ -985,6 +1008,8 @@ class Customer_Provider extends Component {
                                         name="exonerado"
                                         onChange={this._saveStateVariable}
                                         checked={customer_provider.exonerado}
+                                            disabled={isView}
+
                                     />
                                 </Col>
 
@@ -996,12 +1021,15 @@ class Customer_Provider extends Component {
                                         name="estado"
                                         onChange={this._saveStateVariable}
                                         checked={customer_provider.estado}
+                                            disabled={isView}
+
                                     />
                                 </Col>
                             </Row>
 
                             <div className="well">
                                 <Form onSubmit={this.addPhone}>
+                                    {!isView &&<div>
                                     <Row className="m-2">
                                         <Col sm="12" xl="6">
                                             <label className="txt-darkblue">
@@ -1059,6 +1087,8 @@ class Customer_Provider extends Component {
                                         </Col>
                                     </Row>
 
+                                    </div>}
+
                                     <Row className="m-3">
                                         <Col sm="12" xl="12">
                                             <Table striped bordered hover>
@@ -1068,7 +1098,7 @@ class Customer_Provider extends Component {
                                                         <th>{t("code")}</th>
                                                         <th>{t("number")}</th>
                                                         <th>{t("main")}</th>
-                                                        <th>{t("action")}</th>
+                                                       {!isView &&   <th>{t("action")}</th> }
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1101,8 +1131,8 @@ class Customer_Provider extends Component {
                                                                                   "no"
                                                                               )}
                                                                     </td>
-                                                                    <td>
-                                                                        <Button
+                                                                    {!isView &&  <td>
+                                                                      <Button
                                                                             variant="danger"
                                                                             className=""
                                                                             onClick={() =>
@@ -1114,7 +1144,7 @@ class Customer_Provider extends Component {
                                                                             {" "}
                                                                             <i className="fas fa-trash" />
                                                                         </Button>
-                                                                    </td>
+                                                                    </td>}
                                                                 </tr>
                                                             )
                                                         )}
@@ -1136,7 +1166,7 @@ class Customer_Provider extends Component {
                             {this.state.processing ? (
                                 <div className="lds-dual-ring-2"></div>
                             ) : (
-                                <Button
+                                !isView && <Button
                                     variant="primary"
                                     className=""
                                     type="submit"

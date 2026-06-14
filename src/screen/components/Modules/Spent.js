@@ -2,7 +2,7 @@ import React, { Component,createRef } from "react";
 
 import DataTable from "datatables.net-react";
 import DT from "datatables.net-dt";
-import {Container, Row, Col,  Button, Modal, Form, Alert} from "react-bootstrap";
+import {Container, Row, Col,  Button, Modal, Form} from "react-bootstrap";
 import Table from "react-bootstrap/Table";
 import { url } from "screen/components/services/api";
 import crypto from "crypto-js";
@@ -22,6 +22,7 @@ class Spent extends Component {
     this.state = {
       tableData: [],
       show: false,
+      isView:false,
       processing: true,
      
 
@@ -312,7 +313,7 @@ _saveStateVariable = async (e) => {
       },
     );
 
-  getSpentById = (id) => {
+  getSpentById = (id, isView = false)  => {
     const { t } = this.props;
 
     AppUtil.getAPI(`gastos/${id}`).then(
@@ -321,12 +322,12 @@ _saveStateVariable = async (e) => {
           const spent = response.data;
           spent.createElectronicDoc = spent.tipo_documento_id === 6 ? 1:0; 
           const lines = spent.gastosDetalle;
-          console.log(spent);
-          
+
           this.setState({
               spent,
               lines,
               show: true,
+              isView
             });
 
         } else {
@@ -429,7 +430,7 @@ _saveStateVariable = async (e) => {
     return (
 
       <ActionButtons
-        viewAction={() => this.getSpentById(rowData.id)}
+        viewAction={() => this.getSpentById(rowData.id, true)}
         editAction={() => this.getSpentById(rowData.id)}
       />
     );
@@ -444,9 +445,7 @@ _saveStateVariable = async (e) => {
       paymentMethods,
       providers,
       commercialCodes,
-      error,
-      errorMsg,
-      color,
+  isView,
       processing,
       token,
       taxes,
@@ -546,7 +545,7 @@ _saveStateVariable = async (e) => {
           >
             <Modal.Header closeButton>
               <h3 className="tituloFerias">
-                {spent.id === 0 ? t("create_spent") : t("edit_spent")}
+                {spent.id === 0 ? t("create") : (isView ? t("view") :t("edit"))}
               </h3>
             </Modal.Header>
 
@@ -566,6 +565,7 @@ _saveStateVariable = async (e) => {
                           required
                           maxLength={150}
                           value={spent.doc_Referencia}
+                          disabled={isView}
                         />
                       </Form.Group>
                     </Col>
@@ -582,6 +582,8 @@ _saveStateVariable = async (e) => {
                           required
                           maxLength={800}
                           value={spent.descripcion}
+                          disabled={isView}
+
                         />
                       </Form.Group>
                     </Col>
@@ -595,6 +597,8 @@ _saveStateVariable = async (e) => {
                           onChange={this._saveStateVariable}
                           value={spent.categoria_gasto_id}
                           required
+                          disabled={isView}
+
                         >
                           <option value="">{t("select_option")}</option>
                           {categories.map((item) => (
@@ -616,6 +620,8 @@ _saveStateVariable = async (e) => {
                           onChange={this._saveStateVariable}
                           value={spent.medio_pago_id}
                           required
+                          disabled={isView}
+
                         >
                           <option value="">{t("select_option")}</option>
                           {paymentMethods.map((item) => (
@@ -637,6 +643,8 @@ _saveStateVariable = async (e) => {
                           onChange={this._saveStateVariable}
                           value={spent.tipo_moneda_id}
                           required
+                          disabled={isView}
+
                         >
                           <option value="">{t("select_option")}</option>
                           {this.state.currency.map((item) => (
@@ -665,6 +673,8 @@ _saveStateVariable = async (e) => {
                             onChange={(value) => this.setState({ spent: { ...this.state.spent, proveedor_id: value.id}}) }
                             getOptionValue={(option) => option.id}
                             getOptionLabel={(option) => `${option.nombre} ${option.apellido1}`}
+                          disabled={isView}
+
                             defaultValue={() =>
                               providers?.find(
                                 (opt) => opt.id === spent.proveedor_id,
@@ -683,6 +693,8 @@ _saveStateVariable = async (e) => {
                                                       name="createElectronicDoc"
                                                       onChange={this._saveStateVariable}
                                                       checked={spent.createElectronicDoc ===1 ? true:false}
+                          disabled={isView}
+
                                                       />
                                               </Form.Group>
               
@@ -692,8 +704,10 @@ _saveStateVariable = async (e) => {
                   </Row>
 
                   {/* ── SECCIÓN DE DETALLES ── */}
-                  <div className="well mt-3">
+                  
+                 <div className="well mt-3">
                     <Form onSubmit={this.addLine}>
+                       {!isView && <div>
                       <Row className="m-2">
                         <Col sm="12" xl="4">
                           <label className="txt-darkblue">
@@ -836,6 +850,7 @@ _saveStateVariable = async (e) => {
                           </Button>
                         </Col>
                       </Row>
+                      </div>}
 
                       {/* ── TABLA DE LÍNEAS ── */}
                       <Row className="m-3">
@@ -908,7 +923,7 @@ _saveStateVariable = async (e) => {
               {processing ? (
                 <div className="lds-dual-ring-2" />
               ) : (
-                <Button
+              !isView &&  <Button
                   variant="primary"
                   className=""
                   onClick={this.saveSpent}

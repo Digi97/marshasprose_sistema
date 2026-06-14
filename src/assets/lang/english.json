@@ -191,6 +191,9 @@
 "success":"Success",
 "session_expired":"Your session has expired",
 "session_ended":"Your session has been successfully closed",
-"code_required":"The verification code field is required"
+"code_required":"The verification code field is required",
+"edit":"Edit",
+"view":"View",
+"today":"Today"
   }
 }

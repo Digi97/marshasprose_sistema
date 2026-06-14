@@ -1,7 +1,7 @@
 import React, { Component, createRef } from "react";
 import DataTable from "datatables.net-react";
 import DT from "datatables.net-dt";
-import {  Container,  Row,    Col,    Button,    Modal,    Tabs,    Tab,    Form,    Alert} from "react-bootstrap";
+import {  Container,  Row,    Col,    Button,    Modal,    Tabs,    Tab,    Form} from "react-bootstrap";
 import Table from "react-bootstrap/Table";
 import { url } from "screen/components/services/api";
 import crypto from "crypto-js";
@@ -12,6 +12,8 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import moment from 'moment-timezone'
 import Tooltip from 'react-bootstrap/Tooltip';
 import alertSuccess from "../common/SweetAlert";
+import ActionButtons from "../common/ActionButtons";
+
 
 DataTable.use(DT);
 
@@ -22,7 +24,7 @@ class Invoice extends Component {
         this.state = {
             // ── Modal principal (crear/editar factura)
             show: false,
-
+            isView:false,
             // ── Modal aceptación de facturas
             showAcceptance: false,
 
@@ -78,7 +80,8 @@ class Invoice extends Component {
             commercialCodes: [],
             cabyCodes: [],
             selectedCabys:[],
-
+            dolar_compra:           localStorage.getItem("dolar_compra"),
+            dolar_venta:           localStorage.getItem("dolar_venta"),
             defaultTax: 0,
             formatoFecha:"DD-MM-YYYY",
             token: "",
@@ -371,15 +374,16 @@ class Invoice extends Component {
     // CONSULTAR POR ID (edición)
     // ─────────────────────────────────────────────
 
-    getInvoiceById = (id) => {
+    getInvoiceById = (id, isView = false) => {
         const { t } = this.props;
 
         AppUtil.getAPI(`facturas/${id}`, ).then((response) => {
             if (response.codeStatus === 200) {
                 const invoiceData = response.data;
-                const lines       = invoiceData.Factura_Detalles || [];
-
-                delete invoiceData.Factura_Detalles;
+                const lines       = invoiceData.factura_Detalles || [];
+     
+                
+                delete invoiceData.factura_Detalles;
 
                 this.setState({
                     invoice: {
@@ -404,6 +408,7 @@ class Invoice extends Component {
                     },
                     lines,
                     show:  true,
+                    isView
                     
                 });
             } else {
@@ -413,7 +418,7 @@ class Invoice extends Component {
     };
     saveInvoice = () => {
         const { t } = this.props;
-        const { invoice, lines } = this.state;
+        const { invoice, lines, dolar_compra,dolar_venta } = this.state;
 
         // Validaciones
         if (!invoice.clave) {
@@ -448,8 +453,8 @@ class Invoice extends Component {
         this.setState({ processing: true });
 
         // Adjuntar líneas al payload
-        const payload = { ...invoice, Factura_Detalles: lines };
-
+        const payload = { ...invoice, Factura_Detalles: lines, cambio_compra:dolar_compra, cambio_venta:dolar_venta };
+        
         if (invoice.id === 0) {
             // ── CREAR
             AppUtil.postAPI("facturas", payload).then((response) => {
@@ -538,17 +543,10 @@ alertSuccess(t(response.message),"error",t);
     // ─────────────────────────────────────────────
 
     ActionButtons = (rowData) => (
-        <Row className="m-2">
-            <Col lg="12" sm="12">
-                <Button
-                    variant="info"
-                    className=""
-                    onClick={() => this.getInvoiceById(rowData.id)}
-                >
-                    <i className="fas fa-pen" />
-                </Button>
-            </Col>
-        </Row>
+        <ActionButtons 
+            editAction ={() => this.getInvoiceById(rowData.id)}
+            viewAction={() => this.getInvoiceById(rowData.id, true)}   
+        />
     );
 
     
@@ -589,9 +587,7 @@ alertSuccess(t(response.message),"error",t);
             taxes,
             commercialCodes,
             cabyCodes,
-            error,
-            errorMsg,
-            color,
+            isView,
             processing,
             token,
             AuxLine,
@@ -750,8 +746,9 @@ alertSuccess(t(response.message),"error",t);
                                             onChange={this._saveStateVariable}
                                             name="clave"
                                             required
-                                            //maxLength={50}
+                                            maxLength={50}
                                             value={invoice.clave}
+                                            disabled={isView}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -767,6 +764,8 @@ alertSuccess(t(response.message),"error",t);
                                             required
                                             maxLength={45}
                                             value={invoice.consecutivo_electronico}
+                                            disabled={isView}
+
                                         />
                                     </Form.Group>
                                 </Col>
@@ -777,7 +776,10 @@ alertSuccess(t(response.message),"error",t);
                                 <Col sm="12" xl="6">
                                     <label className="txt-darkblue">{t("currency")}</label>
                                     <Form.Group>
-                                        <Form.Select name="tipo_moneda_id" onChange={this._saveStateVariable} value={invoice.tipo_moneda_id} required>
+                                        <Form.Select   name="tipo_moneda_id" onChange={this._saveStateVariable} value={invoice.tipo_moneda_id} required
+                                        
+                                            disabled={isView}
+                                        >
                                             <option value="">{t("select_option")}</option>
                                             {currencies.map((item) => (
                                                 <option key={item.id} value={item.id}>{item.nombre}</option>
@@ -788,7 +790,9 @@ alertSuccess(t(response.message),"error",t);
                                 <Col sm="12" xl="6">
                                     <label className="txt-darkblue">{t("sale_condition")}</label>
                                     <Form.Group>
-                                        <Form.Select name="condicion_venta_id" onChange={this._saveStateVariable} value={invoice.condicion_venta_id} required>
+                                        <Form.Select name="condicion_venta_id" onChange={this._saveStateVariable} value={invoice.condicion_venta_id} required 
+                                            disabled={isView}
+                                        >
                                             <option value="">{t("select_option")}</option>
                                             {saleConditions.map((item) => (
                                                 <option key={item.id} value={item.id}>{item.descripcion}</option>
@@ -803,7 +807,7 @@ alertSuccess(t(response.message),"error",t);
                                 <Col sm="12" xl="12">
                                     <label className="txt-darkblue">{t("payment_method")}</label>
                                     <Form.Group>
-                                        <Form.Select name="medio_pago_id" onChange={this._saveStateVariable} value={invoice.medio_pago_id} required>
+                                        <Form.Select name="medio_pago_id" onChange={this._saveStateVariable} value={invoice.medio_pago_id} required disabled={isView}>
                                             <option value="">{t("select_option")}</option>
                                             {paymentMethods.map((item) => (
                                                 <option key={item.id} value={item.id}>{item.descripcion}</option>
@@ -827,7 +831,8 @@ alertSuccess(t(response.message),"error",t);
                                             step="0.01"
                                             readOnly
                                             onChange={this._saveStateVariable}
-                                            value={invoice.cambio_venta}
+                                            value={this.state.dolar_venta}
+                                            disabled={isView}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -842,7 +847,8 @@ alertSuccess(t(response.message),"error",t);
                                             step="0.01"
                                             readOnly
                                             onChange={this._saveStateVariable}
-                                            value={invoice.cambio_compra}
+                                            value={this.state.dolar_compra}
+                                            disabled={isView}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -859,6 +865,7 @@ alertSuccess(t(response.message),"error",t);
                                         name="clientes_id"
                                        // onChange={(value) => this.setState({ spent: { ...this.state.spent, proveedor_id: value.id}}) }
                                         getOptionValue={(option) => option.id}
+                                        disabled={isView}
                                         getOptionLabel={(option) => `${option.nombre} ${option.apellido1} ${option.apellido2}`}
                                         defaultValue={() =>
                                           customers?.find(
@@ -872,9 +879,13 @@ alertSuccess(t(response.message),"error",t);
                             </Row>
 
                             {/* ══ SECCIÓN DE LÍNEAS DE DETALLE ══ */}
-                            <div className="well mt-3">
+                      <div className="well mt-3">
                                 <Form onSubmit={this.addLine}>
+                         {!isView && <div>
 
+
+
+                         
                                     {/* Código CABYS / Código Comercial */}
                                     <Row className="m-2">
                                         <Col sm="12" xl="6">
@@ -882,6 +893,7 @@ alertSuccess(t(response.message),"error",t);
                                             <Form.Group>
                                         <Select
                                         options={cabyCodes}
+                                        
                                         onChange={(selectedCabys) => {
                                          this.setState({ selectedCabys })}}
                                     
@@ -917,6 +929,7 @@ alertSuccess(t(response.message),"error",t);
                                                     name="detalle"
                                                     required
                                                     maxLength={200}
+                                                    
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -1026,7 +1039,7 @@ alertSuccess(t(response.message),"error",t);
                                             </Button>
                                         </Col>
                                     </Row>
-
+</div>}
                                     {/* Tabla de líneas */}
                                     <Row className="m-3">
                                         <Col sm="12" xl="12">
@@ -1042,7 +1055,7 @@ alertSuccess(t(response.message),"error",t);
                                                         <th>{t("discount")}</th>
                                                         <th>{t("tax")}</th>
                                                         <th>{t("total")}</th>
-                                                        <th>{t("action")}</th>
+                                                        {!isView && <th>{t("action")}</th>}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1058,7 +1071,7 @@ alertSuccess(t(response.message),"error",t);
                                                                 <td>{line.descuento}</td>
                                                                 <td>{line.impuesto}</td>
                                                                 <td>{line.total}</td>
-                                                                <td>
+                                                                {!isView && <td>
                                                                     <Button
                                                                         variant="danger"
                                                                         className=""
@@ -1066,7 +1079,7 @@ alertSuccess(t(response.message),"error",t);
                                                                     >
                                                                         <i className="fas fa-trash" />
                                                                     </Button>
-                                                                </td>
+                                                                </td>}
                                                             </tr>
                                                         ))}
                                                 </tbody>
@@ -1078,7 +1091,7 @@ alertSuccess(t(response.message),"error",t);
                                                             <td>{(invoice.descuento || 0).toFixed(2)}</td>
                                                             <td>{(invoice.impuesto || 0).toFixed(2)}</td>
                                                             <td>{(invoice.total || 0).toFixed(2)}</td>
-                                                            <td />
+                                                            {!isView && <td />}
                                                         </tr>
                                                     </tfoot>
                                                 )}
@@ -1096,7 +1109,7 @@ alertSuccess(t(response.message),"error",t);
                             {processing ? (
                                 <div className="lds-dual-ring-2" />
                             ) : (
-                                <Button variant="primary" className="" onClick={this.saveInvoice}>
+                                !isView && <Button variant="primary" className="" onClick={this.saveInvoice}>
                                     {t("save")}
                                 </Button>
                             )}
