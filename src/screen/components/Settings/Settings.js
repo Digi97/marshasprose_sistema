@@ -4,6 +4,8 @@ import AppUtil from "../../../AppUtil/AppUtil.js";
 import Toast from "../common/Toast.js";
 import Select from "react-select";
 import { withTranslation } from "react-i18next";
+import { url } from "../services/api";
+import Axios from 'axios'
 
 import alertSuccess from "../common/SweetAlert.js";
 
@@ -61,7 +63,8 @@ class Settings extends Component {
         if (response) {
           if (response.codeStatus === 200) {
             let empresa = response ? response.data : [];
-
+            console.log(empresa);
+            
             this.setState({ empresa, processing: false });
           } else {
             alertSuccess(t(response.message), "error", t);
@@ -98,6 +101,15 @@ class Settings extends Component {
 
   _saveStateVariable = async (e) => {
     const { name, type, checked, value } = e.target;
+
+    
+        if (name === "provincia_id") {
+            this.getCanton(value);
+        }
+
+        if (name === "canton_id") {
+            this.getDistrito(value);
+        }
 
     await this.setState({
       empresa: {
@@ -140,12 +152,85 @@ class Settings extends Component {
       // this.setState({user});
     });
   };
+
+
+  uploadLlave =  (archivo) => {
+    const {t} = this.props;
+    const sessionId = sessionStorage.getItem("sessionId") || "";
+    const formData  = new FormData();
+    formData.append("file", archivo);
+
+    console.log(Axios.interceptors.request.handlers);
+    Axios.interceptors.request.handlers = [];
+Axios.interceptors.response.handlers = [];
+
+   Axios.post( `${url}empresa/upload-llave`, formData,
+        { headers: { "X-Session-Id": sessionId, Accept: "application/json" }
+        }
+    ).then((response) =>{
+
+    console.log(response); 
+      if(response.codeStatus===200)
+      {
+            alertSuccess(t('file_saved'), "success", t);
+
+      } else
+      {
+   
+            alertSuccess(t(response.message), "error", t);
+
+      }
+
+
+    }).catch((e) =>{
+      console.log(e);
+      
+
+         if (e.response?.status === 401) 
+          {
+                sessionStorage.setItem("expired", true);
+                window.location.href = "/";
+                return;
+          }
+
+
+            alertSuccess(t(e.response), "error", t);
+
+    });
+  
+};
+
+
   //#endregion
   componentDidMount() {
     this.logCatalogInfo().then(() => {
       this.getEmpresaById();
+       this.getProvincia();
     });
   }
+
+
+
+   getProvincia = () =>
+          AppUtil.getAPI(`ubicacion/provincia`).then((response) => {
+              let province = response ? response.data : [];
+              this.setState({ province });
+          });
+  
+      getCanton = (id = 1) =>
+          AppUtil.getAPI(`ubicacion/canton/provincia/${id}`).then((response) => {
+              let canton = response ? response.data : [];
+              this.setState({ canton });
+          });
+  
+      getDistrito = (id = 1) =>
+          AppUtil.getAPI(`ubicacion/distrito/canton/${id}`).then((response) => {
+              let district = response ? response.data : [];
+              this.setState({ district });
+          });
+
+
+
 
   _setProcessing = (processing) => this.setState({ processing });
 
@@ -293,6 +378,200 @@ class Settings extends Component {
                   <h4 className="txt-blue">{t("electronic_invoice")}</h4>
 
                   <Row>
+
+                        <Col xl="12" sm="12" md="12">
+                      <Form.Group>
+                        <Form.Label className="txt-darkblue">
+                          {t("user_doc_elec")}
+                        </Form.Label>
+                        <Form.Control
+                          placeholder={t("user_doc_elec")}
+                          name="usuario_hacienda"
+                          onChange={this._saveStateVariable}
+                          required
+                          value={empresa.usuario_hacienda}
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+
+                    
+                        <Col xl="12" sm="12" md="12">
+                      <Form.Group>
+                        <Form.Label className="txt-darkblue">
+                          {t("pwd_doc_elec")}
+                        </Form.Label>
+                        <Form.Control
+                          placeholder={t("pwd_doc_elec")}
+                          name="contrasena_hacienda"
+                          onChange={this._saveStateVariable}
+                          
+                          value={empresa.contrasena_hacienda}
+                          type="password"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+
+                 
+
+
+                    
+                                                    <Col sm="12" xl="4">
+                                                        <label className="txt-darkblue">
+                                                            {t("province")}
+                                                        </label>
+                                                        <Form.Group>
+                                                            <Form.Select
+                                                                placeholder={t("province")}
+                                                                onChange={this._saveStateVariable}
+                                                                name="provincia_id"
+                                                                required
+                    
+                                                            >
+                                                                <option value="">
+                                                                    {t("select_option")}
+                                                                </option>
+                                                                {this.state.province?.map(
+                                                                    (item, key) =>
+                                                                        item.id ===
+                                                                        this.state.empresa
+                                                                            ?.provincia_id ? (
+                                                                            <option
+                                                                                value={item.id}
+                                                                                selected
+                                                                                defaultValue
+                                                                                key={key}
+                                                                            >
+                                                                                {item.nombre}
+                                                                            </option>
+                                                                        ) : (
+                                                                            <option
+                                                                                value={item.id}
+                                                                                key={key}
+                                                                            >
+                                                                                {item.nombre}
+                                                                            </option>
+                                                                        )
+                                                                )}
+                                                            </Form.Select>
+                                                        </Form.Group>
+                                                    </Col>
+                    
+                                                    <Col sm="12" xl="4">
+                                                        <label className="txt-darkblue">
+                                                            {t("canton")}
+                                                        </label>
+                                                        <Form.Group>
+                                                            <Form.Select
+                                                                placeholder={t("canton")}
+                                                                onChange={this._saveStateVariable}
+                                                                name="canton_id"
+                                                                required
+                    
+                                                            >
+                                                                <option value="">
+                                                                    {t("select_option")}
+                                                                </option>
+                                                                {this.state.canton?.map(
+                                                                    (item, key) =>
+                                                                        item.id ===
+                                                                        this.state.empresa
+                                                                            ?.canton_id ? (
+                                                                            <option
+                                                                                value={item.id}
+                                                                                selected
+                                                                                defaultValue
+                                                                                key={key}
+                                                                            >
+                                                                                {item.nombre}
+                                                                            </option>
+                                                                        ) : (
+                                                                            <option
+                                                                                value={item.id}
+                                                                                key={key}
+                                                                            >
+                                                                                {item.nombre}
+                                                                            </option>
+                                                                        )
+                                                                )}
+                                                            </Form.Select>
+                                                        </Form.Group>
+                                                    </Col>
+                    
+                                                    <Col sm="12" xl="4">
+                                                        <label className="txt-darkblue">
+                                                            {t("district")}
+                                                        </label>
+                                                        <Form.Group>
+                                                            <Form.Select
+                                                                placeholder={t("district")}
+                                                                onChange={this._saveStateVariable}
+                                                                name="distrito_id"
+                                                                required
+                    
+                                                            >
+                                                                <option value="">
+                                                                    {t("select_option")}
+                                                                </option>
+                                                                {this.state.district?.map(
+                                                                    (item, key) =>
+                                                                        item.id ===
+                                                                        this.state.empresa
+                                                                            ?.distrito_id ? (
+                                                                            <option
+                                                                                value={item.id}
+                                                                                selected
+                                                                                defaultValue
+                                                                                key={key}
+                                                                            >
+                                                                                {item.nombre}
+                                                                            </option>
+                                                                        ) : (
+                                                                            <option
+                                                                                value={item.id}
+                                                                                key={key}
+                                                                            >
+                                                                                {item.nombre}
+                                                                            </option>
+                                                                        )
+                                                                )}
+                                                            </Form.Select>
+                                                        </Form.Group>
+                                                    </Col>
+                                         
+
+   <Col xl="12" sm="12" md="12">
+                      <Form.Group>
+                        <Form.Label className="txt-darkblue">
+                          {t("phone_code")}
+                        </Form.Label>
+                        <Form.Control
+                          placeholder={t("phone_code")}
+                          name="codigo_telefono"
+                          onChange={this._saveStateVariable}
+                          required
+                          value={empresa.codigo_telefono}
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                                   <Col xl="12" sm="12" md="12">
+                      <Form.Group>
+                        <Form.Label className="txt-darkblue">
+                          {t("phone")}
+                        </Form.Label>
+                        <Form.Control
+                          placeholder={t("phone")}
+                          name="telefono"
+                          onChange={this._saveStateVariable}
+                          required
+                          value={empresa.telefono}
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+
+
                     <Col xl="12" sm="12" md="12">
                       <Form.Group>
                         <Form.Label className="txt-darkblue">
@@ -318,9 +597,11 @@ class Settings extends Component {
                           type="file"
                           placeholder={t("invoice_key")}
                           name="Ruta_llave_factura"
-                          onChange={this._saveStateVariable}
-                          value={empresa.ruta_llave_factura}
+                          
+                          accept=".p12"
+                          onChange={(e) => this.uploadLlave(e.target.files[0])}
                         ></Form.Control>
+                               {empresa.ruta_llave_factura !== "" && <span className={`badge_status badge-active`} > <i className={"fas fa-circle-file"} aria-hidden="true"></i> {t("file")}: {empresa.ruta_llave_factura} </span>}
                       </Form.Group>
                     </Col>
 
@@ -418,6 +699,100 @@ class Settings extends Component {
                 </div>
               </Tab>
 
+              <Tab eventKey="smtp" title={
+                  <span>
+                    <i className="fas fa-mail"></i> {t("smtp")}
+                  </span>
+                }>
+                  <Row className="">
+                     
+                    <Col xl="12" sm="12" md="12">
+                      <Form.Group>
+                        <Form.Label className="txt-darkblue">
+                          {t("smtp_mail")}
+                        </Form.Label>
+                        <Form.Control
+                          placeholder={t("smtp_mail")}
+                          name="correo_smtp"
+                          onChange={this._saveStateVariable}
+                          
+                          type="email"
+                          value={empresa.correo_smtp}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+
+                      <Col xl="12" sm="12" md="12">
+                      <Form.Group>
+                        <Form.Label className="txt-darkblue">
+                          {t("smtp_pwd")}
+                        </Form.Label>
+                        <Form.Control
+                          placeholder={t("smtp_pwd")}
+                          name="contrasena_smtp"
+                          onChange={this._saveStateVariable}
+                          
+                          type="password"
+                          value={empresa.contrasena_smtp}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+
+                          <Col xl="12" sm="12" md="12">
+                      <Form.Group>
+                        <Form.Label className="txt-darkblue">
+                          {t("smtp_provider")}
+                        </Form.Label>
+                        <Form.Control
+                          placeholder={t("smtp_provider")}
+                          name="proveedor_SMTP"
+                          onChange={this._saveStateVariable}
+                          
+                          type="text"
+                          value={empresa.proveedor_SMTP}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+
+                <Col xl="12" sm="12" md="12">
+                      <Form.Group>
+                        <Form.Label className="txt-darkblue">
+                          {t("port_smtp")}
+                        </Form.Label>
+                        <Form.Control
+                          placeholder={"22"}
+                          name="puerto_SMTP"
+                          onChange={this._saveStateVariable}
+                          
+                          type="number"
+                          value={empresa.puerto_SMTP}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+
+                  <Col xl="12" sm="12" md="12">
+                      <Form.Group>
+                        <Form.Label className="txt-darkblue">
+                          {t("subject_smtp")}
+                        </Form.Label>
+                        <Form.Control
+                          placeholder={t("subject_smtp")}
+                          name="asunto_SMTP"
+                          onChange={this._saveStateVariable}
+                          
+                          type="text"
+                          value={empresa.asunto_SMTP}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col> 
+
+
+
+                  </Row>
+
+
+              </Tab>
+
               <Tab
                 eventKey="catalogs"
                 title={
@@ -430,255 +805,255 @@ class Settings extends Component {
                   <div className="list-group">
                     <a
                       href="/home/settings/maintenance/currency"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("currency")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("currency")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("currency_description")}</p>
+                      <p className="mb-1">{t("currency_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/activity_code"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("activity_code")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("activity_code")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("activity_code_description")}</p>
+                      <p className="mb-1">{t("activity_code_description")}</p>
                     </a>
                     <a
                       href="/home/settings/maintenance/payment_method"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("payment_method")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("payment_method")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("payment_method_description")}</p>
+                      <p className="mb-1">{t("payment_method_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/accounting_account"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("accounting_account")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("accounting_account")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("accounting_account_description")}</p>
+                      <p className="mb-1">{t("accounting_account_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/type_accounting_account"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("type_accounting_account")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("type_accounting_account")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">
+                      <p className="mb-1">
                         {t("type_accounting_account_description")}
                       </p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/invoice_status"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("invoice_status")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("invoice_status")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("invoice_status_description")}</p>
+                      <p className="mb-1">{t("invoice_status_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/rol"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("rol")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("rol")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("rol_description")}</p>
+                      <p className="mb-1">{t("rol_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/presupuestary_category"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("presupuestary_category")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("presupuestary_category")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">
+                      <p className="mb-1">
                         {t("presupuestary_category_description")}
                       </p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/file_type"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("file_type")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("file_type")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("file_type_description")}</p>
+                      <p className="mb-1">{t("file_type_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/tax_type"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("tax_type")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("tax_type")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("tax_type_description")}</p>
+                      <p className="mb-1">{t("tax_type_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/sale_condition"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("sale_condition")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("sale_condition")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("sale_condition_description")}</p>
+                      <p className="mb-1">{t("sale_condition_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/document_type"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("document_type")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("document_type")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("document_type_description")}</p>
+                      <p className="mb-1">{t("document_type_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/expenses_category"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("expenses_category")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("expenses_category")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("expenses_category_description")}</p>
+                      <p className="mb-1">{t("expenses_category_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/measurement_unity"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("measurement_unity")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("measurement_unity")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("measurement_unity_description")}</p>
+                      <p className="mb-1">{t("measurement_unity_description")}</p>
                     </a>
                     <a
                       href="/home/settings/maintenance/comercial_code"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("comercial_code")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("comercial_code")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("comercial_code_description")}</p>
+                      <p className="mb-1">{t("comercial_code_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/cabys_code"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("cabys_code")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("cabys_code")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("cabys_code_description")}</p>
+                      <p className="mb-1">{t("cabys_code_description")}</p>
                     </a>
 
                     <a
                       href="/home/settings/maintenance/cost_center"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("cost_center")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("cost_center")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("cost_center_description")}</p>
+                      <p className="mb-1">{t("cost_center_description")}</p>
                     </a>
                     <a
                       href="/home/settings/maintenance/permissions"
-                      class="list-group-item list-group-item-action"
+                      className="list-group-item list-group-item-action"
                       aria-current="true"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{t("permissions")}</h5>
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-1">{t("permissions")}</h5>
                         <small>
                           <i className="fas fa-arrow-right"></i>
                         </small>
                       </div>
-                      <p class="mb-1">{t("permissions_description")}</p>
+                      <p className="mb-1">{t("permissions_description")}</p>
                     </a>
                   </div>
                 </div>

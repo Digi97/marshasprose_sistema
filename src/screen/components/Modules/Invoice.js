@@ -86,7 +86,7 @@ class Invoice extends Component {
             formatoFecha:"DD-MM-YYYY",
             token: "",
         };
-
+this.impuestoSelectRef = React.createRef(); 
         this.datatableRef = createRef();
         this.user = null;
     }
@@ -253,6 +253,7 @@ class Invoice extends Component {
             total:                     parseFloat(formData.get("total"))      || 0,
             Unidad_medida_id:          1, // por defecto
             Facturas_id:               0, // se asigna tras crear el encabezado
+            impuesto_id: parseFloat(formData.get("impuesto_id"))      || 0,
         };
 
         this.setState(
@@ -318,10 +319,7 @@ class Invoice extends Component {
             this.setState({ saleConditions: response ? response.data : [] });
         });
 
-    getTaxes = () =>
-        AppUtil.getAPI("catalogos/impuesto").then((response) => {
-            this.setState({ taxes: response ? response.data : [] });
-        });
+
 
     getCommercialCodes = () =>
         AppUtil.getAPI("catalogos/codigo_comercial").then((response) => {
@@ -455,6 +453,7 @@ class Invoice extends Component {
         // Adjuntar líneas al payload
         const payload = { ...invoice, Factura_Detalles: lines, cambio_compra:dolar_compra, cambio_venta:dolar_venta };
         
+        
         if (invoice.id === 0) {
             // ── CREAR
             AppUtil.postAPI("facturas", payload).then((response) => {
@@ -566,6 +565,42 @@ alertSuccess(t(response.message),"error",t);
         </Row>
         
     );
+
+    getTaxes = () =>
+    AppUtil.getAPI(`catalogos/impuesto`, sessionStorage.getItem("token")).then(
+        (response) => {
+            let taxes = response ? response.data : [];
+            this.setState({ taxes }, () => {
+                // ── Una vez que los taxes están en el estado
+                // disparar el onChange del select con el impuesto default
+                this._triggerDefaultTax();
+            });
+        }
+    );
+
+_triggerDefaultTax = () => {
+    const { defaultTax } = this.state;
+
+    if (!defaultTax || !this.impuestoSelectRef.current) return;
+
+    const select = this.impuestoSelectRef.current;
+
+    // Buscar el índice de la opción con el defaultTax
+    const index = Array.from(select.options).findIndex(
+        (opt) => parseInt(opt.value) === defaultTax
+    );
+
+    if (index !== -1) {
+        // Setear el valor del select
+        select.selectedIndex = index;
+
+        // Crear evento sintético y disparar _calculaInput
+        const event = {
+            target: select
+        };
+        this._calculaInput(event, true);
+    }
+};
 
     // ─────────────────────────────────────────────
     // RENDER
@@ -969,7 +1004,7 @@ alertSuccess(t(response.message),"error",t);
                                         </Col>
                                         <Col sm="12" xl="4">
                                             <label className="txt-darkblue">{t("tax_type")}</label>
-                                            <Form.Select name="impuesto_id" onChange={(e) => this._calculaInput(e, true)} required>
+                                            <Form.Select name="impuesto_id" onChange={(e) => this._calculaInput(e, true)} required ref={this.impuestoSelectRef}>
                                                 <option value="">{t("select_option")}</option>
                                                 {taxes.map((item, key) =>
                                                     item.id === this.state.defaultTax ? (

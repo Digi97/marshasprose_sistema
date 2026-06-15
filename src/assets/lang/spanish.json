@@ -187,7 +187,19 @@
 "active_system":"Activos en sistema",
 "this_month":"Este mes",
 "total_electronic_documents":"Total de documentos electrónicos",
-"symbol":"Símbolo"
+"symbol":"Símbolo",
+"smtp":"SMTP",
+"smtp_mail":"Correo SMTP",
+"smtp_pwd":"Contraseña SMTP",
+"smtp_provider":"Proveedor SMTP",
+"port_smtp":"Puerto SMTP",
+"subject_smtp":"Asunto SMTP",
+"user_doc_elec":"Usuario Hacienda",
+"pwd_doc_elec":"Contraseña Hacienda",
+"phone":"Teléfono",
+"phone_code":"Código de teléfono",
+"file_saved":"Archivo guardado correctamente"
+
 
 
     }

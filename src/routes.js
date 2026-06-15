@@ -72,6 +72,15 @@ let dashboardRoutes = (t) =>{
     layout: "/home",
     permiso:   ROUTE_PERMISSIONS["/users"],
   },
+    {
+    path: "/reports",
+    name: t("reports"),
+    icon: "fas fa-chart-area",
+    component: Settings,
+    layout: "/home",
+    permiso:   ROUTE_PERMISSIONS["/settings"],
+  },
+
   {
     path: "/settings",
     name: t("settings"),
