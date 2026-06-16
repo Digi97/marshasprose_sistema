@@ -591,3 +591,31 @@ table.dataTable tbody td {
 .swal2-backdrop-show {
   z-index: 9998 !important;
 }
+.sidebar-light {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.sidebar-light .nav-link {
+    color: #333333;
+}
+
+.sidebar-light .nav-link.active {
+    background-color: #f0f0f0;
+}
+
+.sidebar-dark {
+    background-color: #1a1a2e;
+    color: #ffffff;
+}
+
+.sidebar-dark .nav-link {
+    color: #cccccc;
+}
+
+.sidebar-dark .nav-link.active {
+    background-color: #16213e;
+}
+.css-19bb58m{
+  margin:0px !important;
+}

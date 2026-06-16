@@ -56,12 +56,12 @@ function Header() {
 
 
   return (
-    <Navbar expand="lg">
+    <Navbar expand="lg" bg-theme={isDark ? "dark": "light"}>
       <Container fluid>
         <div className="d-flex justify-content-center align-items-center ml-lg-0">
           <Button
             variant="dark"
-            className="d-lg-none btn-fill d-flex justify-content-center align-items-center rounded-circle p-2"
+            className="d-lg-none btn-fill d-flex justify-content-center align-items-center  p-2"
             onClick={mobileSidebarToggle}
           >
             <i className="fas fa-ellipsis-v"></i>
@@ -74,8 +74,8 @@ function Header() {
           <span className="navbar-toggler-bar burger-lines"></span>
         </Navbar.Toggle>
 
-        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-          <Nav className="ml-auto" navbar>
+        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end"  >
+          <Nav className="ml-auto" navbar bg-theme={isDark ? "dark": "light"}>
 
             {/* ── Notificaciones ── */}
             <Nav.Item>

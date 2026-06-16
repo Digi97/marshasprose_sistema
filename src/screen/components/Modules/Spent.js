@@ -105,7 +105,7 @@ this.getCurrency();
   toggleShow = () =>
     this.setState({
       show: !this.state.show,
-    
+     isView:false,
       lines: [],
       spent: {
         id: 0,
@@ -705,7 +705,7 @@ _saveStateVariable = async (e) => {
 
                   {/* ── SECCIÓN DE DETALLES ── */}
                   
-                 <div className="well mt-3">
+                 <div className="card mt-3 shadow-lg">
                     <Form onSubmit={this.addLine}>
                        {!isView && <div>
                       <Row className="m-2">

@@ -18,13 +18,9 @@ function Sidebar({ color, image, routes }) {
     return location.pathname === routeName ? "active" : "";
   };
 
-  
   return (
-    <div className="sidebar" data-image={image} data-color={isDark ? "black":"white"} data-theme={isDark? "dark":"light"}>
-      <div
-        className="sidebar-background"
-
-      />
+    <div  className={`sidebar ${isDark ? "sidebar-dark" : "sidebar-light"}`} data-image={image} data-color={isDark ? "black":"white"} data-theme={isDark? "dark":"light"}>
+      <div className="sidebar-background" />
       <div className="sidebar-wrapper">
         <div className="logo d-flex align-items-center justify-content-start">
           <a

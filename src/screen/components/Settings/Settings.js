@@ -270,7 +270,8 @@ Axios.interceptors.response.handlers = [];
                 
                 <h4 className="txt-blue">{t("business_info")}</h4>
                
-                <div className="well">
+                <div className="card mt-3 shadow-lg">
+                  <div className="m-3">
                   <Form.Group>
                     <Form.Label className="txt-darkblue">
                       {t("name")}
@@ -363,6 +364,7 @@ Axios.interceptors.response.handlers = [];
                       value={empresa.identificacion}
                     ></Form.Control>
                   </Form.Group>
+                  </div>
                 </div>
               </Tab>
               {/*TAB AJUSTES FACTURACION ELECTRÓNICA*/}
@@ -374,7 +376,8 @@ Axios.interceptors.response.handlers = [];
                   </span>
                 }
               >
-                <div className="well">
+                <div className="card shadow-lg">
+                  <div className="m-3">
                   <h4 className="txt-blue">{t("electronic_invoice")}</h4>
 
                   <Row>
@@ -696,6 +699,7 @@ Axios.interceptors.response.handlers = [];
                       </Form.Group>
                     </Col>
                   </Row>
+                  </div>
                 </div>
               </Tab>
 
@@ -801,8 +805,8 @@ Axios.interceptors.response.handlers = [];
                   </span>
                 }
               >
-                <div className="well">
-                  <div className="list-group">
+                <div className="card shadow-lg">
+                  <div className=" mt-3 list-group">
                     <a
                       href="/home/settings/maintenance/currency"
                       className="list-group-item list-group-item-action"

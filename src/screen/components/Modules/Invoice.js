@@ -154,7 +154,7 @@ this.impuestoSelectRef = React.createRef();
     toggleShow = () =>{
         this.setState({
             show: !this.state.show,
-          
+           isView:false,
             lines: [],
             invoice: this._resetInvoice(),
             AuxLine: { total: "", subtotal: "", descuento: 0, impuesto: "", porcentaje: 0, cantidad: 1 },
@@ -914,7 +914,7 @@ _triggerDefaultTax = () => {
                             </Row>
 
                             {/* ══ SECCIÓN DE LÍNEAS DE DETALLE ══ */}
-                      <div className="well mt-3">
+                      <div className="card mt-3 shadow-lg">
                                 <Form onSubmit={this.addLine}>
                          {!isView && <div>
 

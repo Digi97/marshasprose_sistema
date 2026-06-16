@@ -198,7 +198,17 @@
 "pwd_doc_elec":"Contraseña Hacienda",
 "phone":"Teléfono",
 "phone_code":"Código de teléfono",
-"file_saved":"Archivo guardado correctamente"
+"file_saved":"Archivo guardado correctamente",
+"income":"Ingresos",
+"date":"Fecha",
+"reports":"Reportes",
+"download":"Descargar",
+"user_report":"Reporte Usuarios",
+"report_customer":"Reporte Clientes",
+"report_providers":"Reporte Proveedores",
+"report_invoice":"Reporte Facturas",
+"report_spent":"Reporte Gastos",
+"report_budget":"Reporte Presupuesto"
 
 
 

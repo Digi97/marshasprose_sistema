@@ -40,7 +40,8 @@ constructor(props)
     fecha_creacion:"",
     fecha_actualizacion:"",
     usuarios_Usuario_id:0,
-    centro_Costos_id:""
+    centro_Costos_id:"",
+    tipo_moneda_id: ""
   },
   cost_center:[],
   presupuestary_category:[],
@@ -74,8 +75,12 @@ this.datatableRef = createRef();
     fecha_creacion:"",
     fecha_actualizacion:"",
     usuarios_Usuario_id:0,
-    centro_Costos_id:""
-  }})
+    centro_Costos_id:"",
+    tipo_moneda_id:0,
+     
+  },isView:false,
+
+})
     _saveStateVariable = async (e) => {
 
       const {name, type, checked, value} = e.target;
@@ -211,6 +216,7 @@ if(response.codeStatus === 200)
     this.getBudget();
     this.getCostCenter(); 
     this.getCategories();
+    this.getCurrencies();
   }
 
    getUserInfo = () => {
@@ -223,12 +229,16 @@ if(response.codeStatus === 200)
       this.setState({ user: this.user, token: sessionStorage.getItem("sessionId") });
     };
 
+        getCurrencies = () =>
+            AppUtil.getAPI("catalogos/tipo_moneda").then((response) => {
+                this.setState({ currencies: response ? response.data : [] });
+            });
     //#endregion fin funciones internas
 
 
      render(){
        const { t } = this.props;
-       let {cost_center, budget, budgets, presupuestary_category, isView} = this.state;
+       let {cost_center, budget, budgets, presupuestary_category, isView, currencies} = this.state;
       return (
     <>
       <Container fluid>
@@ -316,7 +326,7 @@ if(response.codeStatus === 200)
           <Modal.Body>
           
                 <Row className="m-2">
-                  <Col sm="12" xl="6">
+                  <Col sm="12" xl="4">
                     <label>{t("code")}</label>
                    <Form.Group>
                      <Form.Control
@@ -334,7 +344,7 @@ if(response.codeStatus === 200)
                    </Form.Group>
                    </Col>
 
-                  <Col sm="12" xl="6">
+                  <Col sm="12" xl="4">
                     <label>{t("name")}</label>
                    <Form.Group>
                      <Form.Control
@@ -350,10 +360,7 @@ if(response.codeStatus === 200)
                        </Form.Control>
                    </Form.Group>
                    </Col>
-                   </Row>
-                   <Row className="m-2">
-
-                  <Col sm="12" xl="6">
+  <Col sm="12" xl="4">
                     <label>{t("description")}</label>
                    <Form.Group>
                      <Form.Control
@@ -371,8 +378,13 @@ if(response.codeStatus === 200)
                    </Form.Group>
                    </Col>
 
+                   </Row>
+                   <Row className="m-2">
 
-                <Col sm="12" xl="6">
+                
+
+
+                <Col sm="12" xl="4">
                     <label>{t("year_budget")}</label>
                    <Form.Group>
                      <Form.Control
@@ -389,11 +401,8 @@ if(response.codeStatus === 200)
                        </Form.Control>
                    </Form.Group>
                    </Col>
-                   </Row>
 
-
-             <Row className="m-2">
-                    <Col sm="12" xl="6">
+                        <Col sm="12" xl="4">
                     <label>{t("begin_period")}</label>
                    <Form.Group>
                      <Form.Control
@@ -411,8 +420,7 @@ if(response.codeStatus === 200)
                    </Form.Group>
                    </Col>
 
-
-                    <Col sm="12" xl="6">
+                      <Col sm="12" xl="4">
                     <label className="txt-darkblue">{t("end_period")}</label>
                        <Form.Group>
                            <Form.Control
@@ -429,6 +437,29 @@ if(response.codeStatus === 200)
                        </Form.Control>
                        </Form.Group>
                    </Col>
+
+
+                   </Row>
+
+
+             <Row className="m-2">
+                <Col sm="12" xl="12">
+                                                   <label className="txt-darkblue">{t("currency")}</label>
+                                                   <Form.Group>
+                                                       <Form.Select   name="tipo_moneda_id" onChange={this._saveStateVariable} value={budget.tipo_moneda_id} required
+                                                       
+                                                           disabled={isView}
+                                                       >
+                                                           <option value="">{t("select_option")}</option>
+                                                           {currencies?.map((item) => (
+                                                               <option key={item.id} value={item.id}>{item.nombre}</option>
+                                                           ))}
+                                                       </Form.Select>
+                                                   </Form.Group>
+                                               </Col>
+
+
+                 
                    </Row>
                    <Row className="m-2">
 

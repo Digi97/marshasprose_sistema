@@ -55,6 +55,7 @@ class Users extends Component {
                     roles_id: 0,
                     activo: false,
                 },
+                 isView:false,
             },
             () => {
                 this.getRoles();

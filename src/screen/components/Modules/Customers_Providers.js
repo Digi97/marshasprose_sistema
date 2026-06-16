@@ -93,6 +93,7 @@ class Customer_Provider extends Component {
                 exonerado: false,
                 otrasSenas: "",
             },
+             isView:false,
         });
 
     addPhone = (e) => {
@@ -1027,7 +1028,7 @@ class Customer_Provider extends Component {
                                 </Col>
                             </Row>
 
-                            <div className="well">
+                            <div className="card mt-3 shadow-lg">
                                 <Form onSubmit={this.addPhone}>
                                     {!isView &&<div>
                                     <Row className="m-2">

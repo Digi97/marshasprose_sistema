@@ -6,6 +6,8 @@ import Invoice from "./screen/components/Modules/Invoice.js";
 import Spent from "./screen/components/Modules/Spent.js";
 import Customers_Providers from "./screen/components/Modules/Customers_Providers.js";
 import Budget from "./screen/components/Modules/Budget.js";
+import Income from  "./screen/components/Modules/Income.js";
+import Reports from  "./screen/components/Modules/Reports.js";
 
 import crypto from "crypto-js";
 import permissions from "./permission.json";
@@ -28,6 +30,14 @@ let dashboardRoutes = (t) =>{
     name: t("invoice"),
     icon: "fas fa-file",
     component: Invoice,
+    layout: "/home",
+    permiso:ROUTE_PERMISSIONS["/invoice"],
+  },
+   {
+    path: "/income",
+    name: t("income"),
+    icon: "fas fa-line-chart",
+    component: Income,
     layout: "/home",
     permiso:ROUTE_PERMISSIONS["/invoice"],
   },
@@ -76,9 +86,9 @@ let dashboardRoutes = (t) =>{
     path: "/reports",
     name: t("reports"),
     icon: "fas fa-chart-area",
-    component: Settings,
+    component: Reports,
     layout: "/home",
-    permiso:   ROUTE_PERMISSIONS["/settings"],
+    permiso:   null,
   },
 
   {
