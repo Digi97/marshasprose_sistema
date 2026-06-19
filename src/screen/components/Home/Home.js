@@ -282,7 +282,7 @@ render(){
                     </Card>
                 </Col>
 
-                <Col lg="6" sm="6" className="mb-3">
+                <Col lg="4" sm="6" className="mb-3">
                 <Card className="shadow-sm border-0">
 <Card.Body>
     <Row className="align-items-center">
