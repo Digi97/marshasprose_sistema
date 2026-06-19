@@ -67,7 +67,35 @@ class Spent extends Component {
     };
     this.user = null;
     this.datatableRef = createRef();
+    this.impuestoSelectRef = createRef(); 
   }
+
+
+_triggerDefaultTax = () => {
+    const { defaultTax } = this.state;
+
+    if (!defaultTax || !this.impuestoSelectRef.current) return;
+
+    const select = this.impuestoSelectRef.current;
+
+    // Buscar el índice de la opción con el defaultTax
+    const index = Array.from(select.options).findIndex(
+        (opt) => parseInt(opt.value) === defaultTax
+    );
+        console.log(index);
+
+    if (index !== -1) {
+        // Setear el valor del select
+        select.selectedIndex = index;
+
+        // Crear evento sintético y disparar _calculaInput
+        const event = {
+            target: select
+        };
+           console.log(event);
+        this._calculaInput(event, true);
+    }
+};
 
 
   componentDidMount() {
@@ -123,7 +151,7 @@ this.getCurrency();
         createElectronicDoc:1,
         tipo_moneda_id:0
       },
-    });
+    }, ()=> this._triggerDefaultTax());
 
   // Actualiza campos del objeto principal spent
 _saveStateVariable = async (e) => {
@@ -778,7 +806,7 @@ _saveStateVariable = async (e) => {
 
                         <Col sm="12" xl="4">
                           <label className="txt-darkblue">{t("tax")}</label>
-                                 <Form.Select aria-label="Impuesto" name="impuesto_id" onChange={(e) => this._calculaInput(e,true) } required>
+                                 <Form.Select aria-label="Impuesto" name="impuesto_id" onChange={(e) => this._calculaInput(e,true) } required ref={ this.impuestoSelectRef }>
                                    <option value="">{t("select_option")}</option>                                
                                     {taxes?.map((item, key) =>(item.id === this.state.defaultTax  ? <option value={item.id} selected attr={item.porcentaje} key={key}>{item.nombre}</option> :  <option attr={item.porcentaje} value={item.id} key={key}>{item.nombre}</option>))}
                                   </Form.Select>                          

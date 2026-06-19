@@ -208,7 +208,11 @@
 "report_providers":"Reporte Proveedores",
 "report_invoice":"Reporte Facturas",
 "report_spent":"Reporte Gastos",
-"report_budget":"Reporte Presupuesto"
+"report_budget":"Reporte Presupuesto",
+"my_account":"Mi Cuenta",
+"logout":"Cerrar Sesión",
+"profile":"Perfil",
+"success":"¡Todo listo!"
 
 
 

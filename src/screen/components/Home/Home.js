@@ -76,7 +76,7 @@ render(){
                                     <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
                                         {t("total_users")}
                                     </p>
-                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_usuarios, true)}</h3>
+                                    <h3 className="fw-bold mb-0">{dashboardInfo.total_usuarios ?  AppUtil.formatNumber(dashboardInfo.total_usuarios, true): t("loading")}</h3>
                                 </Col>
                                 <Col xs="4" className="text-end">
                                     <div style={{
@@ -111,7 +111,7 @@ render(){
                                     <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
                                         {t("total_customers")}
                                     </p>
-                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_clientes, true)}</h3>
+                                    <h3 className="fw-bold mb-0">{dashboardInfo.total_clientes ? AppUtil.formatNumber(dashboardInfo.total_clientes, true): t("loading")}</h3>
                                 </Col>
                                 <Col xs="4" className="text-end">
                                     <div style={{
@@ -145,7 +145,7 @@ render(){
                                     <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
                                         {t("total_invoice")}
                                     </p>
-                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_facturas, true)}</h3>
+                                    <h3 className="fw-bold mb-0">{dashboardInfo.total_facturas ? AppUtil.formatNumber(dashboardInfo.total_facturas, true) : t("loading")}</h3>
                                 </Col>
                                 <Col xs="4" className="text-end">
                                     <div style={{
@@ -180,7 +180,7 @@ render(){
                                     <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
                                         {t("monthly_gains")}
                                     </p>
-                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_ganancias_mes)}</h3>
+                                    <h3 className="fw-bold mb-0">{dashboardInfo.total_ganancias_mes ? AppUtil.formatNumber(dashboardInfo.total_ganancias_mes) : t("loading")}</h3>
                                 </Col>
                                 <Col xs="4" className="text-end">
                                     <div style={{
@@ -215,7 +215,7 @@ render(){
                                     <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
                                         {t("monthly_spent")}
                                     </p>
-                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.total_gastos_mes)}</h3>
+                                    <h3 className="fw-bold mb-0">{dashboardInfo.total_gastos_mes ? AppUtil.formatNumber(dashboardInfo.total_gastos_mes): t("loading")}</h3>
                                 </Col>
                                 <Col xs="4" className="text-end">
                                     <div style={{
@@ -250,13 +250,13 @@ render(){
                                     <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
                                         {t("exchange_rate_buy")}
                                     </p>
-                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.tipo_cambio?.compra)}</h3>
+                                    <h3 className="fw-bold mb-0">{dashboardInfo.tipo_cambio ? AppUtil.formatNumber(dashboardInfo.tipo_cambio?.compra) : t("loading")}</h3>
                                 </Col>
                                 <Col xs="8">
                                     <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
                                         {t("exchange_rate_sale")}
                                     </p>
-                                    <h3 className="fw-bold mb-0">{AppUtil.formatNumber(dashboardInfo.tipo_cambio?.venta)}</h3>
+                                    <h3 className="fw-bold mb-0">{dashboardInfo.tipo_cambio ? AppUtil.formatNumber(dashboardInfo.tipo_cambio?.venta): t("loading")}</h3>
                                 </Col>
                                 <Col xs="4" className="text-end">
                                     <div style={{
@@ -280,31 +280,6 @@ render(){
                             </small>
                         </Card.Body>
                     </Card>
-                </Col>
-
-                <Col lg="4" sm="6" className="mb-3">
-                <Card className="shadow-sm border-0">
-<Card.Body>
-    <Row className="align-items-center">
-        <Col xs="8" >
-                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
-                                        {t("total_electronic_documents")}
-                                    </p>
-                                  
-                                </Col>
-                                  <Col lg="12" className="text-end">
-          <PieChart
-  data={dashboardInfo?.facturas_por_tipo_documento}
-  animate={true}
-  animationDuration={3}
-  labelStyle={{fontSize:4}}
-  label={({ dataEntry }) => {return dataEntry.percentage === 0 ? "": dataEntry.title}}
-/>
-</Col>
-</Row>
-</Card.Body>
-                </Card>
-      
                 </Col>
 
             </Row>

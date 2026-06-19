@@ -1,11 +1,10 @@
-import React, {Component, createRef} from "react";
+import React, {Component} from "react";
 import { Container, Row, Col, Tabs, Tab, Button, Form } from "react-bootstrap";
 import AppUtil from "../../../AppUtil/AppUtil.js";
 import Toast from "../common/Toast.js";
 import Select from "react-select";
 import { withTranslation } from "react-i18next";
 import { url } from "../services/api";
-import Axios from 'axios'
 
 import alertSuccess from "../common/SweetAlert.js";
 
@@ -45,15 +44,11 @@ class Settings extends Component {
       activityCode: [],
 
     };
-    this.modalTopRef = createRef();
+
   }
 
   //#region opciones_selects
-  scrollToTop = () => {
-        if (this.modalTopRef.current) {
-            this.modalTopRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }
+
 
   getEmpresaById = () => {
     const { t } = this.props;
@@ -154,51 +149,31 @@ class Settings extends Component {
   };
 
 
-  uploadLlave =  (archivo) => {
-    const {t} = this.props;
-    const sessionId = sessionStorage.getItem("sessionId") || "";
-    const formData  = new FormData();
-    formData.append("file", archivo);
+  uploadLlave = (archivo) => {
+    const { t } = this.props;
 
-    console.log(Axios.interceptors.request.handlers);
-    Axios.interceptors.request.handlers = [];
-Axios.interceptors.response.handlers = [];
+    if (!archivo) return;
 
-   Axios.post( `${url}empresa/upload-llave`, formData,
-        { headers: { "X-Session-Id": sessionId, Accept: "application/json" }
-        }
-    ).then((response) =>{
-
-    console.log(response); 
-      if(response.codeStatus===200)
-      {
-            alertSuccess(t('file_saved'), "success", t);
-
-      } else
-      {
-   
-            alertSuccess(t(response.message), "error", t);
-
+    AppUtil.fileToBase64(archivo, (error, base64) => {
+      if (error) {
+        alertSuccess(t("error"), "error", t);
+        return;
       }
 
+      const base64Content = base64.split(",")[1];
 
-    }).catch((e) =>{
-      console.log(e);
-      
-
-         if (e.response?.status === 401) 
-          {
-                sessionStorage.setItem("expired", true);
-                window.location.href = "/";
-                return;
-          }
-
-
-            alertSuccess(t(e.response), "error", t);
-
+      AppUtil.postAPI(`empresa/upload-llave`, {
+        file: base64Content,
+        fileName: archivo.name,
+      }).then((response) => {
+        if (response && response.codeStatus === 200) {
+          alertSuccess(t("file_saved"), "success", t);
+        } else {
+          alertSuccess(t(response?.message ?? "error"), "error", t);
+        }
+      });
     });
-  
-};
+  };
 
 
   //#endregion
@@ -206,6 +181,8 @@ Axios.interceptors.response.handlers = [];
     this.logCatalogInfo().then(() => {
       this.getEmpresaById();
        this.getProvincia();
+       this.getCanton(this.state.empresa.provincia_id)
+       this.getDistrito(this.state.empresa.canton_id)
     });
   }
 
@@ -550,10 +527,10 @@ Axios.interceptors.response.handlers = [];
                         </Form.Label>
                         <Form.Control
                           placeholder={t("phone_code")}
-                          name="codigo_telefono"
+                          name="codigo_Telefono"
                           onChange={this._saveStateVariable}
                           required
-                          value={empresa.codigo_telefono}
+                          value={empresa.codigo_Telefono}
                           type="text"
                         ></Form.Control>
                       </Form.Group>

@@ -68,11 +68,43 @@ class Income extends Component {
 
     this.user = null;
     this.datatableRef = createRef();
+    this.impuestoSelectRef = createRef(); 
   }
 
   componentDidMount() {
     this.getUserInfo();
   }
+
+  
+_triggerDefaultTax = () => {
+    const { defaultTax } = this.state;
+
+
+    if (!defaultTax || !this.impuestoSelectRef.current) return;
+
+    const select = this.impuestoSelectRef.current;
+
+   
+
+    // Buscar el índice de la opción con el defaultTax
+    const index = Array.from(select.options).findIndex(
+        (opt) => parseInt(opt.value) === defaultTax
+    );
+        console.log(index);
+
+    if (index !== -1) {
+        // Setear el valor del select
+        select.selectedIndex = index;
+
+        // Crear evento sintético y disparar _calculaInput
+        const event = {
+            target: select
+        };
+           console.log(event);
+        this._calculaInput(event, true);
+    }
+};
+
 
   getUserInfo = () => {
     let bytes = crypto.AES.decrypt(
@@ -122,7 +154,7 @@ class Income extends Component {
         facturas_id: null,
       },
        isView:false,
-    });
+    }, ()=> this._triggerDefaultTax());
 
   // Actualiza campos del objeto principal income
   _saveStateVariable = async (e) => {
@@ -731,6 +763,7 @@ class Income extends Component {
                             name="impuesto_id"
                             onChange={(e) => this._calculaInput(e, true)}
                             required
+                            ref={ this.impuestoSelectRef }
                           >
                             <option value="">{t("select_option")}</option>
                             {taxes?.map((item, key) =>

@@ -5,9 +5,6 @@ import AdminNavbar from "./screen/components/Layouts/Navbar";
 import Footer from "./screen/components/Layouts/Footer";
 import Sidebar from "./screen/components/Layouts/Header";
 
-import Profile from "./screen/components/Profile/profile";
-import NewProfile from "./screen/components/Profile/newProfile";
-
 //#region Mantenimientos
 import Currency from "./screen/components/Settings/Maintenance/currency";
 import Accounting_account from "./screen/components/Settings/Maintenance/accounting_account";
@@ -28,6 +25,7 @@ import Sale_Condition from "./screen/components/Settings/Maintenance/sale_condit
 import Tax_Type from "./screen/components/Settings/Maintenance/tax_type";
 import Type_Accounting_Account from "./screen/components/Settings/Maintenance/type_accounting_account";
 import { useDarkMode } from './screen/components/common/useDarkMode';
+import Profile from "screen/components/Modules/Profile";
 //#endregion
 
 import NotFound from "./screen/components/common/404.js";
@@ -99,8 +97,7 @@ function Admin() {
           <div className="content">
             <Routes>
               {getRoutes(routes)}
-              <Route path={"/home/profile"} element={<Profile />} />
-              <Route path={"/home/new-profile"} element={<NewProfile />} />
+              <Route path={"/profile"} element={<Profile />} />
               {/*Mantenimientos */}
               <Route
                 path={"/settings/maintenance/currency"}

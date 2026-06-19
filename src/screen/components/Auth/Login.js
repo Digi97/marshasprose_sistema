@@ -22,6 +22,9 @@ class Login extends Component {
 
   //previene que recargue pagina
   //cuando se da boton iniciar sesion
+
+
+  stopLoading = () => this.setState({ charging: false})
   preventSubmit(e) {
     e.preventDefault();
   }
@@ -88,22 +91,23 @@ class Login extends Component {
               window.location.href = "/home/";
             } else {
       alertSuccess(t(response.data.message), "error", t);
+      this.stopLoading();
 
             }
           } else {
       alertSuccess(t("invalid_username_or_password"), "error", t);
-
+this.stopLoading();
 
           }
         })
         .catch((error) => {
             alertSuccess(t(error.message), "error", t);
-   
+   this.stopLoading();
         });
     } else {
 
         alertSuccess(t("all_inputs_required"), "error", t);
- 
+ this.stopLoading();
     }
   };
 

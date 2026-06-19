@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Navbar, Container, Nav, Dropdown, Button } from "react-bootstrap";
 import crypto from "crypto-js";
 import { useDarkMode } from '../common/useDarkMode';
+import { t } from "i18next";
 
 
 
@@ -77,27 +78,8 @@ function Header() {
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end"  >
           <Nav className="ml-auto" navbar bg-theme={isDark ? "dark": "light"}>
 
-            {/* ── Notificaciones ── */}
-            <Nav.Item>
-              <Dropdown as={Nav.Item}>
-                <Dropdown.Toggle
-                  as={Nav.Link}
-                  data-toggle="dropdown"
-                  variant="default"
-                >
-                  <i className="nc-icon nc-notification-70"></i>
-                  <span className="d-lg-none ml-1">Notificaciones</span>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item href="#" onClick={(e) => e.preventDefault()}>
-                    Notification 1
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </Nav.Item>
-
-            {/* ── Usuario ── */}
-            <Nav.Item>
+  
+          <Nav.Item>
               <Dropdown as={Nav.Item}>
                 <Dropdown.Toggle
                   as={Nav.Link}
@@ -116,13 +98,13 @@ function Header() {
                     <small className="text-muted">{user.correo}</small>
                   </Dropdown.Header>
                   <Dropdown.Divider />
-                  <Dropdown.Item href="#" onClick={(e) => e.preventDefault()}>
+                  <Dropdown.Item href="/home/profile" >
                     <i className="fas fa-user mr-2"></i>
-                    Mi Cuenta
+                    {t("my_account")}
                   </Dropdown.Item>
                   <Dropdown.Item onClick={handleLogout}>
                     <i className="fas fa-sign-out mr-2"></i>
-                    Cerrar Sesión
+                    {t("logout")}
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>

@@ -86,7 +86,7 @@ class Invoice extends Component {
             formatoFecha:"DD-MM-YYYY",
             token: "",
         };
-this.impuestoSelectRef = React.createRef(); 
+        this.impuestoSelectRef = createRef(); 
         this.datatableRef = createRef();
         this.user = null;
     }
@@ -158,7 +158,7 @@ this.impuestoSelectRef = React.createRef();
             lines: [],
             invoice: this._resetInvoice(),
             AuxLine: { total: "", subtotal: "", descuento: 0, impuesto: "", porcentaje: 0, cantidad: 1 },
-        }, () => this.getClave());
+        }, () => {this.getClave(); this._triggerDefaultTax()});
     }
     toggleShowAcceptance = () =>
         this.setState({
@@ -573,7 +573,7 @@ alertSuccess(t(response.message),"error",t);
             this.setState({ taxes }, () => {
                 // ── Una vez que los taxes están en el estado
                 // disparar el onChange del select con el impuesto default
-                this._triggerDefaultTax();
+               
             });
         }
     );
@@ -581,14 +581,19 @@ alertSuccess(t(response.message),"error",t);
 _triggerDefaultTax = () => {
     const { defaultTax } = this.state;
 
+    
+
     if (!defaultTax || !this.impuestoSelectRef.current) return;
 
     const select = this.impuestoSelectRef.current;
+
+        console.log(select);
 
     // Buscar el índice de la opción con el defaultTax
     const index = Array.from(select.options).findIndex(
         (opt) => parseInt(opt.value) === defaultTax
     );
+        console.log(index);
 
     if (index !== -1) {
         // Setear el valor del select
@@ -598,6 +603,7 @@ _triggerDefaultTax = () => {
         const event = {
             target: select
         };
+           console.log(event);
         this._calculaInput(event, true);
     }
 };
@@ -641,12 +647,14 @@ _triggerDefaultTax = () => {
                             {/* Header */}
                             <Row>
                                 <Col lg="6" sm="12">
-                                    <h1>{t("invoice")}</h1>
+                                    <h1>{t("invoice")}</h1> 
+                                   
                                 </Col>
                                 <Col lg="6" sm="12">
+                                 
                                     <Row>
                                         <Col lg="3" sm="12">
-                                            <Button className=" " onClick={this.toggleShow}>
+                                           <Button className=" " onClick={this.toggleShow}>
                                                 {t("create")}
                                             </Button>
                                         </Col>
@@ -1006,7 +1014,7 @@ _triggerDefaultTax = () => {
                                             <label className="txt-darkblue">{t("tax_type")}</label>
                                             <Form.Select name="impuesto_id" onChange={(e) => this._calculaInput(e, true)} required ref={this.impuestoSelectRef}>
                                                 <option value="">{t("select_option")}</option>
-                                                {taxes.map((item, key) =>
+                                                {taxes?.map((item, key) =>
                                                     item.id === this.state.defaultTax ? (
                                                         <option key={key} value={item.id} attr={item.porcentaje} selected>
                                                             {item.nombre}
