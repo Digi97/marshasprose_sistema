@@ -1,4 +1,6 @@
 
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import Home from "./screen/components/Home/Home.js";
 import Users from "screen/components/Modules/Users.js";
 import Settings from "./screen/components/Settings/Settings.js";
@@ -11,6 +13,11 @@ import Reports from  "./screen/components/Modules/Reports.js";
 
 import crypto from "crypto-js";
 import permissions from "./permission.json";
+
+function BudgetWithNavigate() {
+    const navigate = useNavigate();
+    return <Budget navigate={navigate} />;
+}
 
 
 let dashboardRoutes = (t) =>{ 
@@ -70,7 +77,7 @@ let dashboardRoutes = (t) =>{
     path: "/budget_management",
     name: t("budget_management"),
     icon: "fas fa-money-bill",
-    component: Budget,
+    component: BudgetWithNavigate,
     layout: "/home",
     permiso:ROUTE_PERMISSIONS["/budget_management"]
   },

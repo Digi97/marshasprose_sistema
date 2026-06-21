@@ -212,7 +212,22 @@
 "my_account":"Mi Cuenta",
 "logout":"Cerrar Sesión",
 "profile":"Perfil",
-"success":"¡Todo listo!"
+"success":"¡Todo listo!",
+"budget_detail":"Detalle de Presupuesto",
+"user_report_filters":"Filtros — Reporte de Usuarios",
+"filter_creation_date_from":"Fecha Creación Desde",
+"filter_creation_date_to":"Fecha Creación Hasta",
+"filter_permission_type":"Tipo de Permiso",
+"filter_block_date_from":"Fecha Bloqueo Desde",
+"filter_block_date_to":"Fecha Bloqueo Hasta",
+"consult":"Consultar",
+"report_preview":"Vista Previa del Reporte",
+"no_results":"Sin resultados para mostrar",
+"customer_report_filters":"Filtros — Reporte de Clientes",
+"pdf":"PDF",
+"excel":"Excel"
+
+
 
 
 

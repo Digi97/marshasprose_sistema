@@ -179,13 +179,14 @@ if(response.codeStatus === 200)
   getBudgetById = (id, isView = false) =>
   {
 
-        AppUtil.getAPI(`gestion_presupuestaria/${id}`).then(response => {
-        
+        AppUtil.getAPI(`gestion_presupuestaria/${id}`).then(response => {        
       let budget = response ? response.data : [];      
       this.setState({budget, show:true, isView}, ()=>{this.getCostCenter(); this.getCategories()});
     });
-
   }
+
+
+
 
 
   getCategories = () => AppUtil.getAPI(`catalogos/categoria_presupuestaria`).then(response => {
@@ -202,8 +203,9 @@ if(response.codeStatus === 200)
   ActionButtons = (rowData) => (
 
       <ActionButtons
-        viewAction={() => this.getBudgetById(rowData.id,true)}
+        viewAction={() => this.getBudgetById(rowData.id, true)}
         editAction={() => this.getBudgetById(rowData.id)}
+        listAction={() => this.props.navigate(`/home/budget_detail/${rowData.id}`)}
       />
 
    

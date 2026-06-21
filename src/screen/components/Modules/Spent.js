@@ -82,7 +82,7 @@ _triggerDefaultTax = () => {
     const index = Array.from(select.options).findIndex(
         (opt) => parseInt(opt.value) === defaultTax
     );
-        console.log(index);
+      
 
     if (index !== -1) {
         // Setear el valor del select
@@ -92,7 +92,7 @@ _triggerDefaultTax = () => {
         const event = {
             target: select
         };
-           console.log(event);
+      
         this._calculaInput(event, true);
     }
 };
@@ -423,6 +423,7 @@ _saveStateVariable = async (e) => {
         } else {
 
            alertSuccess(t(response.message),"error",t);
+                 this.setState({ processing: false });
   
         }
       });
@@ -447,7 +448,7 @@ _saveStateVariable = async (e) => {
         } else {
 
                        alertSuccess(t(response.message),"error",t);
-      
+                this.setState({ processing: false });
         }
       });
     }

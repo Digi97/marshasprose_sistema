@@ -7,6 +7,11 @@ const renderActive  =(props) => {
       return (
 <Row className="m-2">
   <Col className="d-flex">
+   {props.listAction && (
+      <Button variant="info" onClick={props.listAction}>
+        <i className="fas fa-list" />
+      </Button>
+    )}
     {props.viewAction && (
       <Button variant="info" onClick={props.viewAction}>
         <i className="fas fa-eye" />

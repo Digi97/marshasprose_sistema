@@ -1,9 +1,11 @@
 import React from "react";
-import { useLocation, Route, Routes, useNavigate } from "react-router-dom";
+import { useLocation, Route, Routes, useNavigate, useParams } from "react-router-dom";
 
 import AdminNavbar from "./screen/components/Layouts/Navbar";
 import Footer from "./screen/components/Layouts/Footer";
 import Sidebar from "./screen/components/Layouts/Header";
+
+import BudgetDetail from "./screen/components/Modules/BudgetDetail";
 
 //#region Mantenimientos
 import Currency from "./screen/components/Settings/Maintenance/currency";
@@ -34,6 +36,12 @@ import dashboardRoutes from "./routes.js";
 import crypto from "crypto-js";
 
 import { useTranslation } from "react-i18next";
+
+function BudgetDetailWrapper() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  return <BudgetDetail gestionID={id} navigate={navigate} />;
+}
 
 function Admin() {
   const { t } = useTranslation();
@@ -170,6 +178,11 @@ function Admin() {
               <Route
                 path={"/settings/maintenance/permissions"}
                 element={<Permissions navigate={useNavigate()} />}
+              />
+
+              <Route
+                path={"/budget_detail/:id"}
+                element={<BudgetDetailWrapper />}
               />
 
               {/* 404 not found para los no reconocidos en home */}
