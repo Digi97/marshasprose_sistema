@@ -587,14 +587,13 @@ _triggerDefaultTax = () => {
 
     const select = this.impuestoSelectRef.current;
 
-        console.log(select);
+ 
 
     // Buscar el índice de la opción con el defaultTax
     const index = Array.from(select.options).findIndex(
         (opt) => parseInt(opt.value) === defaultTax
     );
-        console.log(index);
-
+   
     if (index !== -1) {
         // Setear el valor del select
         select.selectedIndex = index;
@@ -603,7 +602,7 @@ _triggerDefaultTax = () => {
         const event = {
             target: select
         };
-           console.log(event);
+     
         this._calculaInput(event, true);
     }
 };

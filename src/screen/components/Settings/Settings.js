@@ -58,7 +58,7 @@ class Settings extends Component {
         if (response) {
           if (response.codeStatus === 200) {
             let empresa = response ? response.data : [];
-            console.log(empresa);
+        
             
             this.setState({ empresa, processing: false });
           } else {

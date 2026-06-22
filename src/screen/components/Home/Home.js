@@ -25,7 +25,7 @@ getDashboardInfo(){
           {
 
             let dashboardInfo = response.data;
-            console.log(dashboardInfo);
+      
             
           let arrayPonerColor = dashboardInfo.facturas_por_tipo_documento;
 

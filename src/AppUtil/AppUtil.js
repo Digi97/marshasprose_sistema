@@ -69,7 +69,7 @@ const AppUtil = {
             let dataRet = response.data;
             return dataRet;
         } catch (e) {
-            console.log(e); 
+            
             
             if (e.response?.status === 401) {
                 sessionStorage.setItem("expired", true);

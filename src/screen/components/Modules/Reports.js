@@ -5,7 +5,7 @@ import crypto from "crypto-js";
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
+import Select from "react-select";
 import AppUtil from "../../../AppUtil/AppUtil";
 
 
@@ -19,6 +19,8 @@ constructor(props) {
           dashboardInfo:{},
           showUserFilterModal: false,
           showUserPreviewModal: false,
+          showReportIGFModal:false,
+          showReportIGFPreview:false,
           userFilters: {
             fechaCreacionDesde: "",
             fechaCreacionHasta: "",
@@ -33,12 +35,30 @@ constructor(props) {
             estado:true
             
           },
+          ingresoGastosFacturaFilters:{
+             fechaCreacionDesde: "",
+            fechaCreacionHasta: "",
+            clientes_id: "",
+            proveedor_id: "",
+            categoriaGastoId:"",
+            tipoDocumentoId:"",
+            medioPagoId:""
+
+
+
+          },
           userReportData: [],
           loadingReport: false,
           roles:[],
+          doc_type:[],
+          customers:[],
+          supplier:[],
           showClienteProveedorFilterModal:false,
           isSupplier:false,
-          reportName:"Report"
+          reportName:"Report",
+          isPresupuesto:false, 
+          isGasto:false, 
+          isFactura:false,
         };
 
         this.user = null;
@@ -53,21 +73,62 @@ constructor(props) {
         this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
     }
 
-    toggleUserFilterModal = () => {
-        this.setState({ showUserFilterModal: !this.state.showUserFilterModal }, ()=>{
+    toggleUserFilterModal = () => {  this.setState({ showUserFilterModal: !this.state.showUserFilterModal }, ()=>{ this.getRoles() });}
 
-            this.getRoles();
 
-        });
-    }
+    toggleIFGFilterModal = (isGasto = false, isFactura = false, isPresupuesto = false) => {  this.setState({ showReportIGFModal: !this.state.showReportIGFModal, isGasto, isFactura, isPresupuesto }, ()=>{ 
 
-        getRoles = () =>
-            AppUtil.getAPI(`catalogos/roles`).then((response) => {
+       
+
+        if(isGasto)
+        {
+            this.getProviders();
+        } else{
+            this.getCustomers();
+        }
+      
+        this.getDocType();
+        this.getCategorySpent();
+        this.getMedioPago();
+    
+
+    
+    }); 
+}
+
+    getCustomers = () => AppUtil.getAPI("clientes", ).then((response) => {
+                const customers      = response ? response.data.data : [];
+                this.setState({ customers, processing: false });
+            });
+
+   getProviders = () => AppUtil.getAPI("proveedor", ).then((response) => {
+                const supplier      = response ? response.data.data : [];
+                this.setState({ supplier, processing: false });
+            });
+                 
+
+
+
+        getRoles = () => AppUtil.getAPI(`catalogos/roles`).then((response) => {
                 let roles = response ? response.data : [];
                 this.setState({ roles });
             });
-    
 
+    
+ getDocType = () => AppUtil.getAPI(`catalogos/tipo_documento`).then((response) => {
+                let doc_type = response ? response.data : [];
+                this.setState({ doc_type }); });
+
+             getCategorySpent = () =>
+            AppUtil.getAPI(`catalogos/categoria_gasto`).then((response) => {
+                let categoriaGasto = response ? response.data : [];
+                this.setState({ categoriaGasto });
+            });
+             getMedioPago = () =>
+            AppUtil.getAPI(`catalogos/medio_pago`).then((response) => {
+                let medioPago = response ? response.data : [];
+                this.setState({ medioPago });
+            });
 
 
     toggleUserPreviewModal = () => {
@@ -80,6 +141,15 @@ constructor(props) {
     }
 
        handleCustomerFilterChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        this.setState({ customerSupplierFilters: { ...this.state.customerSupplierFilters, 
+           [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
+        
+        
+        } });
+    }
+
+        handleIFGFilterChange = (e) => {
         const { name, value, type, checked } = e.target;
         this.setState({ customerSupplierFilters: { ...this.state.customerSupplierFilters, 
            [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
@@ -148,7 +218,73 @@ constructor(props) {
             });
         });
     }
+
+
+
+    fetchIFGReport = () => {
+        const { ingresoGastosFacturaFilters , isPresupuesto, isGasto, isFactura} = this.state;
+     
+        
+        this.setState({ loadingReport: true });
+
+        const params = new URLSearchParams();
+       
+         if (ingresoGastosFacturaFilters.fechaCreacionDesde) params.append("fechaCreacionDesde", ingresoGastosFacturaFilters.fechaCreacionDesde);
+        if (ingresoGastosFacturaFilters.fechaCreacionHasta) params.append("fechaCreacionHasta", ingresoGastosFacturaFilters.fechaCreacionHasta);
+        if (ingresoGastosFacturaFilters.clientes_id) params.append("clienteId", ingresoGastosFacturaFilters.clientes_id);
+        if (ingresoGastosFacturaFilters.proveedor_id) params.append("proveedorId", ingresoGastosFacturaFilters.proveedor_id);
+        if (ingresoGastosFacturaFilters.categoriaGastoId) params.append("categoriaGastoId", ingresoGastosFacturaFilters.categoriaGastoId);
+        if (ingresoGastosFacturaFilters.tipoDocumentoId) params.append("tipoDocumentoId", ingresoGastosFacturaFilters.tipoDocumentoId);
+        if (ingresoGastosFacturaFilters.medioPagoId) params.append("medioPagoId", ingresoGastosFacturaFilters.medioPagoId);
+
+
+        let conection = "";
+         const qs = params.toString();
+
+        if(isGasto)
+        {
+            conection = `reportes/gastos/filtro${qs ? `?${qs}` : ""}`
+        }
+
+          if(isFactura)
+        {
+            conection = `reportes/facturas/filtro${qs ? `?${qs}` : ""}`
+        }
+
+        if(isPresupuesto)
+        {
+            conection = `reportes/gestion_presupuestaria/filtro${qs ? `?${qs}` : ""}`
+        }
+
+
+       
+        AppUtil.getAPI(conection).then((response) => {
+   
+            const raw = response ? (response.data ?? response) : [];
+            const data = isFactura ? (Array.isArray(raw) ? raw : (Array.isArray(raw?.facturas) ? raw.facturas : [])):(isGasto ? (Array.isArray(raw) ? raw : (Array.isArray(raw?.gastos) ? raw.gastos : [])) : (Array.isArray(raw) ? raw : (Array.isArray(raw?.detalles) ? raw.detalles : [])) );
+                     
+            this.setState({
+                userReportData: data,
+                loadingReport: false,
+                showUserPreviewModal: true,
+                isSupplier: false,
+                reportName: raw.titulo,
+                isFactura: false, 
+                isGasto:false,
+                isPresupuesto:false,
+                showReportIGFModal:false
+
+
+            });
+        });
+    }
     
+
+
+        _saveCustomer = (selectedOption) => this.setState({ ingresoGastosFacturaFilters: { ...this.state.ingresoGastosFacturaFilters,clientes_id: selectedOption ? selectedOption.id : 0 }});
+   
+        _saveSupplier= (selectedOption) => this.setState({ ingresoGastosFacturaFilters: { ...this.state.ingresoGastosFacturaFilters,proveedor_id: selectedOption ? selectedOption.id : 0 }});
+   
 
     //#endregion
 
@@ -182,7 +318,10 @@ doc.save(NombreReporte);
 render(){
 
         const { t } = this.props;
-        const { showUserFilterModal, showUserPreviewModal, userFilters, userReportData, loadingReport, roles, showClienteProveedorFilterModal } = this.state;
+        const { showUserFilterModal, showUserPreviewModal, userFilters, userReportData, loadingReport, roles, showClienteProveedorFilterModal, showReportIGFModal,
+supplier, customers, isGasto, isFactura, doc_type, categoriaGasto, medioPago,ingresoGastosFacturaFilters,isSupplier
+
+         } = this.state;
 
         const previewColumns = userReportData.length > 0 ? Object.keys(userReportData[0]) : [];
 
@@ -318,7 +457,7 @@ render(){
                                 </Col>
                             </Row>
                            <hr className="my-2" />
-                            <small className="text-success" role="button">
+                            <small className="text-success" role="button" onClick={() => this.toggleIFGFilterModal( false, true, false)}>
                                <i className="fas fa-download" style={{ color: "#4e73df", fontSize: "20px" }} />  {t("download")}
                             </small>
                         </Card.Body>
@@ -350,7 +489,7 @@ render(){
                                 </Col>
                             </Row>
                            <hr className="my-2" />
-                            <small className="text-success" role="button">
+                            <small className="text-success" role="button" onClick={()=>this.toggleIFGFilterModal(true, false, false)}>
                                <i className="fas fa-download" style={{ color: "#4e73df", fontSize: "20px" }} />  {t("download")}
                             </small>
                         </Card.Body>
@@ -383,7 +522,7 @@ render(){
                                 </Col>
                             </Row>
                            <hr className="my-2" />
-                            <small className="text-success" role="button">
+                            <small className="text-success" role="button" onClick={()=>this.toggleIFGFilterModal(false, false, true)}>
                                <i className="fas fa-download" style={{ color: "#4e73df", fontSize: "20px" }} />  {t("download")}
                             </small>
                         </Card.Body>
@@ -540,7 +679,7 @@ render(){
 
 
 
-{/* ══ MODAL FILTROS — REPORTE CLIENTES ══ */}
+{/* MODAL FILTROS — REPORTE CLIENTES Y PROVEEDORES */}
 <Modal
     show={showClienteProveedorFilterModal}
     onHide={() => {this.setState({ showClienteProveedorFilterModal: !this.state.showClienteProveedorFilterModal, isSupplier:false}) }}
@@ -586,7 +725,7 @@ render(){
                     label={t("status")}
                 />
             </Col>
-            {!this.state.isSupplier && 
+            {!isSupplier && 
             <Col sm="12" xl="6">
                 <Form.Check
                     type="checkbox"
@@ -614,6 +753,171 @@ render(){
     </Modal.Footer>
 </Modal>
 
+
+
+{/* MODAL FILTROS — IGF (Ingresos Gastos Facturas) */}
+<Modal
+    show={showReportIGFModal}
+    onHide={() => {this.setState({ showReportIGFModal: !this.state.showReportIGFModal}) }}
+    backdrop="static"
+    keyboard={false}
+    size="md"
+    centered
+>
+    <Modal.Header closeButton>
+        <h5 className="tituloFerias">{t("fgp_report_filters")}</h5>
+    </Modal.Header>
+    <Modal.Body>
+        <Row className="mb-3">
+            <Col sm="12" xl="6">
+                <Form.Label>{t("filter_creation_date_from")}</Form.Label>
+                <Form.Control
+                    type="date"
+                    name="fechaCreacionDesde"
+                    value={ingresoGastosFacturaFilters.fechaCreacionDesde}
+                    onChange={this.handleIFGFilterChange}
+                />
+            </Col>
+            <Col sm="12" xl="6">
+                <Form.Label>{t("filter_creation_date_to")}</Form.Label>
+                <Form.Control
+                    type="date"
+                    name="fechaCreacionHasta"
+                    value={ingresoGastosFacturaFilters.fechaCreacionHasta}
+                    onChange={this.handleIFGFilterChange}
+                />
+            </Col>
+        </Row>
+
+        <Row className="mb-3">
+
+            {isFactura && <Col sm="12" xl="12">
+             
+                <label className="txt-darkblue">{t("customer")}</label>
+                                    <Select
+                                        options={customers}
+                                        onChange={this._saveCustomer}
+                                        placeholder={`${t("select_option")}`}
+                                        name="clientes_id"
+                                        getOptionValue={(option) => option.id}                                   
+                                        getOptionLabel={(option) => `${option.nombre} ${option.apellido1} ${option.apellido2}`}
+                                      isSearchable={true}
+
+                                    />
+            </Col>}
+            {isGasto && 
+            <Col sm="12" xl="12">
+                   <label className="txt-darkblue">{t("provider")}</label>
+                                    <Select
+                                        options={supplier}
+                                        onChange={this._saveSupplier}
+                                        placeholder={`${t("select_option")}`}
+                                        name="proveedor_id"
+                                        getOptionValue={(option) => option.id}
+                                        getOptionLabel={(option) => `${option.nombre} ${option.apellido1} ${option.apellido2}`}                                     
+                                      isSearchable={true}
+
+                                    />
+            </Col>}
+
+
+        </Row>
+
+       {isFactura && <Row className="mb-3">
+            <Col sm="12">
+                <Form.Label>{t("doc_type")}</Form.Label>
+        
+
+             <Form.Group>
+                                            <Form.Select
+                                                aria-label="tipoDocumentoId"
+                                                name="tipoDocumentoId"
+                                                onChange={
+                                                    this.handleFilterChange
+                                                }
+                                                required
+                                            >
+                                                <option value="">
+                                                    {t("select_option")}
+                                                </option>
+                                                {
+                                                doc_type?.map((item, key) => ( <option value={item.id}  key={key}> {item.nombre}</option> ))
+                                            }
+                                            </Form.Select>
+                                        </Form.Group>
+
+            </Col>
+        </Row>}
+
+
+
+{isGasto && <Row className="mb-3">
+            <Col sm="12">
+                <Form.Label>{t("doc_type")}</Form.Label>
+        
+
+             <Form.Group>
+                                            <Form.Select
+                                                aria-label="categoriaGastoId"
+                                                name="categoriaGastoId"
+                                                onChange={
+                                                    this.handleFilterChange
+                                                }
+                                                required
+                                            >
+                                                <option value="">
+                                                    {t("select_option")}
+                                                </option>
+                                                {
+                                                categoriaGasto?.map((item, key) => ( <option value={item.id}  key={key}> {item.nombre}</option> ))
+                                            }
+                                            </Form.Select>
+                                        </Form.Group>
+
+            </Col>
+        </Row>}
+
+        {(isGasto || isFactura) && <Row className="mb-3">
+            <Col sm="12">
+                <Form.Label>{t("doc_type")}</Form.Label>
+        
+
+             <Form.Group>
+                                            <Form.Select
+                                                aria-label="medioPagoId"
+                                                name="medioPagoId"
+                                                onChange={
+                                                    this.handleFilterChange
+                                                }
+                                                required
+                                            >
+                                                <option value="">
+                                                    {t("select_option")}
+                                                </option>
+                                                {
+                                                medioPago?.map((item, key) => ( <option value={item.id}  key={key}> {item.descripcion}</option> ))
+                                            }
+                                            </Form.Select>
+                                        </Form.Group>
+
+            </Col>
+        </Row>}
+        
+
+    </Modal.Body>
+    <Modal.Footer>
+        <Button variant="light" onClick={() => {this.setState({ showReportIGFModal: !this.state.showReportIGFModal}) }}>
+            {t("close")}
+        </Button>
+        {loadingReport ? (
+            <div className="lds-dual-ring-2" />
+        ) : (
+            <Button variant="primary" onClick={this.fetchIFGReport}>
+                {t("consult")}
+            </Button>
+        )}
+    </Modal.Footer>
+</Modal>
 
 
 </>

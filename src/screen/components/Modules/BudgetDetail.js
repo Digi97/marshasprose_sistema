@@ -42,7 +42,7 @@ class BudgetDetail extends Component {
     getMovements = (gestionID) => {
         AppUtil.getAPI(`gestion_p_detalle/gestion/${gestionID}`).then((response) => {
             let movements = response ? response.data : [];
-            console.log(movements);
+      
             
             this.setState({ movements });
         });
