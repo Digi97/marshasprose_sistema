@@ -138,6 +138,7 @@
   "all_inputs_required": "Todos los campos son obligatorios",
   "inactive": "Inactivo",
   "updated_successfully": "Registro actualizado correctamente",
+  "tipo_categoria_duplicated": "No se permite más de un registro con el mismo tipo de categoría",
   "please_verify_data": "Por favor verifique los datos enviados",
   "record_created_successfully": "Registro creado correctamente",
   "invalid_string_form_Correo": "El valor del correo es inválido",
@@ -226,8 +227,15 @@
 "customer_report_filters":"Filtros — Reporte de Clientes",
 "fgp_report_filters":"Filtros — Reportes",
 "pdf":"PDF",
-"excel":"Excel"
-
+"excel":"Excel",
+"budgeted_amount":"Monto presupuestado",
+"manage":"Administrar",
+"annual_budgeted_amount":"Monto anual presupuestado",
+"are_you_sure":"¿Está seguro?",
+"this_action_will_delete_the_record":"Esta acción eliminará el registro permanentemente.",
+"yes_delete":"Sí, eliminar",
+"deleted_successfully":"Registro eliminado correctamente",
+"tipo_centro_costo_duplicated":"No se permite más de un registro con el mismo tipo de código"
 
 
 
