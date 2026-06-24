@@ -3,7 +3,7 @@ import React from "react";
 import { Row, Col, Button} from "react-bootstrap";
 
 const renderActive  =(props) => {
-   
+
       return (
 <Row className="m-2">
   <Col className="d-flex">
@@ -20,6 +20,11 @@ const renderActive  =(props) => {
     {props.editAction && (
       <Button variant="warning" onClick={props.editAction}>
         <i className="fas fa-pen" />
+      </Button>
+    )}
+    {props.monthlyAction && (
+      <Button variant="success" onClick={props.monthlyAction}>
+        <i className="fas fa-calendar-alt" />
       </Button>
     )}
     {props.deleteAction && (

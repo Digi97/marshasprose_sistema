@@ -1,7 +1,7 @@
 import React, {Component, createRef} from "react";
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
-import { Container, Row, Col, Button, Modal, Form, Card, Table} from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form, Card, Table, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { withTranslation } from "react-i18next";
 import crypto from "crypto-js";
 import moment from 'moment-timezone'
@@ -10,6 +10,7 @@ import alertSuccess from "../common/SweetAlert";
 import Swal from 'sweetalert2';
 import RenderActive from '../common/renderActive'
 import ActionButtons from '../common/ActionButtons'
+import App from "App";
 
 DataTable.use(DT);
 
@@ -55,6 +56,7 @@ constructor(props)
   deletedCostCenterIds: [],
   newCostCenterLine: { nombre: "", codigo: "", monto_presupuesto_anual: "", tipo_moneda_id: "" },
   budgetMatrix: {},
+  budgetMatrixIds: {},
       user:{}
     }
      this.user = null
@@ -89,6 +91,7 @@ this.datatableRef = createRef();
 
   },isView:false,
   budgetMatrix: {},
+  budgetMatrixIds: {},
 })
     _saveMatrixCell = (catId, ccId, value) => {
       this.setState(prev => ({
@@ -110,7 +113,7 @@ this.datatableRef = createRef();
     saveBudget = (e) => {
 
     const { t } = this.props;
-    let {budget, budgetMatrix} = this.state;
+    let {budget, budgetMatrix, budgetMatrixIds} = this.state;
 
       e.preventDefault();
       e.stopPropagation();
@@ -122,6 +125,7 @@ this.datatableRef = createRef();
         .map(([key, val]) => {
           const [catId, ccId] = key.split("_");
           return {
+            id: budgetMatrixIds[key] || 0,
             categoria_presupuestaria_id: parseInt(catId),
             centro_Costos_id: parseInt(ccId),
             monto: parseFloat(val) || 0
@@ -179,6 +183,7 @@ if(response.codeStatus === 200)
       } 
       else //actualizacion
       {
+        
       AppUtil.putAPI(`gestion_presupuestaria/${budget.id}`, budget).then(response => {
 
         if(response)
@@ -434,12 +439,46 @@ if(response.codeStatus === 200)
     });
   }
 
-  getBudgetById = (id, isView = false) =>
+  getBudgetById = (anio_presupuesto, isView = false) =>
   {
+    AppUtil.getAPI(`gestion_presupuestaria/${anio_presupuesto}`).then(response => {
+      const data = response ? response.data : [];
+      if (!data || data.length === 0) return;
 
-        AppUtil.getAPI(`gestion_presupuestaria/${id}`).then(response => {        
-      let budget = response ? response.data : [];      
-      this.setState({budget, show:true, isView}, ()=>{this.getCostCenter(); this.getCategories()});
+      const first = data[0];
+      const budget = {
+        id: first.id,
+        codigo: first.codigo,
+        nombre: first.nombre,
+        descripcion: first.descripcion,
+        anio_presupuesto: first.anio_presupuesto,
+        periodo_inicio: first.periodo_inicio,
+        periodo_fin: first.periodo_fin,
+        categoria_presupuestaria_id: first.categoria_presupuestaria_id,
+        monto_aprobado: first.monto_aprobado,
+        monto_modificado: first.monto_modificado,
+        monto_comprometido: first.monto_comprometido,
+        monto_ejecutado: first.monto_ejecutado,
+        estado: first.estado,
+        fecha_creacion: first.fecha_creacion,
+        fecha_actualizacion: first.fecha_actualizacion,
+        usuarios_Usuario_id: first.usuarios_Usuario_id,
+        centro_Costos_id: first.centro_Costos_id,
+        tipo_moneda_id: first.tipo_moneda_id,
+      };
+
+      const budgetMatrix = {};
+      const budgetMatrixIds = {};
+      data.forEach(item => {
+        const key = `${item.categoria_presupuestaria_id}_${item.centro_Costos_id}`;
+        budgetMatrix[key] = item.monto_aprobado;
+        budgetMatrixIds[key] = item.id;
+      });
+
+      this.setState({ budget, budgetMatrix, budgetMatrixIds, show: true, isView }, () => {
+        this.getCostCenter();
+        this.getCategories();
+      });
     });
   }
 
@@ -461,8 +500,8 @@ if(response.codeStatus === 200)
   ActionButtons = (rowData) => (
 
       <ActionButtons
-        viewAction={() => this.getBudgetById(rowData.id, true)}
-        editAction={() => this.getBudgetById(rowData.id)}
+        viewAction={() => this.getBudgetById(rowData.anio_presupuesto, true)}
+        editAction={() => this.getBudgetById(rowData.anio_presupuesto)}
         listAction={() => this.props.navigate(`/home/budget_detail/${rowData.id}`)}
       />
 
@@ -544,7 +583,7 @@ if(response.codeStatus === 200)
                                         justifyContent: "center",
                                         marginLeft: "auto"
                                     }}>
-                                        <i className="fas fa-users" style={{ color: "#4e73df", fontSize: "20px" }} />
+                                        <i className="fas fa-list-alt" style={{ color: "#4e73df", fontSize: "20px" }} />
                                     </div>
                                 </Col>
                             </Row>
@@ -577,7 +616,7 @@ if(response.codeStatus === 200)
                                         justifyContent: "center",
                                         marginLeft: "auto"
                                     }}>
-                                        <i className="fas fa-users" style={{ color: "#4e73df", fontSize: "20px" }} />
+                                        <i className="fas fa-building" style={{ color: "#4e73df", fontSize: "20px" }} />
                                     </div>
                                 </Col>
                             </Row>
@@ -596,24 +635,20 @@ if(response.codeStatus === 200)
                 <DataTable
                 data={budgets} 
                 columns={[
-                  {data:'id', title:t("id")},
-                  {data:'codigo', title:t("code")},
+                  
                   {data:'nombre', title:t("name")},
                   {data:'anio_presupuesto', title:t("year_budget")},
-                  {data:'periodo_inicio', title:t("begin_period"), render: (data, type, row) =>{ 
-                   return moment(`${data}`).format(`${row.formato}`) }},
-                  {data:'periodo_fin', title:t("end_period"),  render: (data, type, row) =>{ return moment(`${data}`).format(`${row.formato}`) }},
-                  {data:'categoria_presupuestaria', title:t("category")},
-                  {data:'centro_costo', title:t("cost_center")},
-                  {data:'estado', title:t("status")},
+                  {data:'periodo_inicio', title:t("begin_period"), render: (data) =>{  return moment(`${data}`).format(`${this.user.formatoFecha.toUpperCase()}`) }},
+                  {data:'periodo_fin', title:t("end_period"),  render: (data) =>{ return moment(`${data}`).format(`${this.user.formatoFecha.toUpperCase()}`) }},
+                  {data:'monto_aprobado', title:t("amount"), render:(data, type, row) => { return `${row.simbolo} ${AppUtil.formatNumber(row.monto)}` }},
                   {title:t("action"), data:null, orderable: false, searchable:false, 
                  //   render:(data, type, row)=> {return `<Button variant="danger" className="" onClick={this.removeLine(${row.usuario_id})}><i className="fas fa-trash" /></Button>` }
                  },
                 ]}
                 className="display table cell-border compact stripe"     
                 slots={{
-                  8: (cellData, rowData) => RenderActive(cellData, t),
-                  9: (cellData, rowData) => this.ActionButtons(rowData, cellData)}}
+                
+                  5: (cellData, rowData) => this.ActionButtons(rowData, cellData)}}
                 options={{
                 language: {
                   zeroRecords:t("zeroRecords"),
@@ -774,6 +809,7 @@ if(response.codeStatus === 200)
                           ))}
                           <th className="text-center" style={{ minWidth: "90px" }}>{t("total")}</th>
                           <th className="text-center" style={{ minWidth: "110px" }}>{t("budgeted_amount")}</th>
+                          <th className="text-center" style={{ minWidth: "60px" }}>{t("action")}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -801,10 +837,43 @@ if(response.codeStatus === 200)
                                 </td>
                               ))}
                               <td className="text-center fw-bold" style={{ color: exceeded ? '#dc3545' : '#198754' }}>
-                                {rowTotal.toFixed(2)}
+                                { AppUtil.formatNumber(rowTotal.toFixed(2))}
                               </td>
                               <td className="text-center text-muted small">
-                                {limit.toFixed(2)}
+                                {AppUtil.formatNumber(limit.toFixed(2))}
+                              </td>
+                              <td className="p-1">
+                                <div className="d-flex flex-wrap gap-1 justify-content-center">
+
+<OverlayTrigger
+                  
+                                        placement="top"
+                                        overlay={
+                                          <Tooltip>
+                                            {(rowTotal === 0 && budget.id===0)
+                                              ? t("monthly_budget_disabled")
+                                              : t("add")}
+                                          </Tooltip>
+                                        }
+                                      >
+                                        <span>
+                                          <Button
+                                            variant={(rowTotal === 0 && budget.id===0)? "secondary" : "success"}
+                                            size="sm"
+                                            disabled={(rowTotal === 0 && budget.id===0)}
+                                            style={(rowTotal === 0 && budget.id===0) ? { pointerEvents: "none" } : {}}
+                                            onClick={() => {this.props.navigate(
+                                              `/home/budget_per_year/${budget.anio_presupuesto}`,
+                                              { state: { categoria_presupuestaria_id: cat.id, monto_aprobado: cat.monto, id: cat.id } }
+                                            )}}
+                                          >
+                                            <i className="fas fa-calendar-alt" />
+                                          </Button>
+                                        </span>
+                                      </OverlayTrigger>
+
+                       
+                                </div>
                               </td>
                             </tr>
                           );

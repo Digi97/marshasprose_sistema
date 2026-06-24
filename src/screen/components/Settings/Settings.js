@@ -883,7 +883,7 @@ class Settings extends Component {
                       <p className="mb-1">{t("rol_description")}</p>
                     </a>
 
-                    <a
+                    {/*<a
                       href="/home/settings/maintenance/presupuestary_category"
                       className="list-group-item list-group-item-action"
                       aria-current="true"
@@ -897,7 +897,7 @@ class Settings extends Component {
                       <p className="mb-1">
                         {t("presupuestary_category_description")}
                       </p>
-                    </a>
+                    </a>*/}
 
                     <a
                       href="/home/settings/maintenance/file_type"
@@ -1010,7 +1010,7 @@ class Settings extends Component {
                       <p className="mb-1">{t("cabys_code_description")}</p>
                     </a>
 
-                    <a
+                    {/*<a
                       href="/home/settings/maintenance/cost_center"
                       className="list-group-item list-group-item-action"
                       aria-current="true"
@@ -1022,7 +1022,7 @@ class Settings extends Component {
                         </small>
                       </div>
                       <p className="mb-1">{t("cost_center_description")}</p>
-                    </a>
+                    </a>*/}
                     <a
                       href="/home/settings/maintenance/permissions"
                       className="list-group-item list-group-item-action"

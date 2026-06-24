@@ -214,7 +214,7 @@
 "logout":"Cerrar Sesión",
 "profile":"Perfil",
 "success":"¡Todo listo!",
-"budget_detail":"Detalle de Presupuesto",
+"budget_detail":"Detalle de Movimientos del Presupuesto",
 "user_report_filters":"Filtros — Reporte de Usuarios",
 "filter_creation_date_from":"Fecha Creación Desde",
 "filter_creation_date_to":"Fecha Creación Hasta",
@@ -235,8 +235,21 @@
 "this_action_will_delete_the_record":"Esta acción eliminará el registro permanentemente.",
 "yes_delete":"Sí, eliminar",
 "deleted_successfully":"Registro eliminado correctamente",
-"tipo_centro_costo_duplicated":"No se permite más de un registro con el mismo tipo de código"
-
+"tipo_centro_costo_duplicated":"No se permite más de un registro con el mismo tipo de código",
+"amount":"Monto",
+"monthly_budget_disabled":"Se debe guardar la gestión de presupuesto antes de hacer esta acción",
+"january":"Enero",
+"february":"Febrero",
+"march":"Marzo",
+"april":"Abril",
+"may":"Mayo",
+"june":"Junio",
+"july":"Julio",
+"august":"Agosto",
+"september":"Setiembre",
+"october":"Octubre",
+"november":"Noviembre",
+"december":"Diciembre"
 
 
 

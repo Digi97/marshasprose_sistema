@@ -73,7 +73,7 @@ class BudgetDetail extends Component {
                             columns={[
                                 { data: "id",                      title: t("id") },
                                 { data: "monto",                   title: t("amount") },
-                                { data: "detalle_presupuesto",     title: t("budget_detail_col") },
+                                { data: "detalle_presupuesto",     title: t("detail") },
                                 { data: "categoria_presupuestaria",title: t("category") },
                                 { data: "gastos_id",               title: t("spent") },
                                 { data: "facturas_id",             title: t("invoice") },

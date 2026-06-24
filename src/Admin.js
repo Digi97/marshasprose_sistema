@@ -6,6 +6,7 @@ import Footer from "./screen/components/Layouts/Footer";
 import Sidebar from "./screen/components/Layouts/Header";
 
 import BudgetDetail from "./screen/components/Modules/BudgetDetail";
+import BudgetPerYear from "./screen/components/Modules/BudgetPerYear";
 
 //#region Mantenimientos
 import Currency from "./screen/components/Settings/Maintenance/currency";
@@ -41,6 +42,23 @@ function BudgetDetailWrapper() {
   const { id } = useParams();
   const navigate = useNavigate();
   return <BudgetDetail gestionID={id} navigate={navigate} />;
+}
+
+function BudgetPerYearWrapper() {
+  const { anio } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state || {};
+  return (
+    <BudgetPerYear
+      anio_presupuesto={anio}
+      navigate={navigate}
+      categoria_presupuestaria_id={state.categoria_presupuestaria_id}
+      centro_Costos_id={state.centro_Costos_id}
+      monto_aprobado={state.monto_aprobado}
+      gestion_id={state.id}
+    />
+  );
 }
 
 function Admin() {
@@ -183,6 +201,11 @@ function Admin() {
               <Route
                 path={"/budget_detail/:id"}
                 element={<BudgetDetailWrapper />}
+              />
+
+              <Route
+                path={"/budget_per_year/:anio"}
+                element={<BudgetPerYearWrapper />}
               />
 
               {/* 404 not found para los no reconocidos en home */}
