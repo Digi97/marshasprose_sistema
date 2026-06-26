@@ -13,6 +13,7 @@ import AdminLayout from "./Admin.js";
 import Login from "./screen/components/Auth/Login";
 import Recovery from "./screen/components/Auth/Recovery";
 import ChangePassword from "./screen/components/Auth/ChangePassword";
+import OTP from "./screen/components/Auth/OTP";
 
 import NotFound from './screen/components/common/404.js'
 
@@ -24,6 +25,7 @@ function App() {
   <BrowserRouter>
     <Routes>
       <Route path="/" exact element={ <Login />}  />
+      <Route path="/otp" exact element={<OTP />} />
       <Route path="/recovery" exact  element={ <Recovery   />}  />
       <Route path="/change-password" exact  element={ <ChangePassword  /> } />
       {

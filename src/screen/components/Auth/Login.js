@@ -88,7 +88,7 @@ class Login extends Component {
               sessionStorage.setItem("user", user);
               //se redirecciona a main
 
-              window.location.href = "/home/";
+              window.location.href = "/otp";
             } else {
       alertSuccess(t(response.data.message), "error", t);
       this.stopLoading();
