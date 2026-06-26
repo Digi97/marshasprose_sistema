@@ -251,7 +251,10 @@
 "november":"Noviembre",
 "december":"Diciembre",
 "enter_otp_code":"Ingresa Código OTP",
-"send":"Enviar"
+"send":"Enviar",
+"ctaiban_colones":"CTA IBAN Colones",
+"ctaiban_dolares":"CTA IBAN Dólares"
+
 
 
 
