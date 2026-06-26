@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 
 import axios from "axios";
-import { url, host } from "../services/api";
+import { url } from "../services/api";
 import logo from "../../../assets/PNG/LogoOficial.jpg";
 import crypto from "crypto-js";
 import { withTranslation } from "react-i18next";
 import alertSuccess from "../common/SweetAlert";
-
+import AppUtil from "../../../../AppUtil/AppUtil";
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -20,6 +20,17 @@ class Login extends Component {
     };
   }
 
+    //se obtiene la info de los inputs
+  getInputData = async (e) => {
+    await this.setState({
+      form: {
+        ...this.state.form,
+        [e.target.name]: e.target.value,
+      },
+    });
+  };
+
+
   //previene que recargue pagina
   //cuando se da boton iniciar sesion
 
@@ -29,15 +40,6 @@ class Login extends Component {
     e.preventDefault();
   }
 
-  //se obtiene la info de los inputs
-  getInputData = async (e) => {
-    await this.setState({
-      form: {
-        ...this.state.form,
-        [e.target.name]: e.target.value,
-      },
-    });
-  };
 
   componentDidMount() {
       const { t } = this.props;
@@ -56,12 +58,27 @@ class Login extends Component {
     }
   }
 
+  validateForm = (t) => {
+    let { form } = this.state;
+    if (!AppUtil.isEmail(form.Correo)) {
+            alertSuccess(t("invalid_string_form_Correo"), "warning", t);
+     
+      return false;
+    }
+    if (!AppUtil.isValidPassword(form.Contrasena)) {
+      alertSuccess(t("invalid_string_form_Contrasena"), "warning", t);
+      return false;
+    }
+    return true;
+  };
+
   //se maneja la autenticacion del usuario
   login = () => {
     const { t } = this.props;
     //   window.location.href = "/home/";
 
-    if (this.state.form.Correo !== "" && this.state.form.Contrasena !== "") {
+    if (this.validateForm(t)) 
+      {
       this.setState({
         charging: true,
       });

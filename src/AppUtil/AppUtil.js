@@ -131,10 +131,10 @@ const AppUtil = {
         return isValidEmail.test(email);
     },
     isValidText: function isValidText(text) {
-        let isValidText = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.,;:¡!¿?\-_()%]+$/;
+        let isValidText = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.,;:¡!¿?\-_()%#]+$/;
         return isValidText.test(text);
     },
-    isNumberEntero: function isValidText(value) {
+    isNumberEntero: function isNumberEntero(value) {
         //usaremos este para validar numeros de códigos que sean necesarios enteros
         return /^\d+$/.test(value);
     },
@@ -142,6 +142,11 @@ const AppUtil = {
         //usaremos este para validar montos
         return !isNaN(value) && !isNaN(parseFloat(value));
     },
+    isValidPassword: function isValidPassword(pwd)
+    {
+        return /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[\W_]).+$/.test(pwd)
+    },
+
 
     reloadPage: function reloadPage() {
         setTimeout(function () {

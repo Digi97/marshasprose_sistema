@@ -190,9 +190,6 @@ class Invoice extends Component {
         });
     };
 
-    // ─────────────────────────────────────────────
-    // CÁLCULO DE LÍNEAS (igual que Spent)
-    // ─────────────────────────────────────────────
 
     _calculaInput = (e, isSelect = false) => {
         let { name, value, selectedIndex } = e.target;
