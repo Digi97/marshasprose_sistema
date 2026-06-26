@@ -8,9 +8,7 @@ import moment from 'moment-timezone'
 import AppUtil from "../../../AppUtil/AppUtil";
 import alertSuccess from "../common/SweetAlert";
 import Swal from 'sweetalert2';
-import RenderActive from '../common/renderActive'
 import ActionButtons from '../common/ActionButtons'
-import App from "App";
 
 DataTable.use(DT);
 
@@ -801,7 +799,7 @@ if(response.codeStatus === 200)
                   )}
                   <div className="table-responsive">
                     <Table bordered size="sm" className="align-middle mb-0">
-                      <thead className="table-dark">
+                      <thead className="table">
                         <tr>
                           <th style={{ minWidth: "150px" }}>{t("presupuestary_category")}</th>
                           {cost_center?.map(cc => (

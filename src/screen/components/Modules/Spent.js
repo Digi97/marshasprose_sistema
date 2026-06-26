@@ -64,6 +64,7 @@ class Spent extends Component {
       defaultTax:0,
       currency:[],
       token: "",
+      dropGP:[]
     };
     this.user = null;
     this.datatableRef = createRef();
@@ -126,6 +127,8 @@ _triggerDefaultTax = () => {
     this.getProviders();
     this.getCommercialCodes();    
 this.getCurrency();
+this.getCategories_dropdown();
+
 
     });
   };
@@ -298,6 +301,14 @@ _saveStateVariable = async (e) => {
       (response) => {
         const currency = response ? response.data : [];
         this.setState({ currency });
+      }
+    );
+
+        getCategories_dropdown = () =>
+    AppUtil.getAPI(`gestion_presupuestaria_dropdown/${moment().year()}`).then(
+      (response) => {
+        const dropGP = response ? response.data : [];
+        this.setState({ dropGP });
       }
     );
 
@@ -478,7 +489,7 @@ _saveStateVariable = async (e) => {
       processing,
       token,
       taxes,
-      AuxLine
+      AuxLine, dropGP
     } = this.state;
 
     return (
@@ -583,7 +594,7 @@ _saveStateVariable = async (e) => {
           
 
                   <Row className="m-2">
-                    <Col sm="12" xl="6">
+                    <Col sm="12" xl="4">
                       <label>{t("reference")}</label>
                       <Form.Group>
                         <Form.Control
@@ -599,7 +610,7 @@ _saveStateVariable = async (e) => {
                       </Form.Group>
                     </Col>
                 
-                    <Col sm="12" xl="6">
+                    <Col sm="12" xl="4">
                       <label>{t("description")}</label>
                       <Form.Group>
                         <Form.Control
@@ -614,6 +625,26 @@ _saveStateVariable = async (e) => {
                           disabled={isView}
 
                         />
+                      </Form.Group>
+                    </Col>
+
+                    <Col sm="12" xl="4">
+                      <label>{t("budget")}</label>
+                      <Form.Group>
+                        <Form.Select
+                          name="presupuesto"
+                          onChange={this._saveStateVariable}
+                          value={spent.presupuesto}
+                          required
+                          disabled={isView}
+                        >
+                          <option value="">{t("select_option")}</option>
+                          {dropGP.map((item) => (
+                            <option key={item.id} value={item.id} disabled={item.monto ===0}>
+                              {item.descripcion} {item.simbolo}{item.monto}
+                            </option>
+                          ))}
+                        </Form.Select>
                       </Form.Group>
                     </Col>
                   </Row>
