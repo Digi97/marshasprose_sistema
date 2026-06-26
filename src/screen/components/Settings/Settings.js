@@ -4,7 +4,7 @@ import AppUtil from "../../../AppUtil/AppUtil.js";
 import Toast from "../common/Toast.js";
 import Select from "react-select";
 import { withTranslation } from "react-i18next";
-import { url } from "../services/api";
+
 
 import alertSuccess from "../common/SweetAlert.js";
 

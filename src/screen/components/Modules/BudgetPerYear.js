@@ -136,16 +136,12 @@ class BudgetPerYear extends Component {
     const { t } = this.props;
     const { monthlyMatrix, anio_presupuesto } = this.state;
     const visibleItems = this.getVisibleItems();
-const MONTHS = [
-  t("january"), t("february"), t("march"), t("april"), t("may"), t("june"),
-  t("july"), t("august"), t("september"), t("october"), t("november"), t("december")
-];
-
+    const MONTHS = [ t("january"), t("february"), t("march"), t("april"), t("may"), t("june"), t("july"), t("august"), t("september"), t("october"), t("november"), t("december")];
     return (
       <Container fluid>
         <Row className="mb-3">
           <Col lg="6" sm="12">
-            <h1>{t("budget_management")} — {anio_presupuesto}</h1>
+            <h1>{t("budget_management")} - {anio_presupuesto}</h1>
           </Col>
           <Col lg="6" sm="12" className="d-flex justify-content-end align-items-center gap-2">
             <Button variant="primary" onClick={this.saveMonthly}>
@@ -161,7 +157,7 @@ const MONTHS = [
           <Col sm="12">
             <div className="table-responsive">
               <Table bordered size="sm" className="align-middle">
-                <thead className="table-dark">
+                <thead className="table">
                   <tr>
                     <th style={{ minWidth: "200px" }}>{t("presupuestary_category")} / {t("cost_center")}</th>
                     {MONTHS.map((m, i) => (
@@ -183,7 +179,7 @@ const MONTHS = [
                       <tr key={item.id}>
                         <td className="fw-semibold small">
                           {item.categoria_presupuestaria}
-                          <span className="text-muted fw-normal"> — {item.centro_costo}</span>
+                          <span className="text-muted fw-normal"> - {item.centro_costo}</span>
                         </td>
                         {Array.from({ length: 12 }, (_, i) => i + 1).map(mes => (
                           <td key={mes} className="p-1">
