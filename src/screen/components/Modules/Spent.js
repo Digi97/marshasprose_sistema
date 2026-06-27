@@ -41,7 +41,8 @@ class Spent extends Component {
         usuarios_Usuario_id: 0,
         createElectronicDoc:1, //delete on send
         descuento:0,
-        tipo_moneda_id:0
+        tipo_moneda_id:0,
+        presupuesto_id:0
       },
       AuxLine:{
         total:"",
@@ -152,7 +153,8 @@ this.getCategories_dropdown();
         descuento:0,
         usuarios_Usuario_id: this.user ? this.user.usuario_id : 0,
         createElectronicDoc:1,
-        tipo_moneda_id:0
+        tipo_moneda_id:0,
+        presupuesto_id:0
       },
     }, ()=> this._triggerDefaultTax());
 
@@ -632,7 +634,7 @@ _saveStateVariable = async (e) => {
                       <label>{t("budget")}</label>
                       <Form.Group>
                         <Form.Select
-                          name="presupuesto"
+                          name="presupuesto_id"
                           onChange={this._saveStateVariable}
                           value={spent.presupuesto}
                           required

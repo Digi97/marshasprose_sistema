@@ -374,7 +374,7 @@ class Customer_Provider extends Component {
 
     render() {
         const { t } = this.props;
-        let { customer_provider, token, clientAdmin, providerAdmin, isView } =
+        let { customer_provider, token, clientAdmin, providerAdmin, isView , isProvider} =
             this.state;
 
         return (
