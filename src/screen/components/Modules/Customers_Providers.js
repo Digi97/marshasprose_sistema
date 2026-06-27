@@ -54,6 +54,8 @@ class Customer_Provider extends Component {
               fecha_actualizacion: "",
                 exonerado: false,
                 otrasSenas: "",
+                ctaIBAN_Dolares:"",
+                ctaIBAN_Colones:""
             },
             telefonos: [],
             token: "",
@@ -92,6 +94,8 @@ class Customer_Provider extends Component {
                 fecha_actualizacion: "",
                 exonerado: false,
                 otrasSenas: "",
+                    ctaIBAN_Dolares:"",
+                ctaIBAN_Colones:""
             },
              isView:false,
         });
@@ -1027,6 +1031,46 @@ class Customer_Provider extends Component {
                                     />
                                 </Col>
                             </Row>
+
+                          {isProvider &&  
+                          <Row className="m-2">
+                            <Col sm="12" xl="6">
+                                    <label className="txt-darkblue">
+                                        {t("ctaiban_colones")}
+                                    </label>
+                                    <Form.Group>
+                                        <Form.Control
+                                            placeholder={"CR000000000000000000"}
+                                            type="text"
+                                            onChange={this._saveStateVariable}
+                                            name="ctaIBAN_Colones"
+                                            required
+                                            value={customer_provider.ctaIBAN_Colones}
+                                            disabled={isView}
+                                            maxLength={20}
+
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                     <Col sm="12" xl="6">
+                                    <label className="txt-darkblue">
+                                        {t("ctaiban_dolares")}
+                                    </label>
+                                    <Form.Group>
+                                        <Form.Control
+                                            placeholder={"CR000000000000000000"}
+                                            type="text"
+                                            onChange={this._saveStateVariable}
+                                            name="ctaIBAN_Dolares"
+                                            required
+                                            value={customer_provider.ctaIBAN_Dolares}
+                                            disabled={isView}
+                                            maxLength={20}
+
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>}
 
                             <div className="card mt-3 shadow-lg">
                                 <Form onSubmit={this.addPhone}>
