@@ -158,6 +158,24 @@ const AppUtil = {
     {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(pwd)
     },
+    isValidDate: function isValidDate(date) {
+        //usaremos este para validar fechas con formato YYYY-MM-DD (input type="date")
+        if (typeof date !== "string") return false;
+
+        let match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (!match) return false;
+
+        let year = parseInt(match[1], 10);
+        let month = parseInt(match[2], 10);
+        let day = parseInt(match[3], 10);
+        let parsed = new Date(year, month - 1, day);
+
+        return (
+            parsed.getFullYear() === year &&
+            parsed.getMonth() === month - 1 &&
+            parsed.getDate() === day
+        );
+    },
 
 
     reloadPage: function reloadPage() {

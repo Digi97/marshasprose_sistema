@@ -379,37 +379,50 @@ _saveStateVariable = async (e) => {
     );
   };
 
+  validateForm = (t) => {
+    let { spent } = this.state;
+
+    if (!AppUtil.isValidText(spent.doc_Referencia)) {
+      alertSuccess(t("invalid_string_form_doc_referencia"), "warning", t);
+      return false;
+    }
+    if (!AppUtil.isValidText(spent.descripcion)) {
+      alertSuccess(t("invalid_string_form_descripcion"), "warning", t);
+      return false;
+    }
+    if (!spent.categoria_gasto_id) {
+      alertSuccess(t("invalid_string_form_categoria_gasto_id"), "warning", t);
+      return false;
+    }
+    if (!spent.medio_pago_id) {
+      alertSuccess(t("invalid_string_form_medio_pago_id"), "warning", t);
+      return false;
+    }
+    if (!spent.tipo_moneda_id) {
+      alertSuccess(t("invalid_string_form_tipo_moneda_id"), "warning", t);
+      return false;
+    }
+    if (!spent.proveedor_id) {
+      alertSuccess(t("invalid_string_form_proveedor_id"), "warning", t);
+      return false;
+    }
+    if (!spent.presupuesto_id) {
+      alertSuccess(t("invalid_string_form_presupuesto_id"), "warning", t);
+      return false;
+    }
+    return true;
+  };
+
   saveSpent = () => {
     const { t } = this.props;
     const { spent, lines } = this.state;
 
-
-
-    // Validaciones básicas
-    if (!spent.doc_Referencia) {
-      alertSuccess(t("reference_required"),"warning",t);
-      return;
-    }
-
-    if (spent.categoria_gasto_id === 0) {
-    
-      alertSuccess(t("category_required"),"warning",t);
-      return;
-    }
-
-    if (spent.proveedor_id === 0) {
-  
-           alertSuccess(t("provider_required"),"warning",t);
-      
+    if (!this.validateForm(t)) {
       return;
     }
 
     if (lines.length === 0) {
-   
-
-               alertSuccess(t("lines_required"),"warning",t);
-      
-
+      alertSuccess(t("lines_required"),"warning",t);
       return;
     }
 

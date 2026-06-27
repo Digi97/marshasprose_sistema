@@ -72,6 +72,36 @@ class Users extends Component {
         });
     };
 
+    validateForm = (t) => {
+        let { user } = this.state;
+
+        if (!AppUtil.isValidText(user.Nombre)) {
+            alertSuccess(t("invalid_string_form_nombre"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isValidText(user.apellido1)) {
+            alertSuccess(t("invalid_string_form_apellido1"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isValidText(user.apellido2)) {
+            alertSuccess(t("invalid_string_form_apellido2"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isEmail(user.correo)) {
+            alertSuccess(t("invalid_string_form_email"), "warning", t);
+            return false;
+        }
+        if (user.usuario_id === 0 && !AppUtil.isValidPassword(user.contrasena)) {
+            alertSuccess(t("invalid_string_form_contrasena"), "warning", t);
+            return false;
+        }
+        if (!user.roles_id) {
+            alertSuccess(t("invalid_string_form_roles_id"), "warning", t);
+            return false;
+        }
+        return true;
+    };
+
     saveUser = (e) => {
         const { t } = this.props;
         let { user } = this.state;
@@ -80,6 +110,11 @@ class Users extends Component {
 
         e.preventDefault();
         e.stopPropagation();
+
+        if (!this.validateForm(t)) {
+            return;
+        }
+
         if (user.usuario_id === 0) //creacion
         {
             AppUtil.postAPI(`users`, user).then((response) => {
