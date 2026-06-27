@@ -6,7 +6,7 @@ import logo from "../../../assets/PNG/LogoOficial.jpg";
 import crypto from "crypto-js";
 import { withTranslation } from "react-i18next";
 import alertSuccess from "../common/SweetAlert";
-import AppUtil from "../../../../AppUtil/AppUtil";
+import AppUtil from "../../../AppUtil/AppUtil";
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -65,7 +65,8 @@ class Login extends Component {
      
       return false;
     }
-    if (!AppUtil.isValidPassword(form.Contrasena)) {
+    if (!AppUtil.isValidPassword(form.Contrasena)) 
+      {
       alertSuccess(t("invalid_string_form_Contrasena"), "warning", t);
       return false;
     }
@@ -123,7 +124,7 @@ this.stopLoading();
         });
     } else {
 
-        alertSuccess(t("all_inputs_required"), "error", t);
+       // alertSuccess(t("all_inputs_required"), "error", t);
  this.stopLoading();
     }
   };
