@@ -127,12 +127,76 @@ class Customer_Provider extends Component {
         }));
     };
 
+    validateForm = (t) => {
+        let { customer_provider, isProvider } = this.state;
+
+        if (!AppUtil.isValidText(customer_provider.identificacion)) {
+            alertSuccess(t("invalid_string_form_identificacion"), "warning", t);
+            return false;
+        }
+        if (!customer_provider.tipo_identificacion_id) {
+            alertSuccess(t("invalid_string_form_tipo_identificacion_id"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isValidText(customer_provider.nombre)) {
+            alertSuccess(t("invalid_string_form_nombre"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isValidText(customer_provider.apellido1)) {
+            alertSuccess(t("invalid_string_form_apellido1"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isValidText(customer_provider.apellido2)) {
+            alertSuccess(t("invalid_string_form_apellido2"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isEmail(customer_provider.correo)) {
+            alertSuccess(t("invalid_string_form_email"), "warning", t);
+            return false;
+        }
+        if (!customer_provider.provincia_id) {
+            alertSuccess(t("invalid_string_form_provincia_id"), "warning", t);
+            return false;
+        }
+        if (!customer_provider.canton_id) {
+            alertSuccess(t("invalid_string_form_canton_id"), "warning", t);
+            return false;
+        }
+        if (!customer_provider.distrito_id) {
+            alertSuccess(t("invalid_string_form_distrito_id"), "warning", t);
+            return false;
+        }
+        if (!customer_provider.codigo_actividad_id) {
+            alertSuccess(t("invalid_string_form_codigo_actividad_id"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isValidText(customer_provider.otrasSenas)) {
+            alertSuccess(t("invalid_string_form_otrassenas"), "warning", t);
+            return false;
+        }
+        if (isProvider) {
+            if (!AppUtil.isValidText(customer_provider.ctaIBAN_Colones)) {
+                alertSuccess(t("invalid_string_form_ctaiban_colones"), "warning", t);
+                return false;
+            }
+            if (!AppUtil.isValidText(customer_provider.ctaIBAN_Dolares)) {
+                alertSuccess(t("invalid_string_form_ctaiban_dolares"), "warning", t);
+                return false;
+            }
+        }
+        return true;
+    };
+
     saveCustomerProvider = (e) => {
         const { t } = this.props;
 
         e.preventDefault();
         e.stopPropagation();
         let { customer_provider, isProvider, telefonos } = this.state;
+
+        if (!this.validateForm(t)) {
+            return;
+        }
 
         if (telefonos.length === 0) {
             alertSuccess(t("phone_required"), "error", t);

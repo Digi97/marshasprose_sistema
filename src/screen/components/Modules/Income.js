@@ -351,28 +351,33 @@ _triggerDefaultTax = () => {
   // GUARDAR (crear o actualizar)
   // ─────────────────────────────────────────────
 
+  validateForm = (t) => {
+    let { income } = this.state;
+
+    if (!AppUtil.isValidText(income.codigo)) {
+      alertSuccess(t("invalid_string_form_codigo"), "warning", t);
+      return false;
+    }
+    if (!income.clientes_id) {
+      alertSuccess(t("invalid_string_form_clientes_id"), "warning", t);
+      return false;
+    }
+    if (!income.medio_pago_id) {
+      alertSuccess(t("invalid_string_form_medio_pago_id"), "warning", t);
+      return false;
+    }
+    if (!income.tipo_moneda_id) {
+      alertSuccess(t("invalid_string_form_tipo_moneda_id"), "warning", t);
+      return false;
+    }
+    return true;
+  };
+
   saveIncome = () => {
     const { t } = this.props;
     const { income, lines } = this.state;
 
-    // Validaciones
-    if (!income.codigo) {
-      alertSuccess(t("code_required"), "warning", t);
-      return;
-    }
-
-    if (income.clientes_id === 0) {
-      alertSuccess(t("customer_required"), "warning", t);
-      return;
-    }
-
-    if (income.medio_pago_id === 0) {
-      alertSuccess(t("payment_method_required"), "warning", t);
-      return;
-    }
-
-    if (income.tipo_moneda_id === 0) {
-      alertSuccess(t("currency_required"), "warning", t);
+    if (!this.validateForm(t)) {
       return;
     }
 

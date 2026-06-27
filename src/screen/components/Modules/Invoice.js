@@ -411,35 +411,40 @@ class Invoice extends Component {
             }
         });
     };
+    validateForm = (t) => {
+        let { invoice } = this.state;
+
+        if (!invoice.clave) {
+            alertSuccess(t("invalid_string_form_clave"), "warning", t);
+            return false;
+        }
+        if (!invoice.clientes_id) {
+            alertSuccess(t("invalid_string_form_clientes_id"), "warning", t);
+            return false;
+        }
+        if (!invoice.tipo_moneda_id) {
+            alertSuccess(t("invalid_string_form_tipo_moneda_id"), "warning", t);
+            return false;
+        }
+        if (!invoice.condicion_venta_id) {
+            alertSuccess(t("invalid_string_form_condicion_venta_id"), "warning", t);
+            return false;
+        }
+        if (!invoice.medio_pago_id) {
+            alertSuccess(t("invalid_string_form_medio_pago_id"), "warning", t);
+            return false;
+        }
+        return true;
+    };
+
     saveInvoice = () => {
         const { t } = this.props;
         const { invoice, lines, dolar_compra,dolar_venta } = this.state;
 
-        // Validaciones
-        if (!invoice.clave) {
-            alertSuccess(t("key_required"),"warning",t);
+        if (!this.validateForm(t)) {
             return;
         }
-        if (invoice.clientes_id === 0) {
-            alertSuccess(t("customer_required"),"warning",t);
-      
-            return;
-        }
-        if (invoice.Tipo_moneda_id === 0) {
-        
-            alertSuccess(t("currency_required"),"warning",t);
-            return;
-        }
-        if (invoice.Condicion_venta_id === 0) {
-            alertSuccess(t("sale_condition_required"),"warning",t);
 
-            return;
-        }
-        if (invoice.Medio_pago_id === 0) {
-            alertSuccess(t("payment_method_required"),"warning",t);
-
-            return;
-        }
         if (lines.length === 0) {
             alertSuccess(t("lines_required"),"warning",t);
             return;

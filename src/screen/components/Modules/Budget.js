@@ -108,6 +108,31 @@ this.datatableRef = createRef();
           });
     }
 
+    validateForm = (t) => {
+      let { budget } = this.state;
+      if (!AppUtil.isValidText(budget.nombre)) {
+        alertSuccess(t("invalid_string_form_nombre"), "warning", t);
+        return false;
+      }
+      if (!AppUtil.isValidText(budget.descripcion)) {
+        alertSuccess(t("invalid_string_form_descripcion"), "warning", t);
+        return false;
+      }
+      if (!AppUtil.isNumberEntero(budget.anio_presupuesto)) {
+        alertSuccess(t("invalid_string_form_anio_presupuesto"), "warning", t);
+        return false;
+      }
+      if (!AppUtil.isValidDate(budget.periodo_inicio)) {
+        alertSuccess(t("invalid_string_form_periodo_inicio"), "warning", t);
+        return false;
+      }
+      if (!AppUtil.isValidDate(budget.periodo_fin)) {
+        alertSuccess(t("invalid_string_form_periodo_fin"), "warning", t);
+        return false;
+      }
+      return true;
+    }
+
     saveBudget = (e) => {
 
     const { t } = this.props;
@@ -115,6 +140,10 @@ this.datatableRef = createRef();
 
       e.preventDefault();
       e.stopPropagation();
+
+      if (!this.validateForm(t)) {
+        return;
+      }
 
       budget.usuarios_Usuario_id = this.state.user.usuario_id;
 

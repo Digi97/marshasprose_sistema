@@ -56,12 +56,38 @@ class Profile extends Component {
         });
     };
 
+    validateForm = (t) => {
+        let { user } = this.state;
+
+        if (!AppUtil.isValidText(user.Nombre || user.nombre)) {
+            alertSuccess(t("invalid_string_form_nombre"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isValidText(user.apellido1)) {
+            alertSuccess(t("invalid_string_form_apellido1"), "warning", t);
+            return false;
+        }
+        if (!AppUtil.isEmail(user.correo)) {
+            alertSuccess(t("invalid_string_form_email"), "warning", t);
+            return false;
+        }
+        if (user.contrasena && !AppUtil.isValidPassword(user.contrasena)) {
+            alertSuccess(t("invalid_string_form_contrasena"), "warning", t);
+            return false;
+        }
+        return true;
+    };
+
     saveUser = (e) => {
         const { t } = this.props;
         let { user } = this.state;
 
         e.preventDefault();
         e.stopPropagation();
+
+        if (!this.validateForm(t)) {
+            return;
+        }
 
         this.setState({ processing: true });
 
