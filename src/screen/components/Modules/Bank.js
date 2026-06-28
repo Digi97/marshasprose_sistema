@@ -11,7 +11,7 @@ import moment from "moment-timezone";
 import AppUtil from "../../../AppUtil/AppUtil";
 import alertSuccess from "../common/SweetAlert";
 import ActionButtons from "../common/ActionButtons";
-
+import RenderActive from "../common/renderActive";
 DataTable.use(DT);
 
 const TIPO_CUENTA_OPTIONS = ["Corriente", "Ahorros", "Inversión", "Otro"];
@@ -70,9 +70,7 @@ class Bank extends Component {
   componentDidMount() {
     this.getUserInfo();
     this.getBancos();
-    this.getCurrencies();
-    this.getCostCenter();
-    this.getCategories();
+
   }
 
   getUserInfo = () => {
@@ -87,8 +85,10 @@ class Bank extends Component {
   // ─── API calls ───────────────────────────────────────────────────────────────
 
   getBancos = () =>
-    AppUtil.getAPI("bancos").then((response) =>
-      this.setState({ bancos: response ? response.data : [] })
+    AppUtil.getAPI("bancos").then((response) =>{
+      console.log(response);
+      
+      this.setState({ bancos: response ? response.data : [] })}
     );
 
   getCurrencies = () =>
@@ -109,7 +109,7 @@ class Bank extends Component {
   getBancoById = (id, isView = false) =>
     AppUtil.getAPI(`bancos/${id}`).then((response) => {
       if (!response || !response.data) return;
-      const { banco, movimientos } = response.data;
+      const { banco } = response.data;
       this.setState({
         banco: {
           id: banco.id,
@@ -117,15 +117,20 @@ class Bank extends Component {
           numero_cuenta: banco.numero_cuenta,
           tipo_cuenta: banco.tipo_cuenta,
           saldo_inicial: banco.saldo_inicial,
-          Tipo_moneda_id: banco.Tipo_moneda_id,
-          Centro_Costos_id: banco.Centro_Costos_id || "",
-          Categoria_presupuestaria_id: banco.Categoria_presupuestaria_id || "",
-          Usuarios_Usuario_id: banco.Usuarios_Usuario_id,
+          tipo_moneda_id: banco.tipo_moneda_id,
+          centro_Costos_id: banco.centro_Costos_id || "",
+          categoria_presupuestaria_id: banco.categoria_presupuestaria_id || "",
+          usuarios_Usuario_id: banco.usuarios_Usuario_id,
           estado: banco.estado,
         },
         show: true,
         isView,
-      });
+      }, ()=> { 
+        
+        //cargamos la info para dibujar correctamente el dropdown
+        this.getCurrencies();
+    this.getCostCenter();
+    this.getCategories();});
     });
 
   getBancoDetalle = (id) =>
@@ -164,7 +169,16 @@ class Bank extends Component {
   // ─── form helpers ────────────────────────────────────────────────────────────
 
   toggleShow = () =>
-    this.setState({ show: !this.state.show, banco: this._emptyBanco(), isView: false });
+    this.setState({ show: !this.state.show, banco: this._emptyBanco(), isView: false }, ()=>{
+
+      console.log(this.state.show);
+      if(this.state.show)
+      {
+        this.getCurrencies();
+        this.getCostCenter();
+        this.getCategories();
+      }
+    })
 
   _saveStateVariable = (e) => {
     const { name, type, checked, value } = e.target;
@@ -243,12 +257,6 @@ class Bank extends Component {
     />
   );
 
-  _renderBadgeEstado = (estado) =>
-    estado === 1 ? (
-      <Badge bg="success">Activo</Badge>
-    ) : (
-      <Badge bg="secondary">Inactivo</Badge>
-    );
 
   _renderMovimientosTable = (lista, t) => (
     <Table striped bordered hover size="sm" className="mt-3">
@@ -388,26 +396,20 @@ class Bank extends Component {
                 { data: "nombre_banco", title: t("bank_name") },
                 { data: "numero_cuenta", title: t("account_number") },
                 { data: "tipo_cuenta", title: t("account_type") },
-                { data: "Tipo_moneda", title: t("currency") },
+                { data: "tipo_moneda", title: t("currency") },
                 {
                   data: "saldo_actual", title: t("current_balance"),
                   render: (data, type, row) =>
-                    `${row.Simbolo} ${AppUtil.formatNumber(data)}`,
+                    `${row.simbolo} ${AppUtil.formatNumber(data)}`,
                 },
-                {
-                  data: "estado", title: t("status"),
-                  render: (data) =>
-                    data === 1
-                      ? '<span class="badge bg-success">Activo</span>'
-                      : '<span class="badge bg-secondary">Inactivo</span>',
-                },
+                { data: "estado", title: t("status")},
                 {
                   title: t("action"), data: null,
                   orderable: false, searchable: false,
                 },
               ]}
               className="display table cell-border compact stripe"
-              slots={{ 6: (cellData, rowData) => this.ActionButtons(rowData) }}
+              slots={{ 6: (cellData, rowData) => this.ActionButtons(rowData), 5: (cellData, rowData) => RenderActive(cellData, t), }}
               options={{
                 language: {
                   zeroRecords: t("zeroRecords"),
@@ -480,7 +482,7 @@ class Bank extends Component {
               </Row>
 
               <Row className="m-2">
-                <Col sm="12" xl="4">
+                <Col sm="12" xl={banco.id===0 ? "4" : "6"}>
                   <Form.Group className="mb-3">
                     <Form.Label>{t("account_type")}</Form.Label>
                     <Form.Select
@@ -497,18 +499,19 @@ class Bank extends Component {
                     </Form.Select>
                   </Form.Group>
                 </Col>
-                <Col sm="12" xl="4">
+                <Col sm="12" xl={banco.id===0 ? "4" : "6"}>
                   <Form.Group className="mb-3">
                     <Form.Label>{t("currency")}</Form.Label>
                     <Form.Select
-                      name="Tipo_moneda_id"
-                      value={banco.Tipo_moneda_id}
+                      name="tipo_moneda_id"
+                      value={banco.tipo_moneda_id}
                       onChange={this._saveStateVariable}
                       required
                       disabled={isView}
                     >
                       <option value="">{t("select_option")}</option>
                       {currencies.map((c) => (
+                        banco.tipo_moneda_id === c.id ? <option key={c.id} value={c.id} selected>{c.Nombre || c.nombre}</option> :
                         <option key={c.id} value={c.id}>{c.Nombre || c.nombre}</option>
                       ))}
                     </Form.Select>
@@ -538,13 +541,14 @@ class Bank extends Component {
                   <Form.Group className="mb-3">
                     <Form.Label>{t("cost_center")}</Form.Label>
                     <Form.Select
-                      name="Centro_Costos_id"
-                      value={banco.Centro_Costos_id}
+                      name="centro_Costos_id"
+                      value={banco.centro_Costos_id}
                       onChange={this._saveStateVariable}
                       disabled={isView}
                     >
                       <option value="">{t("select_option")}</option>
                       {cost_center.map((cc) => (
+                        banco.centro_Costos_id === cc.id ? <option key={cc.id} value={cc.id} selected>{cc.Nombre || cc.nombre}</option>:
                         <option key={cc.id} value={cc.id}>{cc.Nombre || cc.nombre}</option>
                       ))}
                     </Form.Select>
@@ -554,14 +558,15 @@ class Bank extends Component {
                   <Form.Group className="mb-3">
                     <Form.Label>{t("presupuestary_category")}</Form.Label>
                     <Form.Select
-                      name="Categoria_presupuestaria_id"
-                      value={banco.Categoria_presupuestaria_id}
+                      name="categoria_presupuestaria_id"
+                      value={banco.categoria_presupuestaria_id}
                       onChange={this._saveStateVariable}
                       disabled={isView}
                     >
                       <option value="">{t("select_option")}</option>
                       {presupuestary_category.map((cp) => (
-                        <option key={cp.id} value={cp.id}>{cp.nombre}</option>
+                       cp.id === banco.categoria_presupuestaria_id ?  (<option defaultValue key={cp.id} value={cp.id} selected >{cp.nombre}</option>): 
+                        (<option key={cp.id} value={cp.id}>{cp.nombre}</option>)
                       ))}
                     </Form.Select>
                   </Form.Group>
@@ -645,7 +650,7 @@ class Bank extends Component {
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("currency")}</small>
-                      <p className="fw-bold mb-1">{bancoDetalle.Tipo_moneda}</p>
+                      <p className="fw-bold mb-1">{bancoDetalle.tipo_moneda}</p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("initial_balance")}</small>
@@ -661,15 +666,16 @@ class Bank extends Component {
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("cost_center")}</small>
-                      <p className="fw-bold mb-1">{bancoDetalle.Centro_Costos || "—"}</p>
+                      <p className="fw-bold mb-1">{bancoDetalle.centro_Costos || "—"}</p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("presupuestary_category")}</small>
-                      <p className="fw-bold mb-1">{bancoDetalle.Categoria_presupuestaria || "—"}</p>
+                      <p className="fw-bold mb-1">{bancoDetalle.categoria_presupuestaria || "—"}</p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("status")}</small>
-                      <p className="mb-1">{this._renderBadgeEstado(bancoDetalle.estado)}</p>
+                        <p className="fw-bold mb-1"> {RenderActive(bancoDetalle.estado, t)}</p>
+                     
                     </Col>
 
                     <Col sm="12" className="mt-3">

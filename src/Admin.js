@@ -83,6 +83,12 @@ function Admin() {
     }
   }
 */
+
+if(sessionStorage.getItem("otp_valid" === "true"))
+{
+window.location.replace("/"); // si no hay validacion de otp se redirecciona
+}
+
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/home") {
