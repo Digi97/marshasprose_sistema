@@ -55,7 +55,15 @@ constructor(props)
   newCostCenterLine: { nombre: "", codigo: "", monto_presupuesto_anual: "", tipo_moneda_id: "" },
   budgetMatrix: {},
   budgetMatrixIds: {},
-      user:{}
+      user:{},
+  showMoverModal: false,
+  moverOrigen: "",
+  moverDestino: "",
+  moverMonto: "",
+  mesOrigen: "",
+  mesDestino: "",
+  anioOrigen: "",
+  anioDestino: "",
     }
      this.user = null
 this.datatableRef = createRef();
@@ -559,6 +567,43 @@ if(response.codeStatus === 200)
             AppUtil.getAPI("catalogos/tipo_moneda").then((response) => {
                 this.setState({ currencies: response ? response.data : [] });
             });
+
+    toggleMoverModal = () => this.setState(prev => ({
+      showMoverModal: !prev.showMoverModal,
+      moverOrigen: "",
+      moverDestino: "",
+      moverMonto: "",
+      mesOrigen: "",
+      mesDestino: "",
+      anioOrigen: "",
+      anioDestino: "",
+    }));
+
+    moverGestion = () => {
+      const { t } = this.props;
+      const { moverOrigen, moverDestino, moverMonto, mesOrigen, mesDestino, anioOrigen, anioDestino } = this.state;
+      if (!moverOrigen || !moverDestino || !moverMonto || !mesOrigen || !mesDestino || !anioOrigen || !anioDestino) {
+        alertSuccess(t("please_verify_data"), "warning", t);
+        return;
+      }
+      AppUtil.putAPI(`mover_gestion_presupuestaria/${moverOrigen}/${moverDestino}`, {
+        monto_modificado: parseFloat(moverMonto),
+        mes_origen: parseInt(mesOrigen),
+        mes_destino: parseInt(mesDestino),
+        anio_origen: parseInt(anioOrigen),
+        anio_destino: parseInt(anioDestino),
+      })
+        .then(response => {
+          if (response && response.codeStatus === 200) {
+            alertSuccess(t("updated_successfully"), "success", t);
+            this.toggleMoverModal();
+            this.getBudget();
+          } else {
+            alertSuccess(t(response?.message || "please_verify_data"), "error", t);
+          }
+        });
+    };
+
     //#endregion fin funciones internas
 
 
@@ -590,7 +635,7 @@ if(response.codeStatus === 200)
 
         <Row className="m-2">
 {/* creacion de las catalogos de presupuesto */}
-  <Col lg="6" sm="6" className="mb-3">
+  <Col lg="4" sm="6" className="mb-3">
                     <Card className="shadow-sm border-0">
                         <Card.Body>
                             <Row className="align-items-center">
@@ -623,7 +668,7 @@ if(response.codeStatus === 200)
                 </Col>
 
 
-<Col lg="6" sm="6" className="mb-3">
+<Col lg="4" sm="6" className="mb-3">
                     <Card className="shadow-sm border-0">
                         <Card.Body>
                             <Row className="align-items-center">
@@ -649,6 +694,38 @@ if(response.codeStatus === 200)
                             </Row>
                             <hr className="my-2" />
                             <small className="text-success" role="button" onClick={this.toggleCostCenterModal}>
+                                {t("manage")}
+                            </small>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+                <Col lg="4" sm="6" className="mb-3">
+                    <Card className="shadow-sm border-0">
+                        <Card.Body>
+                            <Row className="align-items-center">
+                                <Col xs="8">
+                                    <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                                        {t("move_budget_management")}
+                                    </p>
+                                </Col>
+                                <Col xs="4" className="text-end">
+                                    <div style={{
+                                        backgroundColor: "#4e73df20",
+                                        borderRadius: "50%",
+                                        width: "50px",
+                                        height: "50px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginLeft: "auto"
+                                    }}>
+                                        <i className="fas fa-exchange-alt" style={{ color: "#4e73df", fontSize: "20px" }} />
+                                    </div>
+                                </Col>
+                            </Row>
+                            <hr className="my-2" />
+                            <small className="text-success" role="button" onClick={this.toggleMoverModal}>
                                 {t("manage")}
                             </small>
                         </Card.Body>
@@ -1227,6 +1304,124 @@ if(response.codeStatus === 200)
             </Button>
             <Button variant="primary" onClick={this.saveCostCenterLines}>
               {t("save")}
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal
+          show={this.state.showMoverModal}
+          onHide={this.toggleMoverModal}
+          backdrop="static"
+          keyboard={false}
+        >
+          <Modal.Header closeButton>
+            <h3 className="tituloFerias">{t("move_budget_management")}</h3>
+            <small>{t("note_budget_movement")}</small>
+          </Modal.Header>
+          <Modal.Body>
+            {(() => {
+              const MONTH_KEYS = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+              const currentYear = new Date().getFullYear();
+              const YEARS = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+              return (
+                <Row className="m-2">
+                  <Col sm="12" className="mb-3">
+                    <label>{t("origin")}</label>
+                    <Form.Select
+                      value={this.state.moverOrigen}
+                      onChange={(e) => this.setState({ moverOrigen: e.target.value })}
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {budgets
+                        .filter(b => String(b.anio_presupuesto) === String(new Date().getFullYear()))
+                        .map(b => (
+                          <option key={b.id} value={b.id}>{b.nombre}</option>
+                        ))}
+                    </Form.Select>
+                  </Col>
+                  <Col sm="6" className="mb-3">
+                    <label>{t("origin_month")}</label>
+                    <Form.Select
+                      value={this.state.mesOrigen}
+                      onChange={(e) => this.setState({ mesOrigen: e.target.value })}
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {MONTH_KEYS.map((key, i) => (
+                        <option key={i + 1} value={i + 1}>{t(key)}</option>
+                      ))}
+                    </Form.Select>
+                  </Col>
+                  <Col sm="6" className="mb-3">
+                    <label>{t("origin_year")}</label>
+                    <Form.Select
+                      value={this.state.anioOrigen}
+                      onChange={(e) => this.setState({ anioOrigen: e.target.value })}
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {YEARS.map(y => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </Form.Select>
+                  </Col>
+                  <Col sm="12" className="mb-3">
+                    <label>{t("destination")}</label>
+                    <Form.Select
+                      value={this.state.moverDestino}
+                      onChange={(e) => this.setState({ moverDestino: e.target.value })}
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {budgets
+                        .filter(b => String(b.anio_presupuesto) === String(new Date().getFullYear()))
+                        .map(b => (
+                          <option key={b.id} value={b.id}>{b.nombre}</option>
+                        ))}
+                    </Form.Select>
+                  </Col>
+                  <Col sm="6" className="mb-3">
+                    <label>{t("destination_month")}</label>
+                    <Form.Select
+                      value={this.state.mesDestino}
+                      onChange={(e) => this.setState({ mesDestino: e.target.value })}
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {MONTH_KEYS.map((key, i) => (
+                        <option key={i + 1} value={i + 1}>{t(key)}</option>
+                      ))}
+                    </Form.Select>
+                  </Col>
+                  <Col sm="6" className="mb-3">
+                    <label>{t("destination_year")}</label>
+                    <Form.Select
+                      value={this.state.anioDestino}
+                      onChange={(e) => this.setState({ anioDestino: e.target.value })}
+                    >
+                      <option value="">{t("select_option")}</option>
+                      {YEARS.map(y => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </Form.Select>
+                  </Col>
+                  <Col sm="12">
+                    <label>{t("amount_modified")}</label>
+                    <Form.Control
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      placeholder={t("amount_modified")}
+                      value={this.state.moverMonto}
+                      onChange={(e) => this.setState({ moverMonto: e.target.value })}
+                    />
+                  </Col>
+                </Row>
+              );
+            })()}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="light" className="btn-rounded" onClick={this.toggleMoverModal}>
+              {t("close")}
+            </Button>
+            <Button variant="primary" onClick={this.moverGestion}>
+              {t("accept")}
             </Button>
           </Modal.Footer>
         </Modal>
