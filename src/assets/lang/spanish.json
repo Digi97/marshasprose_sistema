@@ -474,7 +474,28 @@
     "origin_month": "Mes Origen",
     "destination_month": "Mes Destino",
     "origin_year": "Año Origen",
-    "destination_year": "Año Destino"
+    "destination_year": "Año Destino",
+      "bank_accounts":"Cuentas Bancarias",
+      "bank_name":"Nombre Banco",
+      "account_number":"Número Cuenta",
+      "account_type":"Tipo Cuenta",
+      "initial_balance":"Balance Inicial",
+      "current_balance":"Balance Actual",
+      "bank_detail":"Detalle Banco",
+      "create_bank_account":"Crear Cuenta Bancaria",
+      "edit_bank_account":"Editar Cuenta Bancaria",
+      "movements":"Movimientos",
+      "last_movements":"Últimos movimientos",
+      "movement_type":"Tipo Movimiento",
+      "previous_balance":"Balance Previo",
+      "posterior_balance":"Balance Posterior",
+      "expense":"Gastos",
+      "total_accounts":"Cuentas Totales",
+      "active_accounts":"Cuentas Activas",
+      "all":"Todo",
+      "month":"Mes",
+      "year":"Año",
+      "information":"Información"
     }
 
 }

@@ -426,6 +426,27 @@
     "origin_month": "Origin Month",
     "destination_month": "Destination Month",
     "origin_year": "Origin Year",
-    "destination_year": "Destination Year"
+    "destination_year": "Destination Year",
+    "bank_accounts": "Bank Accounts",
+    "bank_name": "Bank Name",
+    "account_number": "Account Number",
+    "account_type": "Account Type",
+    "initial_balance": "Initial Balance",
+    "current_balance": "Current Balance",
+    "bank_detail": "Bank Detail",
+    "create_bank_account": "Create Bank Account",
+    "edit_bank_account": "Edit Bank Account",
+    "movements": "Movements",
+    "last_movements": "Last Movements",
+    "movement_type": "Movement Type",
+    "previous_balance": "Previous Balance",
+    "posterior_balance": "Posterior Balance",
+    "expense": "Expenses",
+    "total_accounts": "Total Accounts",
+    "active_accounts": "Active Accounts",
+    "all": "All",
+    "month": "Month",
+    "year": "Year",
+    "information": "Information"
   }
 }

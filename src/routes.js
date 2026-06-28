@@ -8,6 +8,7 @@ import Invoice from "./screen/components/Modules/Invoice.js";
 import Spent from "./screen/components/Modules/Spent.js";
 import Customers_Providers from "./screen/components/Modules/Customers_Providers.js";
 import Budget from "./screen/components/Modules/Budget.js";
+import Bank from "./screen/components/Modules/Bank.js";
 import Income from  "./screen/components/Modules/Income.js";
 import Reports from  "./screen/components/Modules/Reports.js";
 
@@ -17,6 +18,11 @@ import permissions from "./permission.json";
 function BudgetWithNavigate() {
     const navigate = useNavigate();
     return <Budget navigate={navigate} />;
+}
+
+function BankWithNavigate() {
+    const navigate = useNavigate();
+    return <Bank navigate={navigate} />;
 }
 
 
@@ -80,6 +86,14 @@ let dashboardRoutes = (t) =>{
     component: BudgetWithNavigate,
     layout: "/home",
     permiso:ROUTE_PERMISSIONS["/budget_management"]
+  },
+  {
+    path: "/bank",
+    name: t("bank_accounts"),
+    icon: "fas fa-university",
+    component: BankWithNavigate,
+    layout: "/home",
+    permiso: ROUTE_PERMISSIONS["/budget_management"]
   },
   {
     path: "/users",
