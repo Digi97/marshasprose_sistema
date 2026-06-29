@@ -57,7 +57,7 @@ class Bank extends Component {
       numero_cuenta: "",
       tipo_cuenta: "",
       saldo_inicial: "",
-      Tipo_moneda_id: "",
+      tipo_moneda_id: "",
       Centro_Costos_id: "",
       Categoria_presupuestaria_id: "",
       Usuarios_Usuario_id: 0,
@@ -204,7 +204,7 @@ class Bank extends Component {
       alertSuccess(t("invalid_string_form_tipo_cuenta"), "warning", t);
       return false;
     }
-    if (!banco.Tipo_moneda_id) {
+    if (!banco.tipo_moneda_id) {
       alertSuccess(t("invalid_value_form_Tipo_moneda_id"), "warning", t);
       return false;
     }
@@ -221,7 +221,7 @@ class Bank extends Component {
       ...this.state.banco,
       Usuarios_Usuario_id: this.state.user.usuario_id,
       moneda_simbolo:
-        this.state.currencies.find((c) => c.id === parseInt(this.state.banco.Tipo_moneda_id))
+        this.state.currencies.find((c) => c.id === parseInt(this.state.banco.tipo_moneda_id))
           ?.Simbolo || "",
     };
 
@@ -731,7 +731,7 @@ class Bank extends Component {
                         <Row className="mb-2">
                           <Col>
                             <Badge bg="success" className="me-2">
-                              {t("income")}: {currencies.find(c => c.id === bancoDetalle?.Tipo_moneda_id)?.Simbolo || ""}
+                              {t("income")}: {currencies.find(c => c.id === bancoDetalle?.tipo_moneda_id)?.Simbolo || ""}
                               {" "}{AppUtil.formatNumber(
                                 movimientosFiltrados
                                   .filter((m) => m.tipo_movimiento === 1)
@@ -739,7 +739,7 @@ class Bank extends Component {
                               )}
                             </Badge>
                             <Badge bg="danger" className="me-2">
-                              {t("expense")}: {currencies.find(c => c.id === bancoDetalle?.Tipo_moneda_id)?.Simbolo || ""}
+                              {t("expense")}: {currencies.find(c => c.id === bancoDetalle?.tipo_moneda_id)?.Simbolo || ""}
                               {" "}{AppUtil.formatNumber(
                                 movimientosFiltrados
                                   .filter((m) => m.tipo_movimiento === 2)

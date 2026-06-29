@@ -229,7 +229,7 @@ class Cabys_Code extends Component {
                        <Form.Group>
                                           <Form.Select placeholder={t("tax")} onChange={this._saveStateVariable} name="impuesto_id" required >
                                                   <option value="">{t("select_option")}</option>
-                                            {this.state.taxes?.map((item, key) =>(item.id === this.state.cabys_code.impuesto_id  ? <option value={item.id} selected defaultValue key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}                     
+                                            {this.state.taxes?.map((item, key) =>(item.id === this.state.cabys_code.impuesto_id  ? <option value={item.id} selected key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}                     
                                          </Form.Select>
                                      
                                      </Form.Group>

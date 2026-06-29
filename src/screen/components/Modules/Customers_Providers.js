@@ -766,7 +766,7 @@ class Customer_Provider extends Component {
                                                         <option
                                                             value={item.id}
                                                             selected
-                                                            defaultValue
+                                                            
                                                             key={key}
                                                         >
                                                             {item.nombre}
@@ -945,7 +945,7 @@ class Customer_Provider extends Component {
                                                         <option
                                                             value={item.id}
                                                             selected
-                                                            defaultValue
+                                                            
                                                             key={key}
                                                         >
                                                             {item.nombre}
@@ -987,7 +987,7 @@ class Customer_Provider extends Component {
                                                         <option
                                                             value={item.id}
                                                             selected
-                                                            defaultValue
+                                                            
                                                             key={key}
                                                         >
                                                             {item.nombre}
@@ -1029,7 +1029,7 @@ class Customer_Provider extends Component {
                                                         <option
                                                             value={item.id}
                                                             selected
-                                                            defaultValue
+                                                            
                                                             key={key}
                                                         >
                                                             {item.nombre}

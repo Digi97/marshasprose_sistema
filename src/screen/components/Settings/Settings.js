@@ -419,7 +419,7 @@ class Settings extends Component {
                                                                             <option
                                                                                 value={item.id}
                                                                                 selected
-                                                                                defaultValue
+                                                                                
                                                                                 key={key}
                                                                             >
                                                                                 {item.nombre}
@@ -460,7 +460,7 @@ class Settings extends Component {
                                                                             <option
                                                                                 value={item.id}
                                                                                 selected
-                                                                                defaultValue
+                                                                                
                                                                                 key={key}
                                                                             >
                                                                                 {item.nombre}
@@ -501,7 +501,7 @@ class Settings extends Component {
                                                                             <option
                                                                                 value={item.id}
                                                                                 selected
-                                                                                defaultValue
+                                                                                
                                                                                 key={key}
                                                                             >
                                                                                 {item.nombre}

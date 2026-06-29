@@ -11,9 +11,10 @@ import Budget from "./screen/components/Modules/Budget.js";
 import Bank from "./screen/components/Modules/Bank.js";
 import Income from  "./screen/components/Modules/Income.js";
 import Reports from  "./screen/components/Modules/Reports.js";
+import Accounting_Account from  "./screen/components/Modules/Accounts.js";
 
 import crypto from "crypto-js";
-import permissions from "./permission.json";
+
 
 function BudgetWithNavigate() {
     const navigate = useNavigate();
@@ -72,11 +73,11 @@ let dashboardRoutes = (t) =>{
     permiso:null
   },
    {
-    path: "/",
+    path: "/accounts",
     name: t("accounts"),
     icon: "fas fa-file",
-    component: Home,
-    layout: "/home/accounts",
+    component: Accounting_Account,
+    layout: "/home",
     permiso:null
   },
      {

@@ -245,7 +245,7 @@ class Accounting_account extends Component {
                     <Form.Group>
                          <Form.Select placeholder={t("type_accounting_account")} onChange={this._saveStateVariable} name="tipo_Cuenta_Contable_id" required >
                                  <option value="">-- Seleccione una opción --</option>
-                           {this.state.typeAAList?.map((item, key) =>(item.id === this.state.accountingAccount.tipo_Cuenta_Contable_id  ? <option value={item.id} selected defaultValue key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}                     
+                           {this.state.typeAAList?.map((item, key) =>(item.id === this.state.accountingAccount.tipo_Cuenta_Contable_id  ? <option value={item.id} selected key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}                     
                         </Form.Select>
                     
                     </Form.Group>
@@ -270,7 +270,7 @@ class Accounting_account extends Component {
                     <Form.Group>
                       <Form.Select placeholder={t("currency")} onChange={this._saveStateVariable} name="tipo_moneda_id" required >
                                <option value="">{t("select_option")}</option>
-                           {this.state.currencyList?.map((item, key) =>(item.id === this.state.accountingAccount.tipo_moneda_id  ? <option value={item.id} selected defaultValue key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}
+                           {this.state.currencyList?.map((item, key) =>(item.id === this.state.accountingAccount.tipo_moneda_id  ? <option value={item.id} selected key={key}>{item.nombre}</option> :  <option value={item.id} key={key}>{item.nombre}</option>))}
                          
                         </Form.Select>
                     </Form.Group>

@@ -495,7 +495,16 @@
       "all":"Todo",
       "month":"Mes",
       "year":"Año",
-      "information":"Información"
+      "information":"Información",
+      "accounts_receivable":"Cuenta por Cobrar",
+      "paid_accounts":"Cuentas Pagadas",
+      "accounts_payable":"Cuentas por Pagar",
+      "due_date":"Fecha Vencimiento",
+      "projected_amount":"Monto Proyectado",
+      "entity":"Entidad",
+      "add_payment":"Agregar Pago",
+      "credit_days":"Días de Crédito",
+      "days":"días"
     }
 
 }

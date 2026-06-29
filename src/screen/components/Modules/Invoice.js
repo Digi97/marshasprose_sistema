@@ -13,6 +13,7 @@ import moment from 'moment-timezone'
 import Tooltip from 'react-bootstrap/Tooltip';
 import alertSuccess from "../common/SweetAlert";
 import ActionButtons from "../common/ActionButtons";
+import SlideDown from "../common/SlideDown";
 
 
 DataTable.use(DT);
@@ -49,6 +50,7 @@ class Invoice extends Component {
                 cambio_compra: 0,
                 clientes_id: 0,
                 condicion_venta_id: 0,
+                dias_credito: "",
                 medio_pago_id: 0,
                 usuarios_Usuario_id: 0,
             },
@@ -147,6 +149,7 @@ class Invoice extends Component {
         cambio_compra: 0,
         clientes_id: 0,
         condicion_venta_id: 0,
+        dias_credito: "",
         medio_pago_id: 0,
         usuarios_Usuario_id: this.user ? this.user.usuario_id : 0,
     });
@@ -842,6 +845,14 @@ _triggerDefaultTax = () => {
                                     </Form.Group>
                                 </Col>
                             </Row>
+
+                            <SlideDown
+                                show={parseInt(invoice.condicion_venta_id) === 2}//id de los creditos 
+                                value={invoice.dias_credito}
+                                onChange={this._saveStateVariable}
+                                disabled={isView}
+                                t={t}
+                            />
 
                             {/* ── Medio de pago / Tipo documento ── */}
                             <Row className="m-2">

@@ -415,7 +415,7 @@ class Users extends Component {
                                                         <option
                                                             value={item.id}
                                                             selected
-                                                            defaultValue
+                                                            
                                                             key={key}
                                                         >
                                                             {item.descripcion}

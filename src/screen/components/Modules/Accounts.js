@@ -453,7 +453,7 @@ class Accounts extends Component {
             <th>{t("posterior_balance")}</th>
             <th>{t("payment_method")}</th>
             <th>{t("reference")}</th>
-            <th>{t("observations")}</th>
+            <th>{t("detail")}</th>
             <th>{t("action")}</th>
           </tr>
         </thead>
@@ -701,7 +701,7 @@ class Accounts extends Component {
           <Form onSubmit={this.saveCuentaEncabezado}>
             <Modal.Header closeButton>
               <h3 className="tituloFerias">
-                {encabezado.id === 0 ? t("create_account") : t("edit_account")}
+                {encabezado.id === 0 ? t("create") : t("edit")}
               </h3>
             </Modal.Header>
             <Modal.Body>

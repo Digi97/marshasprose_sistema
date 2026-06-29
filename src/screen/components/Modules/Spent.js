@@ -12,6 +12,7 @@ import { withTranslation } from "react-i18next";
 import moment from 'moment-timezone'
 import alertSuccess from "../common/SweetAlert";
 import ActionButtons from '../common/ActionButtons'
+import SlideDown from '../common/SlideDown'
 
 DataTable.use(DT);
 
@@ -42,7 +43,9 @@ class Spent extends Component {
         createElectronicDoc:1, //delete on send
         descuento:0,
         tipo_moneda_id:0,
-        presupuesto_id:0
+        presupuesto_id:"",
+        condicion_venta_id: 0,
+        dias_credito: ""
       },
       AuxLine:{
         total:"",
@@ -64,6 +67,7 @@ class Spent extends Component {
       taxes:[],
       defaultTax:0,
       currency:[],
+      saleConditions: [],
       token: "",
       dropGP:[]
     };
@@ -126,9 +130,10 @@ _triggerDefaultTax = () => {
     this.getTaxes();
     this.getPaymentMethods();
     this.getProviders();
-    this.getCommercialCodes();    
+    this.getCommercialCodes();
 this.getCurrency();
 this.getCategories_dropdown();
+this.getSaleConditions();
 
 
     });
@@ -154,7 +159,9 @@ this.getCategories_dropdown();
         usuarios_Usuario_id: this.user ? this.user.usuario_id : 0,
         createElectronicDoc:1,
         tipo_moneda_id:0,
-        presupuesto_id:0
+        presupuesto_id:"",
+        condicion_venta_id: 0,
+        dias_credito: ""
       },
     }, ()=> this._triggerDefaultTax());
 
@@ -336,6 +343,11 @@ _saveStateVariable = async (e) => {
     );
   }
 
+  getSaleConditions = () =>
+    AppUtil.getAPI("catalogos/condicion_venta").then((response) => {
+      this.setState({ saleConditions: response ? response.data : [] });
+    });
+
   getCommercialCodes = () =>
     AppUtil.getAPI("catalogos/codigo_comercial").then(
       (response) => {
@@ -406,7 +418,7 @@ _saveStateVariable = async (e) => {
       alertSuccess(t("invalid_string_form_proveedor_id"), "warning", t);
       return false;
     }
-    if (!spent.presupuesto_id) {
+    if (spent.presupuesto_id === "") {
       alertSuccess(t("invalid_string_form_presupuesto_id"), "warning", t);
       return false;
     }
@@ -420,7 +432,7 @@ _saveStateVariable = async (e) => {
     if (!this.validateForm(t)) {
       return;
     }
-
+  
     if (lines.length === 0) {
       alertSuccess(t("lines_required"),"warning",t);
       return;
@@ -504,7 +516,7 @@ _saveStateVariable = async (e) => {
       processing,
       token,
       taxes,
-      AuxLine, dropGP
+      AuxLine, dropGP, saleConditions
     } = this.state;
 
     return (
@@ -649,7 +661,7 @@ _saveStateVariable = async (e) => {
                         <Form.Select
                           name="presupuesto_id"
                           onChange={this._saveStateVariable}
-                          value={spent.presupuesto}
+                          value={spent.presupuesto_id}
                           required
                           disabled={isView}
                         >
@@ -729,11 +741,35 @@ _saveStateVariable = async (e) => {
                           ))}
                         </Form.Select>
                       </Form.Group>
-                    </Col>  
+                    </Col>
 
-
+                    <Col sm="12" xl="12">
+                      <label className="txt-darkblue">{t("sale_condition")}</label>
+                      <Form.Group>
+                        <Form.Select
+                          name="condicion_venta_id"
+                          onChange={this._saveStateVariable}
+                          value={spent.condicion_venta_id}
+                          required
+                          disabled={isView}
+                        >
+                          <option value="">{t("select_option")}</option>
+                          {saleConditions.map((item) => (
+                            <option key={item.id} value={item.id}>{item.descripcion}</option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
 
                   </Row>
+
+                  <SlideDown
+                    show={parseInt(spent.condicion_venta_id) === 2}//id de compra a credito 
+                    value={spent.dias_credito}
+                    onChange={this._saveStateVariable}
+                    disabled={isView}
+                    t={t}
+                  />
 
                   <Row className="m-2">
                     <Col sm="12" xl="12">
