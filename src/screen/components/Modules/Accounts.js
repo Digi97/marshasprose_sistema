@@ -12,6 +12,7 @@ import AppUtil from "../../../AppUtil/AppUtil";
 import alertSuccess from "../common/SweetAlert";
 import Swal from "sweetalert2";
 import ActionButtons from "../common/ActionButtons";
+import RenderActive from "../common/renderActive";
 
 DataTable.use(DT);
 
@@ -70,37 +71,37 @@ class Accounts extends Component {
   _emptyEncabezado() {
     return {
       id: 0,
-      Referencia: "",
-      Vigencia_inicial: moment().format("YYYY-MM-DD"),
-      Vigencia_final: moment().add(30, "days").format("YYYY-MM-DD"),
-      Total: "",
-      Monto_Proyeccion: "",
+      referencia: "",
+      vigencia_inicial: moment().format("YYYY-MM-DD"),
+      vigencia_final: moment().add(30, "days").format("YYYY-MM-DD"),
+      total: "",
+      monto_Proyeccion: "",
       impuesto: 0,
       subtotal: "",
-      Descuento: 0,
-      Tipo_moneda_id: "",
-      Medio_pago_id: "",
-      Tipo_cuentas_id: "",
-      Cuentas_Contables_id: "",
-      Centro_Costos_id: "",
-      Clientes_id: "",
-      Proveedor_id: "",
-      Gastos_id: null,
-      Ingresos_id: null,
-      Facturas_id: null,
-      Estado: 1,
-      Usuarios_Usuario_id: 0,
+      descuento: 0,
+      tipo_moneda_id: "",
+      medio_pago_id: "",
+      tipo_cuentas_id: "",
+      cuentas_Contables_id: "",
+      centro_Costos_id: "",
+      clientes_id: "",
+      proveedor_id: "",
+      gastos_id: null,
+      ingresos_id: null,
+      facturas_id: null,
+      estado: 1,
+      usuarios_Usuario_id: 0,
     };
   }
 
   _emptyPago() {
     return {
-      Cuenta_Encabezado_id: 0,
-      Tipo_movimiento: 1,
+      cuenta_Encabezado_id: 0,
+      tipo_movimiento: 1,
       monto: "",
-      Medio_pago_id: "",
+      medio_pago_id: "",
       referencia_pago: "",
-      Observaciones: "",
+      observaciones: "",
     };
   }
 
@@ -132,7 +133,7 @@ class Accounts extends Component {
     AppUtil.getAPI("catalogos/centro_costos").then((r) =>
       this.setState({ cost_center: r ? r.data : [] })
     );
-    AppUtil.getAPI("clientes").then((r) =>
+    AppUtil.getAPI("clientes_dp").then((r) =>
       this.setState({ clientes: r ? r.data : [] })
     );
     AppUtil.getAPI("proveedor").then((r) =>
@@ -165,26 +166,26 @@ class Accounts extends Component {
         {
           encabezado: {
             id: ce.id,
-            Referencia: ce.Referencia,
-            Vigencia_inicial: moment(ce.Vigencia_inicial).format("YYYY-MM-DD"),
-            Vigencia_final: moment(ce.Vigencia_final).format("YYYY-MM-DD"),
-            Total: ce.Total,
-            Monto_Proyeccion: ce.Monto_Proyeccion,
+            referencia: ce.referencia,
+            vigencia_inicial: moment(ce.vigencia_inicial).format("YYYY-MM-DD"),
+            vigencia_final: moment(ce.vigencia_final).format("YYYY-MM-DD"),
+            total: ce.total,
+            monto_Proyeccion: ce.monto_Proyeccion,
             impuesto: ce.impuesto,
             subtotal: ce.subtotal,
-            Descuento: ce.Descuento,
-            Tipo_moneda_id: ce.Tipo_moneda_id,
-            Medio_pago_id: ce.Medio_pago_id,
-            Tipo_cuentas_id: ce.Tipo_cuentas_id,
-            Cuentas_Contables_id: ce.Cuentas_Contables_id || "",
-            Centro_Costos_id: ce.Centro_Costos_id || "",
-            Clientes_id: ce.Clientes_id || "",
-            Proveedor_id: ce.Proveedor_id || "",
-            Gastos_id: ce.Gastos_id,
-            Ingresos_id: ce.Ingresos_id,
-            Facturas_id: ce.Facturas_id,
-            Estado: ce.Estado,
-            Usuarios_Usuario_id: ce.Usuarios_Usuario_id,
+            descuento: ce.descuento,
+            tipo_moneda_id: ce.tipo_moneda_id,
+            medio_pago_id: ce.medio_pago_id,
+            tipo_cuentas_id: ce.tipo_cuentas_id,
+            cuentas_Contables_id: ce.cuentas_Contables_id || "",
+            centro_Costos_id: ce.centro_Costos_id || "",
+            clientes_id: ce.clientes_id || "",
+            proveedor_id: ce.proveedor_id || "",
+            gastos_id: ce.gastos_id,
+            ingresos_id: ce.ingresos_id,
+            facturas_id: ce.facturas_id,
+            estado: ce.Estado,
+            usuarios_Usuario_id: ce.usuarios_Usuario_id,
           },
           show: true,
           isView,
@@ -637,36 +638,29 @@ class Accounts extends Component {
               ref={this.datatableRef}
               data={cuentas}
               columns={[
-                { data: "Referencia", title: t("reference") },
+                { data: "referencia", title: t("reference") },
                 {
-                  data: "Cliente", title: t("entity"),
-                  render: (data, type, row) => row.Cliente || row.Proveedor || "—",
+                  data: "cliente", title: t("entity"),
+                  render: (data, type, row) => row.cliente || row.proveedor || "—",
                 },
-                { data: "Tipo_cuenta", title: t("account_type") },
+                { data: "tipo_cuenta", title: t("account_type") },
                 {
-                  data: "Total", title: t("total"),
+                  data: "total", title: t("total"),
                   render: (data, type, row) =>
-                    `${row.Simbolo || ""} ${AppUtil.formatNumber(data)}`,
+                    `${row.simbolo || ""} ${AppUtil.formatNumber(data)}`,
                 },
                 {
-                  data: "Vigencia_final", title: t("due_date"),
+                  data: "vigencia_final", title: t("due_date"),
                   render: (data) => moment(data).format("DD/MM/YYYY"),
                 },
-                {
-                  data: "Estado", title: t("status"),
-                  render: (data) => {
-                    const v = ESTADO_VARIANT[data] || "secondary";
-                    const l = ESTADO_LABELS[data] || data;
-                    return `<span class="badge bg-${v}">${l}</span>`;
-                  },
-                },
+                {data: "estado", title: t("status")},
                 {
                   title: t("action"), data: null,
                   orderable: false, searchable: false,
                 },
               ]}
               className="display table cell-border compact stripe"
-              slots={{ 6: (cellData, rowData) => this.ActionButtons(rowData) }}
+              slots={{ 6: (cellData, rowData) => this.ActionButtons(rowData), 5: (cellData, rowData) => RenderActive(cellData, t) }}
               options={{
                 language: {
                   zeroRecords: t("zeroRecords"),
@@ -711,9 +705,9 @@ class Accounts extends Component {
                     <Form.Label>{t("reference")}</Form.Label>
                     <Form.Control
                       type="text"
-                      name="Referencia"
+                      name="referencia"
                       placeholder={t("reference")}
-                      value={encabezado.Referencia}
+                      value={encabezado.referencia}
                       onChange={this._saveEncabezado}
                       maxLength={200}
                       required
@@ -724,9 +718,10 @@ class Accounts extends Component {
                 <Col sm="12" xl="3">
                   <Form.Group className="mb-3">
                     <Form.Label>{t("account_type")}</Form.Label>
+                  
                     <Form.Select
                       name="Tipo_cuentas_id"
-                      value={encabezado.Tipo_cuentas_id}
+                      value={encabezado.tipo_cuentas_id}
                       onChange={this._saveEncabezado}
                       required
                       disabled={isView || encabezado.id > 0}
@@ -742,7 +737,7 @@ class Accounts extends Component {
                     <Form.Label>{t("currency")}</Form.Label>
                     <Form.Select
                       name="Tipo_moneda_id"
-                      value={encabezado.Tipo_moneda_id}
+                      value={encabezado.tipo_moneda_id}
                       onChange={this._saveEncabezado}
                       required
                       disabled={isView}
@@ -750,7 +745,7 @@ class Accounts extends Component {
                       <option value="">{t("select_option")}</option>
                       {currencies.map((c) => (
                         <option key={c.id} value={c.id}>
-                          {c.Nombre || c.nombre} ({c.Simbolo})
+                          {c.Nombre || c.nombre} ({c.simbolo})
                         </option>
                       ))}
                     </Form.Select>
@@ -765,8 +760,8 @@ class Accounts extends Component {
                     <Form.Group className="mb-3">
                       <Form.Label>{t("client")}</Form.Label>
                       <Form.Select
-                        name="Clientes_id"
-                        value={encabezado.Clientes_id}
+                        name="clientes_id"
+                        value={encabezado.clientes_id}
                         onChange={this._saveEncabezado}
                         required
                         disabled={isView}
@@ -788,8 +783,8 @@ class Accounts extends Component {
                     <Form.Group className="mb-3">
                       <Form.Label>{t("provider")}</Form.Label>
                       <Form.Select
-                        name="Proveedor_id"
-                        value={encabezado.Proveedor_id}
+                        name="proveedor_id"
+                        value={encabezado.proveedor_id}
                         onChange={this._saveEncabezado}
                         required
                         disabled={isView}
@@ -812,8 +807,8 @@ class Accounts extends Component {
                     <Form.Label>{t("begin_period")}</Form.Label>
                     <Form.Control
                       type="date"
-                      name="Vigencia_inicial"
-                      value={encabezado.Vigencia_inicial}
+                      name="vigencia_inicial"
+                      value={encabezado.vigencia_inicial}
                       onChange={this._saveEncabezado}
                       required
                       disabled={isView}
@@ -826,7 +821,7 @@ class Accounts extends Component {
                     <Form.Control
                       type="date"
                       name="Vigencia_final"
-                      value={encabezado.Vigencia_final}
+                      value={encabezado.vigencia_final}
                       onChange={this._saveEncabezado}
                       required
                       disabled={isView}
@@ -837,8 +832,8 @@ class Accounts extends Component {
                   <Form.Group className="mb-3">
                     <Form.Label>{t("payment_method")}</Form.Label>
                     <Form.Select
-                      name="Medio_pago_id"
-                      value={encabezado.Medio_pago_id}
+                      name="medio_pago_id"
+                      value={encabezado.medio_pago_id}
                       onChange={this._saveEncabezado}
                       required
                       disabled={isView}
@@ -859,8 +854,8 @@ class Accounts extends Component {
                   <Form.Group className="mb-3">
                     <Form.Label>{t("cost_center")}</Form.Label>
                     <Form.Select
-                      name="Centro_Costos_id"
-                      value={encabezado.Centro_Costos_id}
+                      name="centro_Costos_id"
+                      value={encabezado.centro_Costos_id}
                       onChange={this._saveEncabezado}
                       required
                       disabled={isView}
@@ -912,9 +907,9 @@ class Accounts extends Component {
                     <Form.Label>{t("discount")}</Form.Label>
                     <Form.Control
                       type="number"
-                      name="Descuento"
+                      name="descuento"
                       placeholder="0.00"
-                      value={encabezado.Descuento}
+                      value={encabezado.descuento}
                       onChange={this._saveEncabezado}
                       min={0}
                       step="0.01"
@@ -927,9 +922,9 @@ class Accounts extends Component {
                     <Form.Label>{t("total")}</Form.Label>
                     <Form.Control
                       type="number"
-                      name="Total"
+                      name="total"
                       placeholder="0.00"
-                      value={encabezado.Total}
+                      value={encabezado.total}
                       onChange={this._saveEncabezado}
                       min={0}
                       step="0.01"
@@ -943,9 +938,9 @@ class Accounts extends Component {
                     <Form.Label>{t("projected_amount")}</Form.Label>
                     <Form.Control
                       type="number"
-                      name="Monto_Proyeccion"
+                      name="monto_Proyeccion"
                       placeholder="0.00"
-                      value={encabezado.Monto_Proyeccion}
+                      value={encabezado.monto_Proyeccion}
                       onChange={this._saveEncabezado}
                       min={0}
                       step="0.01"
@@ -962,7 +957,7 @@ class Accounts extends Component {
                       <Form.Label>{t("status")}</Form.Label>
                       <Form.Select
                         name="Estado"
-                        value={encabezado.Estado}
+                        value={encabezado.estado}
                         onChange={this._saveEncabezado}
                         disabled={isView}
                       >
@@ -997,7 +992,7 @@ class Accounts extends Component {
         >
           <Modal.Header closeButton>
             <h3 className="tituloFerias">
-              {cuentaDetalle?.Referencia} — {t("account_detail")}
+              {cuentaDetalle?.referencia} — {t("account_detail")}
             </h3>
           </Modal.Header>
           <Modal.Body>
@@ -1022,64 +1017,64 @@ class Accounts extends Component {
                   <Row className="m-2">
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("reference")}</small>
-                      <p className="fw-bold mb-1">{cuentaDetalle.Referencia}</p>
+                      <p className="fw-bold mb-1">{cuentaDetalle.referencia}</p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("account_type")}</small>
-                      <p className="fw-bold mb-1">{cuentaDetalle.Tipo_cuenta}</p>
+                      <p className="fw-bold mb-1">{cuentaDetalle.tipo_cuenta}</p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("entity")}</small>
                       <p className="fw-bold mb-1">
-                        {cuentaDetalle.Cliente || cuentaDetalle.Proveedor || "—"}
+                        {cuentaDetalle.cliente || cuentaDetalle.proveedor || "—"}
                       </p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("currency")}</small>
-                      <p className="fw-bold mb-1">{cuentaDetalle.Tipo_moneda}</p>
+                      <p className="fw-bold mb-1">{cuentaDetalle.tipo_moneda}</p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("payment_method")}</small>
-                      <p className="fw-bold mb-1">{cuentaDetalle.Medio_pago}</p>
+                      <p className="fw-bold mb-1">{cuentaDetalle.medio_pago}</p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("cost_center")}</small>
-                      <p className="fw-bold mb-1">{cuentaDetalle.Centro_costo}</p>
+                      <p className="fw-bold mb-1">{cuentaDetalle.centro_costo}</p>
                     </Col>
                     <Col sm="12" xl="3" className="mb-2">
                       <small className="text-muted">{t("begin_period")}</small>
                       <p className="fw-bold mb-1">
-                        {moment(cuentaDetalle.Vigencia_inicial).format("DD/MM/YYYY")}
+                        {moment(cuentaDetalle.vigencia_inicial).format(this.user?.formatoFecha.toUpperCase())}
                       </p>
                     </Col>
                     <Col sm="12" xl="3" className="mb-2">
                       <small className="text-muted">{t("due_date")}</small>
                       <p className="fw-bold mb-1">
-                        {moment(cuentaDetalle.Vigencia_final).format("DD/MM/YYYY")}
+                        {moment(cuentaDetalle.vigencia_final).format(this.user?.formatoFecha.toUpperCase())}
                       </p>
                     </Col>
                     <Col sm="12" xl="3" className="mb-2">
                       <small className="text-muted">{t("total")}</small>
                       <p className="fw-bold mb-1">
-                        {cuentaDetalle.Simbolo} {AppUtil.formatNumber(cuentaDetalle.Total)}
+                        {cuentaDetalle.simbolo} {AppUtil.formatNumber(cuentaDetalle.total)}
                       </p>
                     </Col>
                     <Col sm="12" xl="3" className="mb-2">
                       <small className="text-muted">{t("pending_balance")}</small>
-                      <p className={`fw-bold mb-1 ${cuentaDetalle.Saldo_pendiente > 0 ? "text-danger" : "text-success"}`}>
-                        {cuentaDetalle.Simbolo} {AppUtil.formatNumber(cuentaDetalle.Saldo_pendiente)}
+                      <p className={`fw-bold mb-1 ${cuentaDetalle.saldo_pendiente > 0 ? "text-danger" : "text-success"}`}>
+                        {cuentaDetalle.simbolo} {AppUtil.formatNumber(cuentaDetalle.saldo_pendiente)}
                       </p>
                     </Col>
                     {cuentaDetalle.DiasVencido > 0 && (
                       <Col sm="12" className="mb-2">
                         <Badge bg="danger">
-                          {t("overdue_days")}: {cuentaDetalle.DiasVencido}
+                          {t("overdue_days")}: {cuentaDetalle.diasVencido}
                         </Badge>
                       </Col>
                     )}
                     <Col sm="12" className="mb-2">
                       <small className="text-muted">{t("status")}</small>
-                      <div>{this._badgeEstado(cuentaDetalle.Estado)}</div>
+                      <div>{this._badgeEstado(cuentaDetalle.estado)}</div>
                     </Col>
                   </Row>
                 )}
@@ -1089,7 +1084,7 @@ class Accounts extends Component {
                   <Row className="m-2">
                     <Col sm="12">
                       {this._detallesTable(
-                        cuentaDetalle.Detalles,
+                        cuentaDetalle.detalles,
                         t,
                         cuentaDetalle.id
                       )}

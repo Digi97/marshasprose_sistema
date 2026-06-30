@@ -25,8 +25,7 @@ class Bank extends Component {
     this.state = {
       bancos: [],
       currencies: [],
-      cost_center: [],
-      presupuestary_category: [],
+
 
       // create/edit modal
       show: false,
@@ -58,9 +57,7 @@ class Bank extends Component {
       tipo_cuenta: "",
       saldo_inicial: "",
       tipo_moneda_id: "",
-      Centro_Costos_id: "",
-      Categoria_presupuestaria_id: "",
-      Usuarios_Usuario_id: 0,
+      usuarios_Usuario_id: 0,
       estado: 1,
     };
   }
@@ -96,15 +93,7 @@ class Bank extends Component {
       this.setState({ currencies: response ? response.data : [] })
     );
 
-  getCostCenter = () =>
-    AppUtil.getAPI("catalogos/centro_costos").then((response) =>
-      this.setState({ cost_center: response ? response.data : [] })
-    );
 
-  getCategories = () =>
-    AppUtil.getAPI("catalogos/categoria_presupuestaria").then((response) =>
-      this.setState({ presupuestary_category: response ? response.data : [] })
-    );
 
   getBancoById = (id, isView = false) =>
     AppUtil.getAPI(`bancos/${id}`).then((response) => {
@@ -129,8 +118,8 @@ class Bank extends Component {
         
         //cargamos la info para dibujar correctamente el dropdown
         this.getCurrencies();
-    this.getCostCenter();
-    this.getCategories();});
+  
+  });
     });
 
   getBancoDetalle = (id) =>
@@ -175,8 +164,7 @@ class Bank extends Component {
       if(this.state.show)
       {
         this.getCurrencies();
-        this.getCostCenter();
-        this.getCategories();
+ 
       }
     })
 
@@ -248,12 +236,28 @@ class Bank extends Component {
     }
   };
 
+  deleteBanco = (id) =>{
+            const { t } = this.props;
+             AppUtil.deleteAPI(`banco/${id}`).then((response) => {
+
+                if(response.codeStatus ===200)
+                {
+                     alertSuccess( t(response.message), "success", t );
+                }
+
+                 alertSuccess( t(response.message), "warning", t );
+         
+          
+        });
+        }
+
   // ─── render helpers ──────────────────────────────────────────────────────────
 
   ActionButtons = (rowData) => (
     <ActionButtons
       viewAction={() => this.getBancoDetalle(rowData.id)}
       editAction={() => this.getBancoById(rowData.id)}
+      deleteAction={()=> this.deleteBanco(rowData.id)}
     />
   );
 
@@ -309,7 +313,7 @@ class Bank extends Component {
   render() {
     const { t } = this.props;
     const {
-      bancos, currencies, cost_center, presupuestary_category,
+      bancos, currencies,
       banco, show, isView,
       showDetail, bancoDetalle, movimientos,
       activeTab, filtroMes, filtroAnio,
@@ -536,42 +540,7 @@ class Bank extends Component {
                 )}
               </Row>
 
-              <Row className="m-2">
-                <Col sm="12" xl="6">
-                  <Form.Group className="mb-3">
-                    <Form.Label>{t("cost_center")}</Form.Label>
-                    <Form.Select
-                      name="centro_Costos_id"
-                      value={banco.centro_Costos_id}
-                      onChange={this._saveStateVariable}
-                      disabled={isView}
-                    >
-                      <option value="">{t("select_option")}</option>
-                      {cost_center.map((cc) => (
-                        banco.centro_Costos_id === cc.id ? <option key={cc.id} value={cc.id} selected>{cc.Nombre || cc.nombre}</option>:
-                        <option key={cc.id} value={cc.id}>{cc.Nombre || cc.nombre}</option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-                <Col sm="12" xl="6">
-                  <Form.Group className="mb-3">
-                    <Form.Label>{t("presupuestary_category")}</Form.Label>
-                    <Form.Select
-                      name="categoria_presupuestaria_id"
-                      value={banco.categoria_presupuestaria_id}
-                      onChange={this._saveStateVariable}
-                      disabled={isView}
-                    >
-                      <option value="">{t("select_option")}</option>
-                      {presupuestary_category.map((cp) => (
-                       cp.id === banco.categoria_presupuestaria_id ?  (<option defaultValue key={cp.id} value={cp.id} selected >{cp.nombre}</option>): 
-                        (<option key={cp.id} value={cp.id}>{cp.nombre}</option>)
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-              </Row>
+             
 
               {banco.id > 0 && (
                 <Row className="m-2">

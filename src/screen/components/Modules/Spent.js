@@ -131,9 +131,7 @@ _triggerDefaultTax = () => {
     this.getPaymentMethods();
     this.getProviders();
     this.getCommercialCodes();
-this.getCurrency();
-this.getCategories_dropdown();
-this.getSaleConditions();
+
 
 
     });
@@ -163,7 +161,11 @@ this.getSaleConditions();
         condicion_venta_id: 0,
         dias_credito: ""
       },
-    }, ()=> this._triggerDefaultTax());
+    }, ()=> {
+      this.getCurrency();
+this.getCategories_dropdown();
+this.getSaleConditions();
+      this._triggerDefaultTax()});
 
   // Actualiza campos del objeto principal spent
 _saveStateVariable = async (e) => {
@@ -375,13 +377,17 @@ _saveStateVariable = async (e) => {
           const spent = response.data;
           spent.createElectronicDoc = spent.tipo_documento_id === 6 ? 1:0; 
           const lines = spent.gastosDetalle;
-
+          
+          
           this.setState({
               spent,
               lines,
               show: true,
               isView
-            });
+            }, ()=> {
+              this.getCurrency();
+this.getCategories_dropdown();
+this.getSaleConditions();});
 
         } else {
              alertSuccess(t(response.message),"error",t);
@@ -667,6 +673,7 @@ _saveStateVariable = async (e) => {
                         >
                           <option value="">{t("select_option")}</option>
                           {dropGP.map((item) => (
+                  
                             <option key={item.id} value={item.id} disabled={item.monto ===0}>
                               {item.descripcion} {item.simbolo}{item.monto}
                             </option>
@@ -682,16 +689,15 @@ _saveStateVariable = async (e) => {
                         <Form.Select
                           name="categoria_gasto_id"
                           onChange={this._saveStateVariable}
-                          value={spent.categoria_gasto_id}
+                          
                           required
                           disabled={isView}
 
                         >
                           <option value="">{t("select_option")}</option>
                           {categories.map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {item.nombre}
-                            </option>
+ <option key={item.id} value={item.id} selected={spent.categoria_gasto_id === item.id }> {item.nombre} </option>
+                            
                           ))}
                         </Form.Select>
                       </Form.Group>
@@ -705,14 +711,13 @@ _saveStateVariable = async (e) => {
                         <Form.Select
                           name="medio_pago_id"
                           onChange={this._saveStateVariable}
-                          value={spent.medio_pago_id}
                           required
                           disabled={isView}
 
                         >
                           <option value="">{t("select_option")}</option>
                           {paymentMethods.map((item) => (
-                            <option key={item.id} value={item.id}>
+                            <option key={item.id} value={item.id} selected={spent.medio_pago_id === item.id}>
                               {item.descripcion}
                             </option>
                           ))}
@@ -727,15 +732,16 @@ _saveStateVariable = async (e) => {
                       <Form.Group>
                         <Form.Select
                           name="tipo_moneda_id"
-                          onChange={this._saveStateVariable}
-                          value={spent.tipo_moneda_id}
+                          onChange={this._saveStateVariable}       
                           required
                           disabled={isView}
 
-                        >
+                        > 
                           <option value="">{t("select_option")}</option>
-                          {this.state.currency.map((item) => (
-                            <option key={item.id} value={item.id}>
+                          {this.state.currency?.map((item) => (
+                           spent.tipo_moneda_id == item.id ? <option key={item.id} value={item.id} selected> 
+                              {item.nombre}
+                            </option>:  <option key={item.id} value={item.id}> 
                               {item.nombre}
                             </option>
                           ))}
@@ -749,13 +755,12 @@ _saveStateVariable = async (e) => {
                         <Form.Select
                           name="condicion_venta_id"
                           onChange={this._saveStateVariable}
-                          value={spent.condicion_venta_id}
                           required
                           disabled={isView}
                         >
                           <option value="">{t("select_option")}</option>
                           {saleConditions.map((item) => (
-                            <option key={item.id} value={item.id}>{item.descripcion}</option>
+                            <option key={item.id} value={item.id} selected={spent.condicion_venta_id === item.id}>{item.descripcion}</option>
                           ))}
                         </Form.Select>
                       </Form.Group>

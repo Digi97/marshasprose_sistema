@@ -96,7 +96,7 @@ constructor(props) {
     }); 
 }
 
-    getCustomers = () => AppUtil.getAPI("clientes", ).then((response) => {
+    getCustomers = () => AppUtil.getAPI("clientes_dp", ).then((response) => {
                 const customers      = response ? response.data.data : [];
                 this.setState({ customers, processing: false });
             });

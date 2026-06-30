@@ -504,7 +504,18 @@
       "entity":"Entidad",
       "add_payment":"Agregar Pago",
       "credit_days":"Días de Crédito",
-      "days":"días"
+      "days":"días",
+      "view":"Ver",
+      "edit":"Editar",
+      "payments":"Pagos",
+      "account_detail":"Detalle de Cuenta",
+      "pending_balance":"Balance Pendiente",
+      "observations":"Observaciones",
+      "paid":"Pagado",
+      "session_expired":"Tu sesión ha expirado",
+      "session_ended":"Tu sesión ha sido cerrada exitosamente",
+      "code_required":"El campo del código de verificación es obligatorio",
+      "today":"Hoy"
     }
 
 }

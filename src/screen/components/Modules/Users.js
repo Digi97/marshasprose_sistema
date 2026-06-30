@@ -184,10 +184,26 @@ class Users extends Component {
             this.setState({ roles });
         });
 
+        deleteUserById = (id) =>{
+            const { t } = this.props;
+             AppUtil.deleteAPI(`users/${id}`).then((response) => {
+
+                if(response.codeStatus ===200)
+                {
+                     alertSuccess( t(response.message), "success", t );
+                }
+
+                 alertSuccess( t(response.message), "warning", t );
+         
+          
+        });
+        }
+
     ActionButtons = (rowData) => (
         <ActionButtons
             editAction={() => this.getUserById(rowData.usuario_id)}
             viewAction={() => this.getUserById(rowData.usuario_id, true)}
+            deleteAction={()=> this.deleteUserById(rowData.usuario_id,)}
         />
     );
 

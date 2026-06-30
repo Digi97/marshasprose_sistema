@@ -293,7 +293,7 @@ class Invoice extends Component {
     // ─────────────────────────────────────────────
 
     getCustomers = () =>
-        AppUtil.getAPI("clientes", ).then((response) => {
+        AppUtil.getAPI("clientes_dp", ).then((response) => {
             const customers      = response ? response.data.data : [];
             this.setState({ customers, processing: false });
         });
