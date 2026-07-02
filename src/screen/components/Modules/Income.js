@@ -83,7 +83,7 @@ class Income extends Component {
 
     getCategories_dropdown = () =>
         AppUtil.getAPI(
-            `gestion_presupuestaria_dropdown/${moment().year()}`
+            `gestion_presupuestaria_dropdown/${moment().year()}/""`
         ).then((response) => {
             const dropGP = response ? response.data : [];
             this.setState({ dropGP });
@@ -197,9 +197,9 @@ class Income extends Component {
         });
     };
 
-    // ─────────────────────────────────────────────
+    // 
     // LÍNEAS DE DETALLE
-    // ─────────────────────────────────────────────
+    // 
 
     addLine = (e) => {
         e.preventDefault();
@@ -300,9 +300,9 @@ class Income extends Component {
         );
     };
 
-    // ─────────────────────────────────────────────
+    // 
     // CATÁLOGOS
-    // ─────────────────────────────────────────────
+    // 
 
     getCustomers = () => {
         const { t } = this.props;
@@ -346,9 +346,9 @@ class Income extends Component {
             this.setState({ invoiceStates });
         });
 
-    // ─────────────────────────────────────────────
+    // 
     // CONSULTAR POR ID (edición)
-    // ─────────────────────────────────────────────
+    // 
 
     getIncomeById = (id, isView = false) => {
         const { t } = this.props;
@@ -376,9 +376,9 @@ class Income extends Component {
         });
     };
 
-    // ─────────────────────────────────────────────
+    // 
     // GUARDAR (crear o actualizar)
-    // ─────────────────────────────────────────────
+    // 
 
     validateForm = (t) => {
         let { income } = this.state;
@@ -458,9 +458,9 @@ class Income extends Component {
         }
     };
 
-    // ─────────────────────────────────────────────
+    // 
     // BOTONES DE ACCIÓN
-    // ─────────────────────────────────────────────
+    // 
 
     ActionButtons = (rowData) => {
         return (
@@ -471,9 +471,9 @@ class Income extends Component {
         );
     };
 
-    // ─────────────────────────────────────────────
+    // 
     // RENDER
-    // ─────────────────────────────────────────────
+    // 
 
     render() {
         const { t } = this.props;

@@ -234,12 +234,10 @@ _saveStateVariable = async (e) => {
 
   _recalcularTotales = () => {
     const { lines } = this.state;
-    
     const subtotal = lines.reduce((acc, l) => acc + l.subtotal, 0);
     const impuesto = lines.reduce((acc, l) => acc + l.impuesto, 0);
     const total = lines.reduce((acc, l) => acc + l.total, 0);
     const descuento = lines.reduce((acc, l) => acc + l.descuento, 0);
-
     this.setState((prevState) => ({
       spent: {
         ...prevState.spent,
@@ -250,11 +248,8 @@ _saveStateVariable = async (e) => {
       },
     }));
   };
-
   _calculaInput = (e, isSelect= false) =>{
-
- 
-   let {name, type, value, selectedIndex} = e.target;
+   let {name, value, selectedIndex} = e.target;
     if(isSelect)
     {
       const index = selectedIndex;
@@ -263,9 +258,7 @@ _saveStateVariable = async (e) => {
       name = 'porcentaje'
       value = taxOption
       }
-          
-    
-   
+        
      this.setState({ AuxLine: { ...this.state.AuxLine, [name]: value }}, () =>{
 
     let {AuxLine} = this.state;
@@ -275,17 +268,12 @@ _saveStateVariable = async (e) => {
      total = 0, 
      cantidad = isNaN(AuxLine.cantidad) ? 1 : AuxLine.cantidad , 
      descuento = isNaN(AuxLine.descuento)? 0 :AuxLine.descuento ;
-
      impuesto = ((subtotal*cantidad)-descuento) * (tax/100)
      total = ((subtotal*cantidad)-descuento) + impuesto;
-
     AuxLine.total = total;
     AuxLine.impuesto = impuesto
     this.setState({AuxLine})
-
-
      });
-    
   }
 
   getCategories = () =>
@@ -316,7 +304,7 @@ _saveStateVariable = async (e) => {
     );
 
         getCategories_dropdown = () =>
-    AppUtil.getAPI(`gestion_presupuestaria_dropdown/${moment().year()}`).then(
+    AppUtil.getAPI(`gestion_presupuestaria_dropdown/${moment().year()}/""`).then(
       (response) => {
         const dropGP = response ? response.data : [];
         this.setState({ dropGP });
@@ -739,7 +727,7 @@ this.getSaleConditions();});
                         > 
                           <option value="">{t("select_option")}</option>
                           {this.state.currency?.map((item) => (
-                           spent.tipo_moneda_id == item.id ? <option key={item.id} value={item.id} selected> 
+                           spent.tipo_moneda_id === item.id ? <option key={item.id} value={item.id} selected> 
                               {item.nombre}
                             </option>:  <option key={item.id} value={item.id}> 
                               {item.nombre}

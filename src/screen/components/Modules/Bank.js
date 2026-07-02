@@ -62,7 +62,7 @@ class Bank extends Component {
     };
   }
 
-  // ─── lifecycle ──────────────────────────────────────────────────────────────
+  // ─── lifecycle ─────────────────
 
   componentDidMount() {
     this.getUserInfo();
@@ -79,11 +79,11 @@ class Bank extends Component {
     this.setState({ user: this.user });
   };
 
-  // ─── API calls ───────────────────────────────────────────────────────────────
+  // ─── API calls ──────────────────
 
   getBancos = () =>
     AppUtil.getAPI("bancos").then((response) =>{
-      console.log(response);
+    
       
       this.setState({ bancos: response ? response.data : [] })}
     );
@@ -155,12 +155,12 @@ class Bank extends Component {
     );
   };
 
-  // ─── form helpers ────────────────────────────────────────────────────────────
+  // ─── form helpers ───────────────
 
   toggleShow = () =>
     this.setState({ show: !this.state.show, banco: this._emptyBanco(), isView: false }, ()=>{
 
-      console.log(this.state.show);
+      
       if(this.state.show)
       {
         this.getCurrencies();
@@ -251,7 +251,7 @@ class Bank extends Component {
         });
         }
 
-  // ─── render helpers ──────────────────────────────────────────────────────────
+  // ─── render helpers ─────────────
 
   ActionButtons = (rowData) => (
     <ActionButtons
@@ -308,7 +308,7 @@ class Bank extends Component {
     </Table>
   );
 
-  // ─── render ──────────────────────────────────────────────────────────────────
+  // ─── render ─────────────────────
 
   render() {
     const { t } = this.props;

@@ -35,7 +35,7 @@ class Login extends Component {
   //cuando se da boton iniciar sesion
 
 
-  stopLoading = () => this.setState({ charging: false})
+  stopLoading = () => this.setState({ charging: false, form: {...this.state.form, Contrasena:""}})
   preventSubmit(e) {
     e.preventDefault();
   }
@@ -162,7 +162,8 @@ this.stopLoading();
                     aria-describedby="emailHelp"
                     placeholder="nombre@ejemplo.com"
                     onChange={this.getInputData}
-                    maxLength={200}
+                    value={this.state.form.Correo}
+                    maxLength={100}
                   />
                 </div>
                 <div className="form-group">
@@ -179,7 +180,8 @@ this.stopLoading();
                     name="Contrasena"
                     placeholder="***********"
                     onChange={this.getInputData}
-                    maxLength={200}
+                    value={this.state.form.Contrasena ?? ""}
+                    maxLength={100}
                   />
                 </div>
                 <div className="d-flex justify-content-center">

@@ -67,7 +67,7 @@ class Accounts extends Component {
       user: {},
     };
   }
-
+// funciones de limpieza de campos
   _emptyEncabezado() {
     return {
       id: 0,
@@ -93,7 +93,6 @@ class Accounts extends Component {
       usuarios_Usuario_id: 0,
     };
   }
-
   _emptyPago() {
     return {
       cuenta_Encabezado_id: 0,
@@ -104,14 +103,11 @@ class Accounts extends Component {
       observaciones: "",
     };
   }
-
-  // ─── lifecycle ───────────────────────────────────────────────────────────────
-
+  //  arranque 
   componentDidMount() {
     this.getUserInfo();
     this.getCuentas();
   }
-
   getUserInfo = () => {
     let bytes = crypto.AES.decrypt(
       sessionStorage.getItem("user"),
@@ -121,8 +117,7 @@ class Accounts extends Component {
     this.setState({ user: this.user });
   };
 
-  // ─── catalogs (lazy) ─────────────────────────────────────────────────────────
-
+  // catálogos
   _loadCatalogs = () => {
     AppUtil.getAPI("catalogos/tipo_moneda").then((r) =>
       this.setState({ currencies: r ? r.data : [] })
@@ -147,17 +142,14 @@ class Accounts extends Component {
         this.setState({ payment_methods: r ? r.data : [] })
       );
   };
-
-  // ─── API — Cuenta_Encabezado ─────────────────────────────────────────────────
-
+  // API — Cuenta_Encabezado 
   getCuentas = (tipoCuentaId = "") => {
     const qs = tipoCuentaId ? `?tipoCuentaId=${tipoCuentaId}` : "";
     AppUtil.getAPI(`cuenta_encabezado${qs}`).then((response) => {
-      console.log(response);
+  
       this.setState({ cuentas: response ? response.data : [] });
     });
   };
-
   getCuentaById = (id, isView = false) =>
     AppUtil.getAPI(`cuenta_encabezado/${id}`).then((response) => {
       if (!response || !response.data) return;
@@ -167,8 +159,8 @@ class Accounts extends Component {
           encabezado: {
             id: ce.id,
             referencia: ce.referencia,
-            vigencia_inicial: moment(ce.vigencia_inicial).format("YYYY-MM-DD"),
-            vigencia_final: moment(ce.vigencia_final).format("YYYY-MM-DD"),
+            vigencia_inicial: moment(ce.vigencia_inicial).format("YYYY-MM-DD"),//formato para input
+            vigencia_final: moment(ce.vigencia_final).format("YYYY-MM-DD"),//formato para input
             total: ce.total,
             monto_Proyeccion: ce.monto_Proyeccion,
             impuesto: ce.impuesto,
@@ -193,7 +185,6 @@ class Accounts extends Component {
         this._loadCatalogs
       );
     });
-
   openDetalle = (id) =>
     AppUtil.getAPI(`cuenta_encabezado/${id}`).then((response) => {
       if (!response || !response.data) return;
@@ -203,43 +194,42 @@ class Accounts extends Component {
         activeTab: "info",
       });
     });
-
   saveCuentaEncabezado = (e) => {
     e.preventDefault();
     e.stopPropagation();
     const { t } = this.props;
     const { encabezado } = this.state;
 
-    if (!AppUtil.isValidText(encabezado.Referencia)) {
+    if (!AppUtil.isValidText(encabezado.referencia)) {
       alertSuccess(t("invalid_string_form_Referencia"), "warning", t);
       return;
     }
-    if (!encabezado.Tipo_moneda_id) {
+    if (!encabezado.ripo_moneda_id) {
       alertSuccess(t("invalid_value_form_Tipo_moneda_id"), "warning", t);
       return;
     }
-    if (!encabezado.Medio_pago_id) {
+    if (!encabezado.medio_pago_id) {
       alertSuccess(t("invalid_value_form_Medio_pago_id"), "warning", t);
       return;
     }
-    if (!encabezado.Tipo_cuentas_id) {
+    if (!encabezado.tipo_cuentas_id) {
       alertSuccess(t("invalid_value_form_Tipo_cuentas_id"), "warning", t);
       return;
     }
-    if (!encabezado.Centro_Costos_id) {
+    if (!encabezado.centro_Costos_id) {
       alertSuccess(t("invalid_value_form_Centro_Costos_id"), "warning", t);
       return;
     }
     if (
-      parseInt(encabezado.Tipo_cuentas_id) === TIPO_CUENTA_CXC &&
-      !encabezado.Clientes_id
+      parseInt(encabezado.tipo_cuentas_id) === TIPO_CUENTA_CXC &&
+      !encabezado.clientes_id
     ) {
       alertSuccess(t("clientes_id_required_for_cxc"), "warning", t);
       return;
     }
     if (
-      parseInt(encabezado.Tipo_cuentas_id) === TIPO_CUENTA_CXP &&
-      !encabezado.Proveedor_id
+      parseInt(encabezado.tipo_cuentas_id) === TIPO_CUENTA_CXP &&
+      !encabezado.proveedor_id
     ) {
       alertSuccess(t("proveedor_id_required_for_cxp"), "warning", t);
       return;
@@ -247,14 +237,14 @@ class Accounts extends Component {
 
     const payload = {
       ...encabezado,
-      Usuarios_Usuario_id: this.state.user.usuario_id,
-      Clientes_id:
-        parseInt(encabezado.Tipo_cuentas_id) === TIPO_CUENTA_CXC
-          ? parseInt(encabezado.Clientes_id)
+      usuarios_Usuario_id: this.state.user.usuario_id,
+      clientes_id:
+        parseInt(encabezado.tipo_cuentas_id) === TIPO_CUENTA_CXC
+          ? parseInt(encabezado.clientes_id)
           : null,
-      Proveedor_id:
-        parseInt(encabezado.Tipo_cuentas_id) === TIPO_CUENTA_CXP
-          ? parseInt(encabezado.Proveedor_id)
+      proveedor_id:
+        parseInt(encabezado.tipo_cuentas_id) === TIPO_CUENTA_CXP
+          ? parseInt(encabezado.proveedor_id)
           : null,
     };
 
@@ -286,7 +276,6 @@ class Accounts extends Component {
       );
     }
   };
-
   deleteCuentaEncabezado = async (id) => {
     const { t } = this.props;
     const result = await Swal.fire({
@@ -309,9 +298,7 @@ class Accounts extends Component {
       }
     });
   };
-
-  // ─── API — Cuenta_Detalle (pagos) ────────────────────────────────────────────
-
+  //  API — Cuenta_Detalle (pagos) 
   openPagoModal = (encabezadoId) => {
     this._loadPaymentCatalogs();
     this.setState({
@@ -319,7 +306,6 @@ class Accounts extends Component {
       pago: { ...this._emptyPago(), Cuenta_Encabezado_id: encabezadoId },
     });
   };
-
   savePago = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -338,7 +324,7 @@ class Accounts extends Component {
     const payload = {
       ...pago,
       monto: parseFloat(pago.monto),
-      Usuarios_Usuario_id: this.state.user.usuario_id,
+      usuarios_Usuario_id: this.state.user.usuario_id,
     };
 
     AppUtil.postAPI("cuenta_detalle", payload).then((response) => {
@@ -353,7 +339,6 @@ class Accounts extends Component {
       }
     });
   };
-
   deletePago = async (id) => {
     const { t } = this.props;
     const result = await Swal.fire({
@@ -382,9 +367,7 @@ class Accounts extends Component {
       }
     });
   };
-
-  // ─── form helpers ────────────────────────────────────────────────────────────
-
+  //  acciones del formulario
   toggleShow = () =>
     this.setState(
       { show: !this.state.show, encabezado: this._emptyEncabezado(), isView: false },
@@ -415,7 +398,7 @@ class Accounts extends Component {
     this.getCuentas(tipo);
   };
 
-  // ─── render helpers ──────────────────────────────────────────────────────────
+  // renderizado de badges
 
   ActionButtons = (rowData) => (
     <ActionButtons
@@ -468,7 +451,7 @@ class Accounts extends Component {
           )}
           {(detalles || []).map((d) => (
             <tr key={d.id}>
-              <td>{moment(d.fecha_movimiento).format("DD/MM/YYYY")}</td>
+              <td>{moment(d.fecha_movimiento).format(this.user?.formatoFecha.toUpperCase())}</td>
               <td>
                 <Badge bg="info">{TIPO_MOV_LABELS[d.Tipo_movimiento] || d.Tipo_movimiento_texto}</Badge>
               </td>
@@ -494,7 +477,7 @@ class Accounts extends Component {
     </>
   );
 
-  // ─── render ──────────────────────────────────────────────────────────────────
+  // ─── render ─────────────────────
 
   render() {
     const { t } = this.props;
@@ -508,10 +491,6 @@ class Accounts extends Component {
 
     const esCXC = parseInt(encabezado.Tipo_cuentas_id) === TIPO_CUENTA_CXC;
     const esCXP = parseInt(encabezado.Tipo_cuentas_id) === TIPO_CUENTA_CXP;
-
-    const totalPendiente = cuentas
-      .filter((c) => c.Estado === 1)
-      .reduce((s, c) => s + (c.Total || 0), 0);
 
     return (
       <>

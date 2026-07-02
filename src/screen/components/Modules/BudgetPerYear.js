@@ -122,7 +122,7 @@ class BudgetPerYear extends Component {
 
     AppUtil.postAPI(`gestion_por_anio`, { anio_presupuesto, detalles }).then(response => {
 
-         console.log(response);
+    
       if (response && response.codeStatus === 200) {
         alertSuccess(t("updated_successfully"), "success", t);
         this.getMonthlyData(anio_presupuesto);

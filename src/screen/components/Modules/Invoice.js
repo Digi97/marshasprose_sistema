@@ -70,6 +70,8 @@ class Invoice extends Component {
 
             // ── Archivo XML de aceptación
             archivoAceptacion: null,
+            facturaData: null,
+            gastoRegistrado: false,
 
             // ── Catálogos
             customers: [],
@@ -87,6 +89,9 @@ class Invoice extends Component {
             defaultTax: 0,
             formatoFecha:"DD-MM-YYYY",
             token: "",
+            dropGP:[],
+            condicion_venta_id: 0,
+            dias_credito: ""
         };
         this.impuestoSelectRef = createRef(); 
         this.datatableRef = createRef();
@@ -95,6 +100,7 @@ class Invoice extends Component {
 
     componentDidMount() {
         this.getUserInfo();
+        this.getCategories_dropdown();
     }
 
     getUserInfo = () => {
@@ -167,7 +173,8 @@ class Invoice extends Component {
         this.setState({
             showAcceptance: !this.state.showAcceptance,
             archivoAceptacion: null,
-          
+            facturaData: null,
+            gastoRegistrado: false,
         });
 
     // Actualiza campos del objeto invoice
@@ -224,9 +231,9 @@ class Invoice extends Component {
         });
     };
 
-    // ─────────────────────────────────────────────
+    // 
     // LÍNEAS DE DETALLE
-    // ─────────────────────────────────────────────
+    // 
 
     addLine = (e) => {
         e.preventDefault();
@@ -288,9 +295,9 @@ class Invoice extends Component {
         }));
     };
 
-    // ─────────────────────────────────────────────
+    // 
     // CATÁLOGOS
-    // ─────────────────────────────────────────────
+    // 
 
     getCustomers = () =>
         AppUtil.getAPI("clientes_dp", ).then((response) => {
@@ -368,9 +375,9 @@ class Invoice extends Component {
 
    
 }
-    // ─────────────────────────────────────────────
+    // 
     // CONSULTAR POR ID (edición)
-    // ─────────────────────────────────────────────
+    // 
 
     getInvoiceById = (id, isView = false) => {
         const { t } = this.props;
@@ -498,53 +505,85 @@ class Invoice extends Component {
         }
     };
 
-    // ─────────────────────────────────────────────
+    // 
     // ACEPTACIÓN DE FACTURAS (XML)
-    // ─────────────────────────────────────────────
+    // 
 
     _handleFileChange = (e) => {
-        this.setState({ archivoAceptacion: e.target.files[0] });
+        const { t } = this.props;
+        const file = e.target.files[0];
+
+        if (!file) {
+            this.setState({ archivoAceptacion: null, facturaData: null });
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const facturaData = AppUtil.parseInvoiceXML(event.target.result);
+
+            if (!facturaData) {
+                alertSuccess(t("invalid_xml_format"), "error", t);
+                this.setState({ archivoAceptacion: null, facturaData: null });
+                return;
+            }
+
+            if (facturaData.tipoDocumento !== "TiqueteElectronico" && facturaData.tipoDocumento !== "FacturaElectronica") {
+                alertSuccess(t("invalid_xml_not_factura_electronica"), "error", t);
+                this.setState({ archivoAceptacion: null, facturaData: null });
+                return;
+            }
+
+            this.setState({ archivoAceptacion: file, facturaData });
+        };
+        reader.readAsText(file);
+    };
+
+         getCategories_dropdown = () =>
+    AppUtil.getAPI(`gestion_presupuestaria_dropdown/${moment().year()}/""`).then(
+      (response) => {
+        const dropGP = response ? response.data : [];
+        this.setState({ dropGP });
+      }
+    );
+    _toggleGastoRegistrado = (e) => {
+        this.setState({ gastoRegistrado: e.target.checked });
     };
 
     saveAcceptance = () => {
         const { t } = this.props;
-        const { archivoAceptacion } = this.state;
+        const { facturaData, gastoRegistrado, condicion_venta_id, dias_credito } = this.state;
 
-        if (!archivoAceptacion) {
-             alertSuccess(t("xml_file_required"),"error",t);
+        if (!facturaData) {
+            alertSuccess(t("xml_file_required"), "error", t);
             return;
         }
 
         this.setState({ processing: true });
 
-        const formData = new FormData();
-        formData.append("archivo", archivoAceptacion);
+        const payload = { ...facturaData, gastoRegistrado, condicion_venta_id, dias_credito};
 
-        // Envío del XML al endpoint de aceptación
-        fetch(`${url}facturas/aceptacion`, {
-            method: "POST",
-         
-            body: formData,
-        })
-            .then((res) => res.json())
-            .then((response) => {
-                if (response.codeStatus === 200) {
-                      alertSuccess(t("record_created_successfully"),"error",t);
-           
-                } else {
-alertSuccess(t(response.message),"error",t);
-        
+console.log(payload);
+
+        AppUtil.postAPI("aceptacion_factura", payload).then((response) => {
+            this.setState({ processing: false });
+
+            if (response.codeStatus === 200) {
+                alertSuccess(t("record_created_successfully"), "success", t);
+                this.toggleShowAcceptance();
+
+                if (this.datatableRef.current?.dt()) {
+                    this.datatableRef.current.dt().ajax.reload(null, false);
                 }
-            })
-            .catch(() => {
-                alertSuccess(t("please_verify_data"),"error",t);
-        
-            });
+            } else {
+                alertSuccess(t(response.message), "error", t);
+            }
+        });
     };
 
-    // ─────────────────────────────────────────────
+    // 
     // BOTONES DE ACCIÓN EN LA TABLA
-    // ─────────────────────────────────────────────
+    // 
 
     ActionButtons = (rowData) => (
         <ActionButtons 
@@ -633,6 +672,8 @@ _triggerDefaultTax = () => {
             processing,
             token,
             AuxLine,
+            facturaData,
+            gastoRegistrado,
         } = this.state;
 
         return (
@@ -1185,7 +1226,7 @@ _triggerDefaultTax = () => {
 
                         <Modal.Body>
                             <div ref={this.modalTopRef} />
-                   
+
 
                             <Row className="m-2">
                                 <Col sm="12" xl="12">
@@ -1201,16 +1242,190 @@ _triggerDefaultTax = () => {
                                     </Form.Group>
                                 </Col>
                             </Row>
+
+
+                            {
+                                facturaData && 
+                                <Row className="m-2">
+                            <Col sm="12" xl="12">
+                      <label>{t("budget")}</label>
+                      <Form.Group>
+                        <Form.Select
+                          name="presupuesto_id"
+                          onChange={this._saveStateVariable}               
+                          required
+                        >
+                          <option value="">{t("select_option")}</option>
+                          {this.state.dropGP.map((item) => (
+                  
+                            <option key={item.id} value={item.id} disabled={item.monto ===0}>
+                              {item.descripcion} {item.simbolo}{item.monto}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+
+<Row className="m-2">
+                    <Col sm="12" xl="6">
+                                    <label className="txt-darkblue">{t("sale_condition")}</label>
+                                    <Form.Group>
+                                        <Form.Select name="condicion_venta_id" onChange={(value) => this.setState({condicion_venta_id: value})} value={this.state.condicion_venta_id} required 
+                                            disabled={isView}
+                                        >
+                                            <option value="">{t("select_option")}</option>
+                                            {saleConditions.map((item) => (
+                                                <option key={item.id} value={item.id}>{item.descripcion}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            <SlideDown
+                                show={parseInt(this.state.condicion_venta_id) === 2}//id de los creditos 
+                                value={this.state.dias_credito}
+                                onChange={this._saveStateVariable}
+                               
+                                t={t}
+                            />
+                            </Row>
+
+                            }
+
+                            {facturaData && (
+                                <>
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("key")}</label>
+                                            <p>{facturaData.clave}</p>
+                                        </Col>
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("consecutive")}</label>
+                                            <p>{facturaData.numeroConsecutivo}</p>
+                                        </Col>
+                                    </Row>
+
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="12">
+                                            <h5 className="txt-darkblue">{t("issuer")}</h5>
+                                        </Col>
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("name")}</label>
+                                            <p>{facturaData.emisor?.nombre}</p>
+                                        </Col>
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("commercial_name")}</label>
+                                            <p>{facturaData.emisor?.nombreComercial}</p>
+                                        </Col>
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("identification")}</label>
+                                            <p>{facturaData.emisor?.tipoIdentificacion} - {facturaData.emisor?.numeroIdentificacion}</p>
+                                        </Col>
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("email")}</label>
+                                            <p>{facturaData.emisor?.correo}</p>
+                                        </Col>
+                                        <Col sm="12" xl="12">
+                                            <label className="txt-darkblue">{t("address")}</label>
+                                            <p>{facturaData.emisor?.otrasSenas}</p>
+                                        </Col>
+                                    </Row>
+
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="12">
+                                            <h5 className="txt-darkblue">{t("receiver")}</h5>
+                                        </Col>
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("name")}</label>
+                                            <p>{facturaData.receptor?.nombre}</p>
+                                        </Col>
+                                        <Col sm="12" xl="6">
+                                            <label className="txt-darkblue">{t("identification")}</label>
+                                            <p>{facturaData.receptor?.tipoIdentificacion} - {facturaData.receptor?.numeroIdentificacion}</p>
+                                        </Col>
+                                        <Col sm="12" xl="12">
+                                            <label className="txt-darkblue">{t("address")}</label>
+                                            <p>{facturaData.receptor?.otrasSenas}</p>
+                                        </Col>
+                                    </Row>
+
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="12">
+                                            <h5 className="txt-darkblue">{t("invoice_lines")}</h5>
+                                            <Table striped bordered hover size="sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>{t("cabys_code")}</th>
+                                                        <th>{t("detail")}</th>
+                                                        <th>{t("qty")}</th>
+                                                        <th>{t("unit_price")}</th>
+                                                        <th>{t("tax")}</th>
+                                                        <th>{t("total")}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {facturaData.lineas.map((line, index) => (
+                                                        <tr key={index}>
+                                                            <td>{line.numeroLinea}</td>
+                                                            <td>{line.codigoCabys}</td>
+                                                            <td>{line.detalle}</td>
+                                                            <td>{line.cantidad}</td>
+                                                            <td>{AppUtil.formatNumber(line.precioUnitario)}</td>
+                                                            <td>{AppUtil.formatNumber(line.impuestoMonto)}</td>
+                                                            <td>{AppUtil.formatNumber(line.montoTotalLinea)}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        </Col>
+                                    </Row>
+
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="12">
+                                            <h5 className="txt-darkblue">{t("totals")}</h5>
+                                        </Col>
+                                        <Col sm="12" xl="4">
+                                            <label className="txt-darkblue">{t("subtotal")}</label>
+                                            <p>{AppUtil.formatNumber(facturaData.resumen.totalVentaNeta)}</p>
+                                        </Col>
+                                        <Col sm="12" xl="4">
+                                            <label className="txt-darkblue">{t("tax")}</label>
+                                            <p>{AppUtil.formatNumber(facturaData.resumen.totalImpuesto)}</p>
+                                        </Col>
+                                        <Col sm="12" xl="4">
+                                            <label className="txt-darkblue">{t("total")}</label>
+                                            <p>{AppUtil.formatNumber(facturaData.resumen.totalComprobante)}</p>
+                                        </Col>
+                                    </Row>
+
+                                    <Row className="m-2">
+                                        <Col sm="12" xl="12">
+                                            <Form.Group>
+                                                <Form.Check
+                                                    type="checkbox"
+                                                    id="gastoRegistrado"
+                                                    label={t("expense_already_registered")}
+                                                    name="gastoRegistrado"
+                                                    onChange={this._toggleGastoRegistrado}
+                                                    checked={gastoRegistrado}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </>
+                            )}
                         </Modal.Body>
 
                         <Modal.Footer>
                             <Button variant="light" className="btn-rounded" onClick={this.toggleShowAcceptance}>
-                                {t("close")}
+                                {t("cancel")}
                             </Button>
                             {processing ? (
                                 <div className="lds-dual-ring-2" />
                             ) : (
-                                <Button variant="primary" className="" onClick={this.saveAcceptance}>
+                                <Button variant="primary" className="" onClick={this.saveAcceptance} disabled={!facturaData}>
                                     {t("save")}
                                 </Button>
                             )}

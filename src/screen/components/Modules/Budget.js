@@ -10,6 +10,7 @@ import alertSuccess from "../common/SweetAlert";
 import Swal from 'sweetalert2';
 import ActionButtons from '../common/ActionButtons'
 
+
 DataTable.use(DT);
 
 class Budget extends Component {
@@ -60,10 +61,12 @@ constructor(props)
   moverOrigen: "",
   moverDestino: "",
   moverMonto: "",
-  mesOrigen: "",
-  mesDestino: "",
-  anioOrigen: "",
-  anioDestino: "",
+  mesOrigen: moment().month()+1,
+  mesDestino: moment().month()+1,
+  anioOrigen: moment().year(),
+  anioDestino: moment().year(),
+  dropGPOrigen:[],
+  dropGPDestino:[]
     }
      this.user = null
 this.datatableRef = createRef();
@@ -532,12 +535,12 @@ if(response.codeStatus === 200)
     });
 
 
-  ActionButtons = (rowData) => (
+  ActionButtons = (rowData, cellData) => (
 
       <ActionButtons
         viewAction={() => this.getBudgetById(rowData.anio_presupuesto, true)}
         editAction={() => this.getBudgetById(rowData.anio_presupuesto)}
-        listAction={() => this.props.navigate(`/home/budget_detail/${rowData.id}`)}
+        listAction={() => this.props.navigate(`/home/budget_detail/${rowData.anio_presupuesto}`)}
       />
 
    
@@ -551,6 +554,8 @@ if(response.codeStatus === 200)
     this.getCostCenter(); 
     this.getCategories();
     this.getCurrencies();
+    this.getCategories_dropdownOrigen();
+     this.getCategories_dropdownDestino();
   }
 
    getUserInfo = () => {
@@ -573,25 +578,31 @@ if(response.codeStatus === 200)
       moverOrigen: "",
       moverDestino: "",
       moverMonto: "",
-      mesOrigen: "",
-      mesDestino: "",
-      anioOrigen: "",
-      anioDestino: "",
+      mesOrigen: moment().month()+1,
+  mesDestino: moment().month()+1,
+  anioOrigen: moment().year(),
+  anioDestino: moment().year(),
     }));
 
     moverGestion = () => {
       const { t } = this.props;
+      
       const { moverOrigen, moverDestino, moverMonto, mesOrigen, mesDestino, anioOrigen, anioDestino } = this.state;
-      if (!moverOrigen || !moverDestino || !moverMonto || !mesOrigen || !mesDestino || !anioOrigen || !anioDestino) {
+
+
+      console.log(moverOrigen, moverDestino,moverMonto, mesOrigen, mesDestino, anioOrigen, anioDestino);
+      if (moverOrigen==="" || moverDestino ==="" || !moverMonto || !mesOrigen || !mesDestino || !anioOrigen || !anioDestino) {
         alertSuccess(t("please_verify_data"), "warning", t);
         return;
       }
+
+      
       AppUtil.putAPI(`mover_gestion_presupuestaria/${moverOrigen}/${moverDestino}`, {
         monto_modificado: parseFloat(moverMonto),
-        mes_origen: parseInt(mesOrigen),
-        mes_destino: parseInt(mesDestino),
-        anio_origen: parseInt(anioOrigen),
-        anio_destino: parseInt(anioDestino),
+        mesOrigen: parseInt(mesOrigen),
+        mesDestino: parseInt(mesDestino),
+        anioOrigen: parseInt(anioOrigen),
+        anioDestino: parseInt(anioDestino),
       })
         .then(response => {
           if (response && response.codeStatus === 200) {
@@ -603,6 +614,44 @@ if(response.codeStatus === 200)
           }
         });
     };
+
+         getCategories_dropdownOrigen = (anio = "", mes ="") =>{
+
+          if(anio === "")
+          {
+            anio = moment().year()
+          }
+
+         if(mes === "")
+          {
+            mes = moment().month()+1
+          }
+
+    AppUtil.getAPI(`gestion_presupuestaria_dropdown/${anio}/${mes}`).then(
+      (response) => {
+        const dropGPOrigen = response ? response.data : [];
+        this.setState({ dropGPOrigen });
+      }
+    )};
+
+            getCategories_dropdownDestino = (anio = "", mes ="") =>{
+
+          if(anio === "")
+          {
+            anio = moment().year()
+          }
+
+         if(mes === "")
+          {
+            mes = moment().month()+1
+          }
+
+    AppUtil.getAPI(`gestion_presupuestaria_dropdown/${anio}/${mes}`).then(
+      (response) => {
+        const dropGPDestino= response ? response.data : [];
+        this.setState({ dropGPDestino });
+      }
+    )};
 
     //#endregion fin funciones internas
 
@@ -1327,39 +1376,41 @@ if(response.codeStatus === 200)
                 <Row className="m-2">
                   <Col sm="12" className="mb-3">
                     <label>{t("origin")}</label>
+
+         
                     <Form.Select
                       value={this.state.moverOrigen}
                       onChange={(e) => this.setState({ moverOrigen: e.target.value })}
                     >
                       <option value="">{t("select_option")}</option>
-                      {budgets
-                        .filter(b => String(b.anio_presupuesto) === String(new Date().getFullYear()))
-                        .map(b => (
-                          <option key={b.id} value={b.id}>{b.nombre}</option>
-                        ))}
+                      {this.state.dropGPOrigen?.map((item) => (
+                  
+                            <option key={item.id} value={item.id}>
+                              {item.descripcion} {item.simbolo}{item.monto}
+                            </option>
+                          ))}
                     </Form.Select>
                   </Col>
                   <Col sm="6" className="mb-3">
                     <label>{t("origin_month")}</label>
                     <Form.Select
-                      value={this.state.mesOrigen}
-                      onChange={(e) => this.setState({ mesOrigen: e.target.value })}
+                     
+                      onChange={(e) => this.setState({ mesOrigen: e.target.value }, ()=> ()=> this.getCategories_dropdownOrigen(this.state.anioOrigen, this.state.mesOrigen))}
                     >
                       <option value="">{t("select_option")}</option>
-                      {MONTH_KEYS.map((key, i) => (
-                        <option key={i + 1} value={i + 1}>{t(key)}</option>
+                        {MONTH_KEYS.map((key, i) => (
+                        ((moment().month()+1) === (i+1))? (<option selected key={i + 1} value={i + 1}>{t(key)}</option>): (<option key={i + 1} value={i + 1}>{t(key)}</option>)
                       ))}
                     </Form.Select>
                   </Col>
                   <Col sm="6" className="mb-3">
                     <label>{t("origin_year")}</label>
                     <Form.Select
-                      value={this.state.anioOrigen}
-                      onChange={(e) => this.setState({ anioOrigen: e.target.value })}
+                        onChange={(e) => this.setState({ anioOrigen: e.target.value }, ()=> this.getCategories_dropdownOrigen(this.state.anioOrigen, this.state.mesOrigen))}
                     >
                       <option value="">{t("select_option")}</option>
-                      {YEARS.map(y => (
-                        <option key={y} value={y}>{y}</option>
+                       {YEARS.map(y => (
+                        moment().year() === y ? <option key={y} value={y} selected>{y}</option> : <option key={y} value={y}>{y}</option> 
                       ))}
                     </Form.Select>
                   </Col>
@@ -1370,34 +1421,36 @@ if(response.codeStatus === 200)
                       onChange={(e) => this.setState({ moverDestino: e.target.value })}
                     >
                       <option value="">{t("select_option")}</option>
-                      {budgets
-                        .filter(b => String(b.anio_presupuesto) === String(new Date().getFullYear()))
-                        .map(b => (
-                          <option key={b.id} value={b.id}>{b.nombre}</option>
-                        ))}
+                      {this.state.dropGPDestino?.map((item) => (
+                  
+                            <option key={item.id} value={item.id}>
+                              {item.descripcion} {item.simbolo}{item.monto}
+                            </option>
+                          ))}
                     </Form.Select>
                   </Col>
                   <Col sm="6" className="mb-3">
-                    <label>{t("destination_month")}</label>
+                    <label>{t("destination_month")}</label>             
                     <Form.Select
-                      value={this.state.mesDestino}
-                      onChange={(e) => this.setState({ mesDestino: e.target.value })}
+                      
+                      onChange={(e) => this.setState({ mesDestino: e.target.value }, ()=> this.getCategories_dropdownDestino(this.state.anioDestino, this.state.mesDestino))}
                     >
+                      
                       <option value="">{t("select_option")}</option>
                       {MONTH_KEYS.map((key, i) => (
-                        <option key={i + 1} value={i + 1}>{t(key)}</option>
+                        ((moment().month()+1) === (i+1))? (<option selected key={i + 1} value={i + 1}>{t(key)}</option>): (<option disabled={((i) < moment().month() )} key={i + 1} value={i + 1}>{t(key)}</option>)
                       ))}
                     </Form.Select>
                   </Col>
                   <Col sm="6" className="mb-3">
                     <label>{t("destination_year")}</label>
                     <Form.Select
-                      value={this.state.anioDestino}
-                      onChange={(e) => this.setState({ anioDestino: e.target.value })}
+                     
+                      onChange={(e) => this.setState({ anioDestino: e.target.value }, ()=> this.getCategories_dropdownDestino(this.state.anioDestino, this.state.mesDestino))}
                     >
                       <option value="">{t("select_option")}</option>
                       {YEARS.map(y => (
-                        <option key={y} value={y}>{y}</option>
+                        moment().year() === y ? <option key={y} value={y} selected>{y}</option> : <option key={y} value={y}>{y}</option> 
                       ))}
                     </Form.Select>
                   </Col>

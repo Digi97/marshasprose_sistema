@@ -192,6 +192,108 @@ const AppUtil = {
             maximumFractionDigits: isInteger ? 0 : 2,
         });
     },
+    parseInvoiceXML: function parseInvoiceXML(xmlString) {
+        try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+
+            if (xmlDoc.getElementsByTagName("parsererror").length > 0) {
+                return false;
+            }
+
+            const root = xmlDoc.documentElement;
+            if (!root) {
+                return false;
+            }
+
+            const getDirectChild = (parent, tag) => {
+                if (!parent) return null;
+                for (let i = 0; i < parent.children.length; i++) {
+                    if (parent.children[i].tagName === tag) return parent.children[i];
+                }
+                return null;
+            };
+
+            const getText = (parent, tag) => {
+                const el = getDirectChild(parent, tag);
+                return el ? el.textContent.trim() : "";
+            };
+
+            const parsePersona = (node) => {
+                if (!node) return null;
+                const identificacion = getDirectChild(node, "Identificacion");
+                const ubicacion = getDirectChild(node, "Ubicacion");
+                const telefono = getDirectChild(node, "Telefono");
+
+                return {
+                    nombre: getText(node, "Nombre"),
+                    nombreComercial: getText(node, "NombreComercial"),
+                    tipoIdentificacion: getText(identificacion, "Tipo"),
+                    numeroIdentificacion: getText(identificacion, "Numero"),
+                    provincia: getText(ubicacion, "Provincia"),
+                    canton: getText(ubicacion, "Canton"),
+                    distrito: getText(ubicacion, "Distrito"),
+                    otrasSenas: getText(ubicacion, "OtrasSenas"),
+                    telefono: telefono ? `${getText(telefono, "CodigoPais")} ${getText(telefono, "NumTelefono")}`.trim() : "",
+                    correo: getText(node, "CorreoElectronico"),
+                };
+            };
+
+            const lineas = [];
+            const detalleServicio = getDirectChild(root, "DetalleServicio");
+            const lineaNodes = detalleServicio ? detalleServicio.getElementsByTagName("LineaDetalle") : [];
+
+            for (let i = 0; i < lineaNodes.length; i++) {
+                const linea = lineaNodes[i];
+                const impuesto = getDirectChild(linea, "Impuesto");
+
+                lineas.push({
+                    numeroLinea: getText(linea, "NumeroLinea"),
+                    codigoCabys: getText(linea, "CodigoCABYS"),
+                    cantidad: parseFloat(getText(linea, "Cantidad")) || 0,
+                    unidadMedida: getText(linea, "UnidadMedida"),
+                    detalle: getText(linea, "Detalle"),
+                    precioUnitario: parseFloat(getText(linea, "PrecioUnitario")) || 0,
+                    subTotal: parseFloat(getText(linea, "SubTotal")) || 0,
+                    baseImponible: parseFloat(getText(linea, "BaseImponible")) || 0,
+                    impuestoTarifa: parseFloat(getText(impuesto, "Tarifa")) || 0,
+                    impuestoMonto: parseFloat(getText(impuesto, "Monto")) || 0,
+                    montoTotalLinea: parseFloat(getText(linea, "MontoTotalLinea")) || 0,
+                });
+            }
+
+            const resumenFactura = getDirectChild(root, "ResumenFactura");
+            const codigoTipoMoneda = getDirectChild(resumenFactura, "CodigoTipoMoneda");
+
+            const resumen = {
+                codigoMoneda: getText(codigoTipoMoneda, "CodigoMoneda"),
+                tipoCambio: parseFloat(getText(codigoTipoMoneda, "TipoCambio")) || 0,
+                totalGravado: parseFloat(getText(resumenFactura, "TotalGravado")) || 0,
+                totalExento: parseFloat(getText(resumenFactura, "TotalExento")) || 0,
+                totalVenta: parseFloat(getText(resumenFactura, "TotalVenta")) || 0,
+                totalDescuentos: parseFloat(getText(resumenFactura, "TotalDescuentos")) || 0,
+                totalVentaNeta: parseFloat(getText(resumenFactura, "TotalVentaNeta")) || 0,
+                totalImpuesto: parseFloat(getText(resumenFactura, "TotalImpuesto")) || 0,
+                totalOtrosCargos: parseFloat(getText(resumenFactura, "TotalOtrosCargos")) || 0,
+                totalComprobante: parseFloat(getText(resumenFactura, "TotalComprobante")) || 0,
+            };
+
+            return {
+                tipoDocumento: root.tagName,
+                clave: getText(root, "Clave"),
+                numeroConsecutivo: getText(root, "NumeroConsecutivo"),
+                fechaEmision: getText(root, "FechaEmision"),
+                condicionVenta: getText(root, "CondicionVenta"),
+                emisor: parsePersona(getDirectChild(root, "Emisor")),
+                receptor: parsePersona(getDirectChild(root, "Receptor")),
+                lineas,
+                resumen,
+            };
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    },
     randomHexColor: function randomHexColor(opacity = 0.6) {
         return Array.from({ length: 1 }, () => {
             const r = Math.floor(Math.random() * 255);
