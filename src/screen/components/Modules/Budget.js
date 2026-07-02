@@ -603,6 +603,7 @@ if(response.codeStatus === 200)
         mesDestino: parseInt(mesDestino),
         anioOrigen: parseInt(anioOrigen),
         anioDestino: parseInt(anioDestino),
+        usuarios_Usuario_id: this.user.usuario_id
       })
         .then(response => {
           if (response && response.codeStatus === 200) {
