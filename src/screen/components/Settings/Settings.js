@@ -8,8 +8,6 @@ import { withTranslation } from "react-i18next";
 
 import alertSuccess from "../common/SweetAlert.js";
 
-
-//TODO: agregar informacion de conexion a smtp para obtener facturas
 class Settings extends Component {
   constructor(props) {
     super(props);
@@ -682,7 +680,7 @@ class Settings extends Component {
 
               <Tab eventKey="smtp" title={
                   <span>
-                    <i className="fas fa-mail"></i> {t("smtp")}
+                    <i className="fas fa-envelope"></i> {t("smtp")}
                   </span>
                 }>
                   <Row className="">

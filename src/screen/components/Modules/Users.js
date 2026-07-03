@@ -6,7 +6,7 @@ import { withTranslation } from "react-i18next";
 import RenderActive from "../common/renderActive";
 import ActionButtons from "../common/ActionButtons";
 import alertSuccess from "../common/SweetAlert";
-
+import Swal from "sweetalert2";
 import AppUtil from "../../../AppUtil/AppUtil";
 
 DataTable.use(DT);
@@ -104,7 +104,13 @@ class Users extends Component {
 
     saveUser = (e) => {
         const { t } = this.props;
-        let { user } = this.state;
+        let { user, processing } = this.state;
+
+        if(processing)
+        {
+            return
+        }
+
 
         user.activo = user.activo ? 1 : 0; //asignacion para tipo de dato
 
@@ -127,6 +133,7 @@ class Users extends Component {
                             t
                         );
                         this.getUsers();
+                          this.toggleShow()
                     } else {
                         alertSuccess(t(response.message), "error", t);
                     }
@@ -148,6 +155,7 @@ class Users extends Component {
                                 t
                             );
                             this.getUsers();
+                              this.toggleShow()
                         } else {
                             alertSuccess(t(response.message), "error", t);
                         }
@@ -184,16 +192,33 @@ class Users extends Component {
             this.setState({ roles });
         });
 
-        deleteUserById = (id) =>{
+        deleteUserById = async (id) =>{
             const { t } = this.props;
-             AppUtil.deleteAPI(`users/${id}`).then((response) => {
+    const result = await Swal.fire({
+      icon: "warning",
+      title: t("are_you_sure"),
+      text: t("this_action_will_delete_the_record"),
+      showCancelButton: true,
+      confirmButtonColor: "#000f47",
+      cancelButtonColor: "#d33",
+      confirmButtonText: t("yes_delete"),
+      cancelButtonText: t("cancel"),
+    });
+    if (!result.isConfirmed) return;
+   
+    AppUtil.deleteAPI(`users/${id}`).then((response) => {
 
                 if(response.codeStatus ===200)
                 {
+                    this.getUsers();
                      alertSuccess( t(response.message), "success", t );
+                   
+                }
+                else{
+alertSuccess( t(response.message), "warning", t );
                 }
 
-                 alertSuccess( t(response.message), "warning", t );
+                 
          
           
         });

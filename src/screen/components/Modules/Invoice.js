@@ -91,7 +91,8 @@ class Invoice extends Component {
             token: "",
             dropGP:[],
             condicion_venta_id: 0,
-            dias_credito: ""
+            dias_credito: "",
+            presupuesto_id:""
         };
         this.impuestoSelectRef = createRef(); 
         this.datatableRef = createRef();
@@ -301,7 +302,8 @@ class Invoice extends Component {
 
     getCustomers = () =>
         AppUtil.getAPI("clientes_dp", ).then((response) => {
-            const customers      = response ? response.data.data : [];
+            const customers      = response ? response.data : [];
+            
             this.setState({ customers, processing: false });
         });
 
@@ -473,7 +475,7 @@ class Invoice extends Component {
 
                      alertSuccess(t("updated_successfully"),"success",t);
           this.toggleShow()
-            this.setState({ processing: false });
+           
           // Guardar los detalles con el id del gasto recién creado
         if (this.datatableRef.current?.dt()) 
           {
@@ -490,7 +492,7 @@ class Invoice extends Component {
                     
                     alertSuccess(t("updated_successfully"),"success",t);
                               this.toggleShow()
-            this.setState({ processing: false });
+       
           // Guardar los detalles con el id del gasto recién creado
         if (this.datatableRef.current?.dt()) 
           {
@@ -503,6 +505,7 @@ class Invoice extends Component {
                 }
             });
         }
+                    this.setState({ processing: false });
     };
 
     // 
@@ -552,7 +555,7 @@ class Invoice extends Component {
 
     saveAcceptance = () => {
         const { t } = this.props;
-        const { facturaData, gastoRegistrado, condicion_venta_id, dias_credito } = this.state;
+        const { facturaData, gastoRegistrado, presupuesto_id, condicion_venta_id, dias_credito } = this.state;
 
         if (!facturaData) {
             alertSuccess(t("xml_file_required"), "error", t);
@@ -560,12 +563,12 @@ class Invoice extends Component {
         }
 
         this.setState({ processing: true });
+        let usuarios_Usuario_id = this.user.usuario_id;
 
-        const payload = { ...facturaData, gastoRegistrado, condicion_venta_id, dias_credito};
+        const payload = { ...facturaData, gastoRegistrado, presupuesto_id, condicion_venta_id, dias_credito, usuarios_Usuario_id};
 
-console.log(payload);
 
-        AppUtil.postAPI("aceptacion_factura", payload).then((response) => {
+        AppUtil.postAPI("aceptafactura", payload).then((response) => {
             this.setState({ processing: false });
 
             if (response.codeStatus === 200) {
@@ -805,7 +808,7 @@ _triggerDefaultTax = () => {
                         onHide={this.toggleShow}
                         backdrop="static"
                         keyboard={false}
-                        size="lg"
+                        size="xl"
                         
                         scrollable
                     >
@@ -959,7 +962,7 @@ _triggerDefaultTax = () => {
                                        // onChange={(value) => this.setState({ spent: { ...this.state.spent, proveedor_id: value.id}}) }
                                         getOptionValue={(option) => option.id}
                                         disabled={isView}
-                                        getOptionLabel={(option) => `${option.nombre} ${option.apellido1} ${option.apellido2}`}
+                                        getOptionLabel={(option) => `${option.nombre} ${option.apellido1}`}
                                         defaultValue={() =>
                                           customers?.find(
                                             (opt) => opt.id === invoice.clientes_id,
@@ -1217,7 +1220,7 @@ _triggerDefaultTax = () => {
                         onHide={this.toggleShowAcceptance}
                         backdrop="static"
                         keyboard={false}
-                        size="lg"
+                        size="xl"
                         
                     >
                         <Modal.Header closeButton>
@@ -1225,9 +1228,7 @@ _triggerDefaultTax = () => {
                         </Modal.Header>
 
                         <Modal.Body>
-                            <div ref={this.modalTopRef} />
-
-
+                
                             <Row className="m-2">
                                 <Col sm="12" xl="12">
                                     <label>{t("xml_file")}</label>
@@ -1247,12 +1248,12 @@ _triggerDefaultTax = () => {
                             {
                                 facturaData && 
                                 <Row className="m-2">
-                            <Col sm="12" xl="12">
+                            <Col sm="12" xl="6">
                       <label>{t("budget")}</label>
                       <Form.Group>
                         <Form.Select
                           name="presupuesto_id"
-                          onChange={this._saveStateVariable}               
+                          onChange={(e) => {e.preventDefault(); this.setState({presupuesto_id: e.target.value})}}               
                           required
                         >
                           <option value="">{t("select_option")}</option>
@@ -1266,11 +1267,10 @@ _triggerDefaultTax = () => {
                       </Form.Group>
                     </Col>
 
-<Row className="m-2">
                     <Col sm="12" xl="6">
                                     <label className="txt-darkblue">{t("sale_condition")}</label>
                                     <Form.Group>
-                                        <Form.Select name="condicion_venta_id" onChange={(value) => this.setState({condicion_venta_id: value})} value={this.state.condicion_venta_id} required 
+                                        <Form.Select name="condicion_venta_id" onChange={(e) => {e.preventDefault(); this.setState({condicion_venta_id: e.target.value})}} required 
                                             disabled={isView}
                                         >
                                             <option value="">{t("select_option")}</option>
@@ -1280,12 +1280,12 @@ _triggerDefaultTax = () => {
                                         </Form.Select>
                                     </Form.Group>
                                 </Col>
-                            </Row>
+                           
 
                             <SlideDown
                                 show={parseInt(this.state.condicion_venta_id) === 2}//id de los creditos 
                                 value={this.state.dias_credito}
-                                onChange={this._saveStateVariable}
+                                onChange={(e) => {e.preventDefault(); this.setState({dias_credito: e.target.value})}}
                                
                                 t={t}
                             />

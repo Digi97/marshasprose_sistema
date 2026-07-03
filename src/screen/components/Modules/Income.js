@@ -308,7 +308,7 @@ class Income extends Component {
         const { t } = this.props;
         AppUtil.getAPI("clientes_dp").then((response) => {
             if (response) {
-                const customers = response ? response.data.data : [];
+                const customers = response ? response.data : [];
                 this.setState({ customers, processing: false });
             } else {
                 alertSuccess(t(response.message), "error", t);
@@ -832,7 +832,7 @@ class Income extends Component {
                                 t={t}
                             />
 
-                            <Row className="m-2">
+                           {/* <Row className="m-2">
                                 <Col sm="12" xl="12">
                                     <Form.Group>
                                         <Form.Check // prettier-ignore
@@ -850,7 +850,7 @@ class Income extends Component {
                                         />
                                     </Form.Group>
                                 </Col>
-                            </Row>
+                            </Row>*/}
 
                             {/* ── SECCIÓN DE DETALLES ── */}
                             <div className="card mt-3 shadow-lg">

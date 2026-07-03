@@ -608,8 +608,11 @@ if(response.codeStatus === 200)
         .then(response => {
           if (response && response.codeStatus === 200) {
             alertSuccess(t("updated_successfully"), "success", t);
+
+             // TODO: quitar las dos funciones posteriores y hacer un reload del sitio
             this.toggleMoverModal();
             this.getBudget();
+           
           } else {
             alertSuccess(t(response?.message || "please_verify_data"), "error", t);
           }

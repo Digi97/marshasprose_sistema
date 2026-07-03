@@ -15,7 +15,7 @@ import { withTranslation } from "react-i18next";
 import ActionButtons from '../../common/ActionButtons'
 
 DataTable.use(DT);
-//TODO: agregar rol por permiso
+
 class Rol extends Component {
     constructor(props) {
         super(props);

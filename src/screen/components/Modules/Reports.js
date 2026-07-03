@@ -151,7 +151,8 @@ constructor(props) {
 
         handleIFGFilterChange = (e) => {
         const { name, value, type, checked } = e.target;
-        this.setState({ customerSupplierFilters: { ...this.state.customerSupplierFilters, 
+        
+        this.setState({ ingresoGastosFacturaFilters: { ...this.state.ingresoGastosFacturaFilters, 
            [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
         
         

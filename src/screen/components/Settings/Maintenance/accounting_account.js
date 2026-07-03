@@ -8,7 +8,7 @@ import crypto from "crypto-js";
 import { withTranslation } from "react-i18next";
 import ActionButtons from '../../common/ActionButtons'
 DataTable.use(DT);
-//TODO ARREGLAR NUEVO CAMPO DE TIPO MONEDA 
+
 
 class Accounting_account extends Component {
   constructor(props) {
