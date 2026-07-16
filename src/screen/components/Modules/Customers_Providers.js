@@ -142,14 +142,22 @@ class Customer_Provider extends Component {
             alertSuccess(t("invalid_string_form_nombre"), "warning", t);
             return false;
         }
-        if (!AppUtil.isValidText(customer_provider.apellido1)) {
+     
+        if(customer_provider.tipo_identificacion_id !== 2)
+        {
+               if (!AppUtil.isValidText(customer_provider.apellido1)) {
             alertSuccess(t("invalid_string_form_apellido1"), "warning", t);
             return false;
         }
-        if (!AppUtil.isValidText(customer_provider.apellido2)) {
+
+               if (!AppUtil.isValidText(customer_provider.apellido2)) {
             alertSuccess(t("invalid_string_form_apellido2"), "warning", t);
             return false;
         }
+
+        }
+
+ 
         if (!AppUtil.isEmail(customer_provider.correo)) {
             alertSuccess(t("invalid_string_form_email"), "warning", t);
             return false;
@@ -174,16 +182,7 @@ class Customer_Provider extends Component {
             alertSuccess(t("invalid_string_form_otrassenas"), "warning", t);
             return false;
         }
-        if (isProvider) {
-            if (!AppUtil.isValidText(customer_provider.ctaIBAN_Colones)) {
-                alertSuccess(t("invalid_string_form_ctaiban_colones"), "warning", t);
-                return false;
-            }
-            if (!AppUtil.isValidText(customer_provider.ctaIBAN_Dolares)) {
-                alertSuccess(t("invalid_string_form_ctaiban_dolares"), "warning", t);
-                return false;
-            }
-        }
+        
         return true;
     };
 
@@ -872,8 +871,8 @@ class Customer_Provider extends Component {
                                             placeholder={t("lastname")}
                                             type="text"
                                             onChange={this._saveStateVariable}
-                                            name="Apellido1"
-                                            required
+                                            name="apellido1"
+                                            
                                             value={customer_provider.apellido1}
                                             maxLength={100}
                                             disabled={isView}
@@ -889,8 +888,8 @@ class Customer_Provider extends Component {
                                             placeholder={t("secondlastname")}
                                             type="text"
                                             onChange={this._saveStateVariable}
-                                            name="Apellido2"
-                                            required
+                                            name="apellido2"
+                                            
                                             maxLength={100}
                                             disabled={isView}
 
