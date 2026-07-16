@@ -44,6 +44,7 @@ class Spent extends Component {
         descuento:0,
         tipo_moneda_id:0,
         presupuesto_id:"",
+        banco_id:"",
         condicion_venta_id: 0,
         dias_credito: ""
       },
@@ -69,7 +70,8 @@ class Spent extends Component {
       currency:[],
       saleConditions: [],
       token: "",
-      dropGP:[]
+      dropGP:[],
+      bancos:[]
     };
     this.user = null;
     this.datatableRef = createRef();
@@ -131,6 +133,7 @@ _triggerDefaultTax = () => {
     this.getPaymentMethods();
     this.getProviders();
     this.getCommercialCodes();
+    this.getBanks();
 
 
 
@@ -158,6 +161,7 @@ _triggerDefaultTax = () => {
         createElectronicDoc:1,
         tipo_moneda_id:0,
         presupuesto_id:"",
+        banco_id:"",
         condicion_venta_id: 0,
         dias_credito: ""
       },
@@ -284,6 +288,14 @@ _saveStateVariable = async (e) => {
       }
     );
 
+      getBanks = () =>
+    AppUtil.getAPI("bancos").then(
+      (response) => {
+        const bancos = response ? response.data : [];
+        this.setState({ bancos });
+      }
+    );
+
 
 
   getPaymentMethods = () =>
@@ -396,10 +408,7 @@ this.getSaleConditions();});
       alertSuccess(t("invalid_string_form_descripcion"), "warning", t);
       return false;
     }
-    if (!spent.categoria_gasto_id) {
-      alertSuccess(t("invalid_string_form_categoria_gasto_id"), "warning", t);
-      return false;
-    }
+    
     if (!spent.medio_pago_id) {
       alertSuccess(t("invalid_string_form_medio_pago_id"), "warning", t);
       return false;
@@ -414,6 +423,23 @@ this.getSaleConditions();});
     }
     if (spent.presupuesto_id === "") {
       alertSuccess(t("invalid_string_form_presupuesto_id"), "warning", t);
+      return false;
+    }
+    if (!spent.banco_id) {
+      alertSuccess(t("invalid_string_form_banco_id"), "warning", t);
+      return false;
+    }
+
+    const { dropGP, bancos } = this.state;
+    const selectedBudget = dropGP.find((item) => String(item.id) === String(spent.presupuesto_id));
+    const selectedBank = bancos.find((item) => String(item.id) === String(spent.banco_id));
+
+    if (selectedBudget && spent.total > selectedBudget.monto) {
+      alertSuccess(t("spent_exceeds_budget_amount"), "warning", t);
+      return false;
+    }
+    if (selectedBank && spent.total > selectedBank.saldo_actual) {
+      alertSuccess(t("spent_exceeds_bank_amount"), "warning", t);
       return false;
     }
     return true;
@@ -502,7 +528,7 @@ this.getSaleConditions();});
     const {
       spent,
       lines,
-      categories,
+      bancos,
       paymentMethods,
       providers,
       commercialCodes,
@@ -671,7 +697,7 @@ this.getSaleConditions();});
                     </Col>
                   </Row>
                   <Row className="m-2">
-                    <Col sm="12" xl="4">
+   {/*                 <Col sm="12" xl="4">
                       <label className="txt-darkblue">{t("category")}</label>
                       <Form.Group>
                         <Form.Select
@@ -686,6 +712,26 @@ this.getSaleConditions();});
                           {categories.map((item) => (
  <option key={item.id} value={item.id} selected={spent.categoria_gasto_id === item.id }> {item.nombre} </option>
                             
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>*/}
+
+                    <Col sm="12" xl="4">
+                      <label className="txt-darkblue">{t("bank_accounts")}</label>
+                      <Form.Group>
+                        <Form.Select
+                          name="banco_id"
+                          onChange={this._saveStateVariable}
+                          value={spent.banco_id}
+                          required
+                          disabled={isView}
+
+                        >
+                          <option value="">{t("select_option")}</option>
+                          {bancos.map((item) => (
+ <option key={item.id} value={item.id} > {item.nombre_banco} - {item.simbolo} {item.saldo_actual} </option>
+
                           ))}
                         </Form.Select>
                       </Form.Group>
@@ -738,7 +784,7 @@ this.getSaleConditions();});
                     </Col>
 
                     <Col sm="12" xl="12">
-                      <label className="txt-darkblue">{t("sale_condition")}</label>
+                      <label className="txt-darkblue">{t("buy_condition")}</label>
                       <Form.Group>
                         <Form.Select
                           name="condicion_venta_id"
@@ -788,7 +834,7 @@ this.getSaleConditions();});
                           />
                         )}
                       
-                      <Col sm="12" xl="12">
+       {/*               <Col sm="12" xl="12">
                            <Form.Group>
                                                    <Form.Check // prettier-ignore
                                                       type="checkbox"
@@ -802,7 +848,7 @@ this.getSaleConditions();});
                                                       />
                                               </Form.Group>
               
-                    </Col>
+                    </Col>*/}
                     </Col>
                              
                   </Row>

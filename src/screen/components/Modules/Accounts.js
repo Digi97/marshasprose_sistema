@@ -500,9 +500,9 @@ class Accounts extends Component {
             <Col lg="6" sm="12">
               <h1>{t("accounts")}</h1>
             </Col>
-            <Col lg="6" sm="12" className="text-end">
+        { /*   <Col lg="6" sm="12" className="text-end">
               <Button onClick={this.toggleShow}>{t("create")}</Button>
-            </Col>
+            </Col>*/}
           </Row>
 
           {/* ── Summary cards ── */}
@@ -539,7 +539,7 @@ class Accounts extends Component {
                         {t("active_accounts")}
                       </p>
                       <h5 className="mb-0 fw-bold">
-                        {cuentas.filter((c) => c.Estado === 1).length}
+                        {cuentas.filter((c) => c.estado === 1).length}
                       </h5>
                     </Col>
                     <Col xs="4" className="text-end">
@@ -564,7 +564,7 @@ class Accounts extends Component {
                         {t("paid_accounts")}
                       </p>
                       <h5 className="mb-0 fw-bold">
-                        {cuentas.filter((c) => c.Estado === 2).length}
+                        {cuentas.filter((c) => c.estado === 2).length}
                       </h5>
                     </Col>
                     <Col xs="4" className="text-end">

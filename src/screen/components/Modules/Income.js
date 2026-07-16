@@ -44,7 +44,7 @@ class Income extends Component {
                 facturas_id: null,
                 createElectronicDoc: 0,
                 condicion_venta_id: 0,
-                presupuesto_id: 0,
+                banco_id: "",
                 dias_credito: "",
             },
 
@@ -69,7 +69,7 @@ class Income extends Component {
             invoiceStates: [],
             saleConditions: [],
             token: "",
-            dropGP: [],
+            bancos: [],
         };
 
         this.user = null;
@@ -81,12 +81,10 @@ class Income extends Component {
         this.getUserInfo();
     }
 
-    getCategories_dropdown = () =>
-        AppUtil.getAPI(
-            `gestion_presupuestaria_dropdown/${moment().year()}/""`
-        ).then((response) => {
-            const dropGP = response ? response.data : [];
-            this.setState({ dropGP });
+    getBanks = () =>
+        AppUtil.getAPI("bancos").then((response) => {
+            const bancos = response ? response.data : [];
+            this.setState({ bancos });
         });
 
     getSaleConditions = () =>
@@ -166,11 +164,12 @@ class Income extends Component {
                     cambio_compra: localStorage.getItem("dolar_compra"),
                     usuarios_Usuario_id: this.user ? this.user.usuario_id : 0,
                     facturas_id: null,
+                    banco_id: "",
                 },
                 isView: false,
             },
             () => {
-                this.getCategories_dropdown();
+                this.getBanks();
                 this.getSaleConditions();
                 this._triggerDefaultTax();
             }
@@ -366,7 +365,7 @@ class Income extends Component {
                         isView,
                     },
                     () => {
-                        this.getCategories_dropdown();
+                        this.getBanks();
                         this.getSaleConditions();
                     }
                 );
@@ -489,7 +488,7 @@ class Income extends Component {
             taxes,
             AuxLine,
             invoiceStates,
-            dropGP,
+            bancos,
             saleConditions,
         } = this.state;
 
@@ -727,27 +726,28 @@ class Income extends Component {
                                 </Col>
 
                                 <Col sm="12" xl="4">
-                                    <label>{t("budget")}</label>
+                                    <label className="txt-darkblue">
+                                        {t("bank_accounts")}
+                                    </label>
                                     <Form.Group>
                                         <Form.Select
-                                            name="presupuesto_id"
+                                            name="banco_id"
                                             onChange={this._saveStateVariable}
-                                            value={income.presupuesto_id}
+                                            value={income.banco_id}
                                             required
                                             disabled={isView}
                                         >
                                             <option value="">
                                                 {t("select_option")}
                                             </option>
-                                            {dropGP.map((item) => (
+                                            {bancos.map((item) => (
                                                 <option
                                                     key={item.id}
                                                     value={item.id}
-                                                    disabled={item.monto === 0}
                                                 >
-                                                    {item.descripcion}{" "}
+                                                    {item.nombre_banco} -{" "}
                                                     {item.simbolo}
-                                                    {item.monto}
+                                                    {item.saldo_actual}
                                                 </option>
                                             ))}
                                         </Form.Select>

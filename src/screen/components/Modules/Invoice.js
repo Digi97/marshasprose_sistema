@@ -6,6 +6,7 @@ import Table from "react-bootstrap/Table";
 import { url } from "screen/components/services/api";
 import crypto from "crypto-js";
 import AppUtil from "../../../AppUtil/AppUtil";
+import Swal from "sweetalert2";
 import Select from "react-select";
 import { withTranslation } from "react-i18next";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
@@ -58,6 +59,10 @@ class Invoice extends Component {
             // ── Líneas de detalle (Factura_Detalles)
             lines: [],
 
+            // ── Tracking de cambios en líneas al editar una factura existente
+            factura_DetalleAgregados: [],
+            factura_DetalleEliminados: [],
+
             // ── Helper para calcular línea activa
             AuxLine: {
                 total: "",
@@ -89,19 +94,21 @@ class Invoice extends Component {
             defaultTax: 0,
             formatoFecha:"DD-MM-YYYY",
             token: "",
-            dropGP:[],
+            bancos:[],
             condicion_venta_id: 0,
             dias_credito: "",
-            presupuesto_id:""
+            banco_id:""
         };
-        this.impuestoSelectRef = createRef(); 
+        this.impuestoSelectRef = createRef();
         this.datatableRef = createRef();
+        this.datatableRefCreditNote = createRef();
+        this.datatableRefDebitNote = createRef();
         this.user = null;
     }
 
     componentDidMount() {
         this.getUserInfo();
-        this.getCategories_dropdown();
+        this.getBanks();
     }
 
     getUserInfo = () => {
@@ -168,6 +175,8 @@ class Invoice extends Component {
             lines: [],
             invoice: this._resetInvoice(),
             AuxLine: { total: "", subtotal: "", descuento: 0, impuesto: "", porcentaje: 0, cantidad: 1 },
+            factura_DetalleAgregados: [],
+            factura_DetalleEliminados: [],
         }, () => {this.getClave(); this._triggerDefaultTax()});
     }
     toggleShowAcceptance = () =>
@@ -176,6 +185,7 @@ class Invoice extends Component {
             archivoAceptacion: null,
             facturaData: null,
             gastoRegistrado: false,
+            banco_id: "",
         });
 
     // Actualiza campos del objeto invoice
@@ -267,6 +277,10 @@ class Invoice extends Component {
         this.setState(
             (prevState) => ({
                 lines: [...prevState.lines, newLine],
+                factura_DetalleAgregados:
+                    prevState.invoice.id !== 0
+                        ? [...prevState.factura_DetalleAgregados, newLine]
+                        : prevState.factura_DetalleAgregados,
                 AuxLine: { total: "", subtotal: "", descuento: "", impuesto: "", porcentaje: 0, cantidad: 1 },
             }),
             () => this._recalcularTotales()
@@ -277,9 +291,20 @@ class Invoice extends Component {
 
     removeLine = (index) => {
         this.setState(
-            (prevState) => ({
-                lines: prevState.lines.filter((_, i) => i !== index),
-            }),
+            (prevState) => {
+                const line = prevState.lines[index];
+                const isExistingLine = prevState.invoice.id !== 0 && !!line?.id;
+
+                return {
+                    lines: prevState.lines.filter((_, i) => i !== index),
+                    factura_DetalleEliminados: isExistingLine
+                        ? [...prevState.factura_DetalleEliminados, line.id]
+                        : prevState.factura_DetalleEliminados,
+                    factura_DetalleAgregados: prevState.factura_DetalleAgregados.filter(
+                        (l) => l !== line
+                    ),
+                };
+            },
             () => this._recalcularTotales()
         );
     };
@@ -415,8 +440,9 @@ class Invoice extends Component {
                     },
                     lines,
                     show:  true,
-                    isView
-                    
+                    isView,
+                    factura_DetalleAgregados: [],
+                    factura_DetalleEliminados: [],
                 });
             } else {
                 alertSuccess(t(response.message),"error",t);
@@ -451,7 +477,7 @@ class Invoice extends Component {
 
     saveInvoice = () => {
         const { t } = this.props;
-        const { invoice, lines, dolar_compra,dolar_venta } = this.state;
+        const { invoice, lines, dolar_compra, dolar_venta, factura_DetalleAgregados, factura_DetalleEliminados } = this.state;
 
         if (!this.validateForm(t)) {
             return;
@@ -487,7 +513,13 @@ class Invoice extends Component {
             });
         } else {
             // ── ACTUALIZAR
-            AppUtil.putAPI(`facturas/${invoice.id}`, payload).then((response) => {
+            const putPayload = {
+                ...payload,
+                factura_DetalleAgregados,
+                factura_DetalleEliminados,
+            };
+
+            AppUtil.putAPI(`facturas/${invoice.id}`, putPayload).then((response) => {
                 if (response.codeStatus === 200) {
                     
                     alertSuccess(t("updated_successfully"),"success",t);
@@ -542,11 +574,11 @@ class Invoice extends Component {
         reader.readAsText(file);
     };
 
-         getCategories_dropdown = () =>
-    AppUtil.getAPI(`gestion_presupuestaria_dropdown/${moment().year()}/""`).then(
+         getBanks = () =>
+    AppUtil.getAPI("bancos").then(
       (response) => {
-        const dropGP = response ? response.data : [];
-        this.setState({ dropGP });
+        const bancos = response ? response.data : [];
+        this.setState({ bancos });
       }
     );
     _toggleGastoRegistrado = (e) => {
@@ -555,7 +587,7 @@ class Invoice extends Component {
 
     saveAcceptance = () => {
         const { t } = this.props;
-        const { facturaData, gastoRegistrado, presupuesto_id, condicion_venta_id, dias_credito } = this.state;
+        const { facturaData, gastoRegistrado, banco_id, condicion_venta_id, dias_credito } = this.state;
 
         if (!facturaData) {
             alertSuccess(t("xml_file_required"), "error", t);
@@ -565,7 +597,7 @@ class Invoice extends Component {
         this.setState({ processing: true });
         let usuarios_Usuario_id = this.user.usuario_id;
 
-        const payload = { ...facturaData, gastoRegistrado, presupuesto_id, condicion_venta_id, dias_credito, usuarios_Usuario_id};
+        const payload = { ...facturaData, gastoRegistrado, banco_id, condicion_venta_id, dias_credito, usuarios_Usuario_id};
 
 
         AppUtil.postAPI("aceptafactura", payload).then((response) => {
@@ -584,18 +616,111 @@ class Invoice extends Component {
         });
     };
 
-    // 
+    //
     // BOTONES DE ACCIÓN EN LA TABLA
-    // 
+    //
+
+    deleteInvoice = async (id) => {
+        const { t } = this.props;
+        const result = await Swal.fire({
+            icon: "warning",
+            title: t("are_you_sure"),
+            text: t("this_action_will_delete_the_record"),
+            showCancelButton: true,
+            confirmButtonColor: "#000f47",
+            cancelButtonColor: "#d33",
+            confirmButtonText: t("yes_delete"),
+            cancelButtonText: t("cancel"),
+        });
+
+        if (!result.isConfirmed) return;
+
+        AppUtil.deleteAPI(`facturas/${id}`).then((response) => {
+            if (response?.codeStatus === 200) {
+                alertSuccess(t("deleted_successfully"), "success", t);
+                if (this.datatableRef.current?.dt()) {
+                    this.datatableRef.current.dt().ajax.reload(null, false);
+                }
+            } else {
+                alertSuccess(t(response?.message || "please_verify_data"), "error", t);
+            }
+        });
+    };
 
     ActionButtons = (rowData) => (
-        <ActionButtons 
+        <ActionButtons
             editAction ={() => this.getInvoiceById(rowData.id)}
-            viewAction={() => this.getInvoiceById(rowData.id, true)}   
+            viewAction={() => this.getInvoiceById(rowData.id, true)}
+            deleteAction={() => this.deleteInvoice(rowData.id)}
         />
     );
 
     
+    // DataTable genérico para notacredito / notadebito (solo consulta GET)
+    renderNotesDataTable = (endpoint, ref) => {
+        const { t } = this.props;
+        const { token } = this.state;
+
+        if (token === "") return <div />;
+
+        return (
+            <DataTable
+                ref={ref}
+                ajax={{
+                    url: `${url}${endpoint}`,
+                    type: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json; charset=UTF-8",
+                        "X-Session-Id": token,
+                    },
+                    dataSrc: function (json) {
+                        return json.data || [];
+                    },
+                    dataType: "json",
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            sessionStorage.setItem("expired", true);
+                            window.location.href = "/";
+                        }
+                    },
+                }}
+                columns={[
+                    { data: "id",                      title: t("id") },
+                    { title: t("key"), data: null, orderable: false, searchable: false, defaultContent: "" },
+                    { data: "consecutivo_electronico", title: t("consecutive") },
+                    { data: "fecha",                   title: t("creation_date"), render: (data, type, row) => moment(`${row.fecha}`).format(`${this.state.formatoFecha}`) },
+                    { data: "cliente",                 title: t("customer") },
+                    { data: "tipo_moneda",             title: t("currency") },
+                    { data: "estado_factura",          title: t("invoice_status") },
+                    { data: "subtotal",                title: t("subtotal") },
+                    { data: "impuesto",                title: t("tax") },
+                    { data: "descuento",               title: t("discount") },
+                    { data: "total",                   title: t("total") },
+                ]}
+                className="display table cell-border compact stripe"
+                slots={{ 1: (cellData) => this.OverlayBtn(cellData) }}
+                options={{
+                    language: {
+                        zeroRecords:       t("zeroRecords"),
+                        emptyTable:        t("emptyTable"),
+                        search:            t("search"),
+                        paginate:          t("paginate"),
+                        searchPlaceholder: t("searchPlaceholder"),
+                        info:              t("info"),
+                        lengthMenu:        t("lengthMenu"),
+                    },
+                    layout: {
+                        topStart:    "pageLength",
+                        topEnd:      "search",
+                        bottomStart: "info",
+                        bottomEnd:   "paging",
+                    },
+                }}
+            />
+        );
+    };
+
     OverlayBtn = (rowData) => (
         <Row className="m-2">
             <Col lg="12" sm="12">
@@ -795,6 +920,34 @@ _triggerDefaultTax = () => {
                                         </Col>
                                     </Row>
                                 </Col>
+                            </Row>
+                        </Tab>
+
+                        {/* ══════════════════════════════════════════
+                            TAB 3 — NOTAS DE CRÉDITO
+                        ══════════════════════════════════════════ */}
+                        <Tab eventKey="credit_note" title={t("credit_note")} className="txt-darkblue">
+                            <Row>
+                                <Col lg="12" sm="12">
+                                    <h1>{t("credit_note")}</h1>
+                                </Col>
+                            </Row>
+                            <Row>
+                                {this.renderNotesDataTable("notacredito", this.datatableRefCreditNote)}
+                            </Row>
+                        </Tab>
+
+                        {/* ══════════════════════════════════════════
+                            TAB 4 — NOTAS DE DÉBITO
+                        ══════════════════════════════════════════ */}
+                        <Tab eventKey="debit_note" title={t("debit_note")} className="txt-darkblue">
+                            <Row>
+                                <Col lg="12" sm="12">
+                                    <h1>{t("debit_note")}</h1>
+                                </Col>
+                            </Row>
+                            <Row>
+                                {this.renderNotesDataTable("notadebito", this.datatableRefDebitNote)}
                             </Row>
                         </Tab>
 
@@ -1249,18 +1402,18 @@ _triggerDefaultTax = () => {
                                 facturaData && 
                                 <Row className="m-2">
                             <Col sm="12" xl="6">
-                      <label>{t("budget")}</label>
+                      <label className="txt-darkblue">{t("bank_accounts")}</label>
                       <Form.Group>
                         <Form.Select
-                          name="presupuesto_id"
-                          onChange={(e) => {e.preventDefault(); this.setState({presupuesto_id: e.target.value})}}               
+                          name="banco_id"
+                          onChange={(e) => {e.preventDefault(); this.setState({banco_id: e.target.value})}}
                           required
                         >
                           <option value="">{t("select_option")}</option>
-                          {this.state.dropGP.map((item) => (
-                  
-                            <option key={item.id} value={item.id} disabled={item.monto ===0}>
-                              {item.descripcion} {item.simbolo}{item.monto}
+                          {this.state.bancos.map((item) => (
+
+                            <option key={item.id} value={item.id}>
+                              {item.nombre_banco} - {item.simbolo}{item.saldo_actual}
                             </option>
                           ))}
                         </Form.Select>
