@@ -56,6 +56,7 @@ constructor(props)
   newCostCenterLine: { nombre: "", codigo: "", monto_presupuesto_anual: "", tipo_moneda_id: "" },
   budgetMatrix: {},
   budgetMatrixIds: {},
+  movementsByYear: [],
       user:{},
   showMoverModal: false,
   moverOrigen: "",
@@ -101,6 +102,7 @@ this.datatableRef = createRef();
   },isView:false,
   budgetMatrix: {},
   budgetMatrixIds: {},
+  movementsByYear: [],
 })
     _saveMatrixCell = (catId, ccId, value) => {
       this.setState(prev => ({
@@ -171,11 +173,9 @@ this.datatableRef = createRef();
         });
       budget.detalles = detalles;
 
-      const { presupuestary_category, cost_center } = this.state;
+      const { presupuestary_category } = this.state;
       for (const cat of (presupuestary_category || [])) {
-        const rowTotal = (cost_center || []).reduce((sum, cc) => (
-          sum + (parseFloat(budgetMatrix[`${cat.id}_${cc.id}`]) || 0)
-        ), 0);
+        const rowTotal = this.getCategoryRowTotal(cat.id);
         const limit = parseFloat(cat.monto_presupuestado || 0);
         if (limit > 0 && rowTotal > limit) {
           alertSuccess(
@@ -516,8 +516,38 @@ if(response.codeStatus === 200)
       this.setState({ budget, budgetMatrix, budgetMatrixIds, show: true, isView }, () => {
         this.getCostCenter();
         this.getCategories();
+        if (isView) {
+          this.getMovementsByYear(anio_presupuesto);
+        }
       });
     });
+  }
+
+  getMovementsByYear = (anio_presupuesto) => {
+    AppUtil.getAPI(`gestion_p_detalle/gestion/${anio_presupuesto}`).then(response => {
+      const movementsByYear = response ? response.data : [];
+      console.log(movementsByYear);
+
+      this.setState({ movementsByYear });
+    });
+  }
+
+  getExecutedAmount = (catId, ccId) => {
+    return (this.state.movementsByYear || [])
+      .filter(m => m.categoria_presupuestaria_id === catId && m.centro_Costos_id === ccId && m.gastos_id)
+      .reduce((sum, m) => sum + (parseFloat(m.monto_ejecutado) || 0), 0);
+  }
+
+  getCategoryExecuted = (catId) => (this.state.cost_center || []).reduce((sum, cc) => (
+    sum + this.getExecutedAmount(catId, cc.id)
+  ), 0);
+
+  getCategoryRowTotal = (catId) => {
+    const { cost_center, budgetMatrix } = this.state;
+    const matrixSum = (cost_center || []).reduce((sum, cc) => (
+      sum + (parseFloat(budgetMatrix[`${catId}_${cc.id}`]) || 0)
+    ), 0);
+    return matrixSum - this.getCategoryExecuted(catId);
   }
 
 
@@ -971,10 +1001,12 @@ if(response.codeStatus === 200)
                       </thead>
                       <tbody>
                         {presupuestary_category?.map(cat => {
-                          const rowTotal = (cost_center || []).reduce((sum, cc) => (
-                            sum + (parseFloat(this.state.budgetMatrix[`${cat.id}_${cc.id}`]) || 0)
-                          ), 0);
+                          const executed = this.getCategoryExecuted(cat.id);
+                          const rowTotal = this.getCategoryRowTotal(cat.id);
                           const limit = parseFloat(cat.monto_presupuestado || 0);
+
+                          const available = limit - executed;
+                          const displayedLimit = isView ? available : limit;
                           const exceeded = limit > 0 && rowTotal > limit;
                           return (
                             <tr key={cat.id}>
@@ -996,8 +1028,8 @@ if(response.codeStatus === 200)
                               <td className="text-center fw-bold" style={{ color: exceeded ? '#dc3545' : '#198754' }}>
                                 { AppUtil.formatNumber(rowTotal.toFixed(2))}
                               </td>
-                              <td className="text-center text-muted small">
-                                {AppUtil.formatNumber(limit.toFixed(2))}
+                              <td className={`text-center small ${isView && available < 0 ? "text-danger fw-bold" : "text-muted"}`}>
+                                {AppUtil.formatNumber(displayedLimit.toFixed(2))}
                               </td>
                               <td className="p-1">
                                 <div className="d-flex flex-wrap gap-1 justify-content-center">

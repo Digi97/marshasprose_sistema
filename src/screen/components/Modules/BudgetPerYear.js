@@ -13,6 +13,7 @@ class BudgetPerYear extends Component {
       budgetItems: [],
       monthlyMatrix: {},
       monthlyMatrixIds: {},
+      movementsByYear: [],
       anio_presupuesto: props.anio_presupuesto || "",
       filterCatId: props.categoria_presupuestaria_id || null,
       filterCcId: props.centro_Costos_id || null,
@@ -33,6 +34,7 @@ class BudgetPerYear extends Component {
     if (anio_presupuesto) {
       this.getBudgetData(anio_presupuesto);
       this.getMonthlyData(anio_presupuesto);
+      this.getMovementsByYear(anio_presupuesto);
     }
   }
 
@@ -66,6 +68,28 @@ class BudgetPerYear extends Component {
     });
   };
 
+  getMovementsByYear = (anio) => {
+    AppUtil.getAPI(`gestion_p_detalle/gestion/${anio}`).then(response => {
+      const movementsByYear = response ? response.data : [];
+     
+      
+      this.setState({ movementsByYear });
+    });
+  };
+
+  getExecutedAmount = (item) => {
+    console.log(item);
+    
+    return (this.state.movementsByYear || [])
+      .filter(m =>
+        m.categoria_presupuestaria_id === item.categoria_presupuestaria_id &&
+        m.centro_Costos_id === item.centro_Costos_id &&
+        m.gestion_Presupuestaria_id === item.id &&
+        m.gastos_id
+      )
+      .reduce((sum, m) => sum + (parseFloat(m.monto_ejecutado) || 0), 0);
+  };
+
   _saveCellValue = (gestionId, mes, value) => {
     this.setState(prev => {
       const monthlyMatrix = { ...prev.monthlyMatrix };
@@ -74,9 +98,11 @@ class BudgetPerYear extends Component {
     });
   };
 
-  getRowTotal = (gestionId) => {
-    const row = this.state.monthlyMatrix[gestionId] || {};
-    return Object.values(row).reduce((sum, v) => sum + (parseFloat(v) || 0), 0);
+  getRowTotal = (item) => {
+    const row = this.state.monthlyMatrix[item.id] || {};
+    const monthlySum = Object.values(row).reduce((sum, v) => sum + (parseFloat(v) || 0), 0);
+    const executed = this.getExecutedAmount(item);
+    return monthlySum - executed;
   };
 
   getVisibleItems = () => {
@@ -94,7 +120,7 @@ class BudgetPerYear extends Component {
     const visibleItems = this.getVisibleItems();
 
     for (const item of visibleItems) {
-      const rowTotal = this.getRowTotal(item.id);
+      const rowTotal = this.getRowTotal(item);
       const limit = parseFloat(item.monto_aprobado || 0);
       if (limit > 0 && rowTotal > limit) {
         alertSuccess(
@@ -169,10 +195,13 @@ class BudgetPerYear extends Component {
                 </thead>
                 <tbody>
                   {visibleItems.map(item => {
-                    const rowTotal = this.getRowTotal(item.id);
+                    const rowTotal = this.getRowTotal(item);
                     const limit = parseFloat(item.monto_aprobado || 0);
+                    const executed = this.getExecutedAmount(item);
+                    const available = limit - executed;
                     const exceeded = limit > 0 && rowTotal > limit;
                     const row = monthlyMatrix[item.id] || {};
+      
                   
                     
                     return (
@@ -200,8 +229,8 @@ class BudgetPerYear extends Component {
                         >
                           {AppUtil.formatNumber(rowTotal.toFixed(2))}
                         </td>
-                        <td className="text-center text-muted small">
-                          {AppUtil.formatNumber(limit.toFixed(2))}
+                        <td className={`text-center small ${available < 0 ? "text-danger fw-bold" : "text-muted"}`}>
+                          {AppUtil.formatNumber(available.toFixed(2))}
                         </td>
                       </tr>
                     );
