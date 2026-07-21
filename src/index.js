@@ -11,6 +11,11 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import Spanish from "./assets/lang/spanish.json";
 import English from "./assets/lang/english.json";
 
+import AppUtil from "./AppUtil/AppUtil";
+
+AppUtil.attachTextInputGuard();
+AppUtil.attachNumberInputGuard();
+
 
 i18n
   .use(LanguageDetector)

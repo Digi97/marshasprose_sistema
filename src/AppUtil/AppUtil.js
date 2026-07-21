@@ -146,6 +146,68 @@ const AppUtil = {
         let isValidText = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.,;:¡!¿?\-_()%#]+$/;
         return isValidText.test(text);
     },
+    sanitizeText: function sanitizeText(text) {
+        if (typeof text !== "string") return text;
+        return text.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.,;:¡!¿?\-_()%#]/g, "");
+    },
+    attachTextInputGuard: function attachTextInputGuard() {
+        document.addEventListener(
+            "input",
+            function (e) {
+                const target = e.target;
+                if (!(target instanceof HTMLInputElement) || target.type !== "text") {
+                    return;
+                }
+
+                const original = target.value;
+                const sanitized = AppUtil.sanitizeText(original);
+                if (sanitized === original) return;
+
+                const caret = target.selectionStart ?? sanitized.length;
+                const removedBeforeCaret =
+                    original.slice(0, caret).length -
+                    AppUtil.sanitizeText(original.slice(0, caret)).length;
+
+                target.value = sanitized;
+
+                const newCaret = Math.max(0, caret - removedBeforeCaret);
+                target.setSelectionRange(newCaret, newCaret);
+            },
+            true
+        );
+    },
+    attachNumberInputGuard: function attachNumberInputGuard() {
+        document.addEventListener(
+            "beforeinput",
+            function (e) {
+                const target = e.target;
+                if (!(target instanceof HTMLInputElement) || target.type !== "number") {
+                    return;
+                }
+                if (e.data == null) return; // borrado, corte, etc.
+
+                if (!/^[0-9.]*$/.test(e.data)) {
+                    e.preventDefault();
+                    return;
+                }
+
+                if (e.data.includes(".") && target.value.includes(".")) {
+                    let selectionCoversDot = false;
+                    try {
+                        selectionCoversDot = target.value
+                            .slice(target.selectionStart, target.selectionEnd)
+                            .includes(".");
+                    } catch (err) {
+                        selectionCoversDot = false;
+                    }
+                    if (!selectionCoversDot) {
+                        e.preventDefault();
+                    }
+                }
+            },
+            true
+        );
+    },
     isNumberEntero: function isNumberEntero(value) {
         //usaremos este para validar numeros de códigos que sean necesarios enteros
         return /^\d+$/.test(value);
@@ -302,6 +364,13 @@ const AppUtil = {
             return `rgba(${r}, ${g}, ${b}, ${opacity})`;
         });
     },
+    createReference:function createReference(texto)
+    {
+      const prefijo = String(texto).trim().slice(0, 3).toUpperCase();
+    const numero = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    return `${prefijo}-${numero}`;
+
+    }
 };
 
 export default AppUtil;

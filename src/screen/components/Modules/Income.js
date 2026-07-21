@@ -29,7 +29,7 @@ class Income extends Component {
             // Objeto principal del ingreso
             income: {
                 id: 0,
-                codigo: "",
+                codigo: AppUtil.createReference("ingresos"),
                 tipo_moneda_id: 0,
                 estado_Factura_id: 1,
                 medio_pago_id: 0,
@@ -137,7 +137,7 @@ class Income extends Component {
                 this.getCustomers();
                 this.getTaxes();
                 this.getPaymentMethods();
-                this.getCommercialCodes();
+               
                 this.getCurrency();
                 this.getInvoiceStates();
             }
@@ -151,7 +151,7 @@ class Income extends Component {
                 lines: [],
                 income: {
                     id: 0,
-                    codigo: "",
+                    codigo: AppUtil.createReference("ingresos"),
                     tipo_moneda_id: 0,
                     estado_Factura_id: 1,
                     medio_pago_id: 0,
@@ -208,7 +208,7 @@ class Income extends Component {
 
         const newLine = {
             codigo_comercial_id:
-                parseInt(formData.get("codigo_comercial")) || 0,
+                parseInt(1) || 0,
             detalle: formData.get("detalle"),
             subtotal: parseFloat(formData.get("subtotal")) || 0,
             impuesto: parseFloat(formData.get("impuesto")) || 0,
@@ -216,9 +216,7 @@ class Income extends Component {
             total: parseFloat(formData.get("total")) || 0,
             ingresos_id: 0, // se asigna tras guardar el encabezado
             cantidad: parseFloat(formData.get("cantidad")) || 0,
-            codigo_comercial:
-                formData.get("codigo_comercial_label") ||
-                formData.get("codigo_comercial"),
+           
         };
 
         this.setState(
@@ -325,12 +323,6 @@ class Income extends Component {
         AppUtil.getAPI("catalogos/tipo_moneda").then((response) => {
             const currency = response ? response.data : [];
             this.setState({ currency });
-        });
-
-    getCommercialCodes = () =>
-        AppUtil.getAPI("catalogos/codigo_comercial").then((response) => {
-            const commercialCodes = response ? response.data : [];
-            this.setState({ commercialCodes });
         });
 
     getTaxes = () =>
@@ -609,7 +601,7 @@ class Income extends Component {
                         onHide={this.toggleShow}
                         backdrop="static"
                         keyboard={false}
-                        size="lg"
+                        size="xl"
                         scrollable
                     >
                         <Modal.Header closeButton>
@@ -644,7 +636,7 @@ class Income extends Component {
                                 {/* Estado factura */}
                                 <Col sm="12" xl="4">
                                     <label className="txt-darkblue">
-                                        {t("invoice_status")}
+                                        {t("status")}
                                     </label>
                                     <Form.Group>
                                         <Form.Select
@@ -657,14 +649,18 @@ class Income extends Component {
                                             <option value="">
                                                 {t("select_option")}
                                             </option>
-                                            {invoiceStates.map((item) => (
+                                            {invoiceStates.map((item) => 
+                                            
+                                            !item.nombre.includes("Hacienda") && (
                                                 <option
                                                     key={item.id}
                                                     value={item.id}
                                                 >
                                                     {item.nombre}
                                                 </option>
-                                            ))}
+                                             )
+                                             
+                                             )}
                                         </Form.Select>
                                     </Form.Group>
                                 </Col>
@@ -832,25 +828,7 @@ class Income extends Component {
                                 t={t}
                             />
 
-                           {/* <Row className="m-2">
-                                <Col sm="12" xl="12">
-                                    <Form.Group>
-                                        <Form.Check // prettier-ignore
-                                            type="checkbox"
-                                            id="createElectronicDoc"
-                                            label={t("create_electronic_doc")}
-                                            name="createElectronicDoc"
-                                            onChange={this._saveStateVariable}
-                                            checked={
-                                                income.createElectronicDoc === 1
-                                                    ? true
-                                                    : false
-                                            }
-                                            disabled={isView}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>*/}
+                  
 
                             {/* ── SECCIÓN DE DETALLES ── */}
                             <div className="card mt-3 shadow-lg">
@@ -858,45 +836,9 @@ class Income extends Component {
                                     {!isView && (
                                         <div>
                                             <Row className="m-2">
-                                                <Col sm="12" xl="4">
-                                                    <label className="txt-darkblue">
-                                                        {t("comercial_code")}
-                                                    </label>
-                                                    <Form.Group>
-                                                        <Form.Select
-                                                            name="codigo_comercial"
-                                                            required
-                                                        >
-                                                            <option value="">
-                                                                {t(
-                                                                    "select_option"
-                                                                )}
-                                                            </option>
-                                                            {commercialCodes.map(
-                                                                (item) => (
-                                                                    <option
-                                                                        key={
-                                                                            item.id
-                                                                        }
-                                                                        value={
-                                                                            item.id
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            item.codigo
-                                                                        }{" "}
-                                                                        -{" "}
-                                                                        {
-                                                                            item.nombre
-                                                                        }
-                                                                    </option>
-                                                                )
-                                                            )}
-                                                        </Form.Select>
-                                                    </Form.Group>
-                                                </Col>
+                                              
 
-                                                <Col sm="12" xl="4">
+                                                <Col sm="12" xl="6">
                                                     <label className="txt-darkblue">
                                                         {t("detail")}
                                                     </label>
@@ -913,7 +855,7 @@ class Income extends Component {
                                                     </Form.Group>
                                                 </Col>
 
-                                                <Col sm="12" xl="4">
+                                                <Col sm="12" xl="6">
                                                     <label className="txt-darkblue">
                                                         {t("qty")}
                                                     </label>
@@ -1132,7 +1074,6 @@ class Income extends Component {
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>{t("code")}</th>
                                                         <th>{t("detail")}</th>
                                                         <th>{t("subtotal")}</th>
                                                         <th>{t("discount")}</th>
@@ -1150,11 +1091,7 @@ class Income extends Component {
                                                                         {index +
                                                                             1}
                                                                     </td>
-                                                                    <td>
-                                                                        {
-                                                                            line.codigo_comercial_id
-                                                                        }
-                                                                    </td>
+                                                                  
                                                                     <td>
                                                                         {
                                                                             line.detalle

@@ -908,7 +908,7 @@ class Customer_Provider extends Component {
                                     <Form.Group>
                                         <Form.Control
                                             placeholder={t("email")}
-                                            type="mail"
+                                            type="email"
                                             onChange={this._saveStateVariable}
                                             name="correo"
                                             required

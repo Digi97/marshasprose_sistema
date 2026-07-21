@@ -30,7 +30,7 @@ class Spent extends Component {
       // Objeto principal del gasto
       spent: {
         id: 0,
-        doc_Referencia: "",
+        doc_Referencia: AppUtil.createReference("gastos"),
         categoria_gasto_id: 0,
         tipo_documento_id: 0,
         medio_pago_id: 0,
@@ -132,7 +132,6 @@ _triggerDefaultTax = () => {
     this.getTaxes();
     this.getPaymentMethods();
     this.getProviders();
-    this.getCommercialCodes();
     this.getBanks();
 
 
@@ -147,7 +146,7 @@ _triggerDefaultTax = () => {
       lines: [],
       spent: {
         id: 0,
-        doc_Referencia: "",
+        doc_Referencia: AppUtil.createReference("gastos"),
         categoria_gasto_id: 0,
         tipo_documento_id: 0,
         medio_pago_id: 0,
@@ -196,7 +195,7 @@ _saveStateVariable = async (e) => {
     const formData = new FormData(e.target);
 
     const newLine = {
-      codigo_comercial_id: parseInt(formData.get("codigo_comercial")) || 0,
+      codigo_comercial_id: 1, //valor por defecto para este tipo de doc
       detalle: formData.get("detalle"),
       subtotal: parseFloat(formData.get("subtotal")) || 0,
       impuesto: parseFloat(formData.get("impuesto")) || 0,
@@ -205,7 +204,6 @@ _saveStateVariable = async (e) => {
       medio_pago_id: parseInt(formData.get("medio_pago")) || 0,
       gastos_id: 0, // se asigna tras guardar el encabezado
       cantidad:parseFloat(formData.get("cantidad")) || 0,//agrgamos uno por defecto
-      codigo_comercial: formData.get("codigo_comercial_label") || formData.get("codigo_comercial"),
     };
 
 
@@ -350,15 +348,7 @@ _saveStateVariable = async (e) => {
       this.setState({ saleConditions: response ? response.data : [] });
     });
 
-  getCommercialCodes = () =>
-    AppUtil.getAPI("catalogos/codigo_comercial").then(
-      (response) => {
-      
-        
-        const commercialCodes = response ? response.data : [];
-        this.setState({ commercialCodes });
-      }
-    );
+ 
 
     getTaxes = () =>
     AppUtil.getAPI(`catalogos/impuesto`).then(
@@ -651,6 +641,7 @@ this.getSaleConditions();});
                           name="doc_Referencia"
                           required
                           maxLength={150}
+                       
                           value={spent.doc_Referencia}
                           disabled={isView}
                         />
@@ -859,25 +850,8 @@ this.getSaleConditions();});
                     <Form onSubmit={this.addLine}>
                        {!isView && <div>
                       <Row className="m-2">
-                        <Col sm="12" xl="4">
-                          <label className="txt-darkblue">
-                            {t("comercial_code")}
-                          </label>
-                          <Form.Group>
-                            <Form.Select name="codigo_comercial" required>
-                              <option value="">
-                                {t("select_option")}
-                              </option>
-                              {commercialCodes.map((item) => (
-                                <option key={item.id} value={item.id}>
-                                  {item.codigo} - {item.nombre}
-                                </option>
-                              ))}
-                            </Form.Select>
-                          </Form.Group>
-                        </Col>
-
-                        <Col sm="12" xl="4">
+              
+                        <Col sm="12" xl="6">
                           <label className="txt-darkblue">{t("detail")}</label>
                           <Form.Group>
                             <Form.Control
@@ -890,7 +864,7 @@ this.getSaleConditions();});
                             />
                           </Form.Group>
                         </Col>
-                                 <Col sm="12" xl="4">
+                                 <Col sm="12" xl="6">
                           <label className="txt-darkblue">{t("qty")}</label>
                           <Form.Group>
                             <Form.Control
@@ -1009,7 +983,7 @@ this.getSaleConditions();});
                             <thead>
                               <tr>
                                 <th>#</th>
-                                <th>{t("code")}</th>
+                          
                                 <th>{t("detail")}</th>
                                 <th>{t("subtotal")}</th>
                                 <th>{t("discount")}</th>
@@ -1023,7 +997,7 @@ this.getSaleConditions();});
                                 lines.map((line, index) => (
                                   <tr key={index}>
                                     <td>{index + 1}</td>
-                                    <td>{line.codigo_comercial_id}</td>
+                                   
                                     <td>{line.detalle}</td>
                                     <td>{line.subtotal}</td>
                                     <td>{line.descuento}</td>

@@ -185,8 +185,11 @@ class Accounts extends Component {
         this._loadCatalogs
       );
     });
-  openDetalle = (id) =>
+  openDetalle = (id) => 
     AppUtil.getAPI(`cuenta_encabezado/${id}`).then((response) => {
+      
+        console.log(response);
+        
       if (!response || !response.data) return;
       this.setState({
         cuentaDetalle: response.data,
@@ -1017,8 +1020,8 @@ class Accounts extends Component {
                       <p className="fw-bold mb-1">{cuentaDetalle.medio_pago}</p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
-                      <small className="text-muted">{t("cost_center")}</small>
-                      <p className="fw-bold mb-1">{cuentaDetalle.centro_costo}</p>
+                      <small className="text-muted">{t("budget")}</small>
+                      <p className="fw-bold mb-1">{cuentaDetalle.gestion?.codigo}</p>
                     </Col>
                     <Col sm="12" xl="3" className="mb-2">
                       <small className="text-muted">{t("begin_period")}</small>
@@ -1060,7 +1063,7 @@ class Accounts extends Component {
 
                 {/* ── Payments tab ── */}
                 {activeTab === "payments" && (
-                  <Row className="m-2">
+                  <Row className="m-2 card shadow-lg">
                     <Col sm="12">
                       {this._detallesTable(
                         cuentaDetalle.detalles,
