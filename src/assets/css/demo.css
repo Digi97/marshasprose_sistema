@@ -470,6 +470,36 @@ table.dataTable tbody td {
   vertical-align: middle;
 }
 
+/* Trunca texto largo dentro de una celda de DataTable y muestra "..." */
+.dt-truncate {
+  display: inline-block;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+
+.dt-truncate_detail {
+
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+/*trunca textos grandes*/
+.truncate_text {
+ display: inline-block;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
 /* Barra de búsqueda y selector de entries */
 .dt-search input,
 .dt-length select {

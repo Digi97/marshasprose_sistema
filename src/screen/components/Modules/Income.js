@@ -522,7 +522,7 @@ class Income extends Component {
                                 columns={[
                                     { data: "id", title: t("id") },
                                     { data: "codigo", title: t("code") },
-                                    { data: "cliente", title: t("customer") },
+                                    { data: "cliente", title: t("customer"),  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>` },
                                     {
                                         data: "fecha",
                                         title: t("date"),
@@ -534,7 +534,7 @@ class Income extends Component {
                                             );
                                         },
                                     },
-                                    { data: "usuario", title: t("created_by") },
+                                    { data: "usuario", title: t("created_by"),  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>` },
                                     {
                                         data: "subtotal",
                                         title: t("subtotal"),
@@ -1092,7 +1092,7 @@ class Income extends Component {
                                                                             1}
                                                                     </td>
                                                                   
-                                                                    <td>
+                                                                    <td className="dt-truncate_detail ">
                                                                         {
                                                                             line.detalle
                                                                         }

@@ -9,7 +9,7 @@ import AppUtil from "../../../AppUtil/AppUtil";
 import alertSuccess from "../common/SweetAlert";
 import Swal from 'sweetalert2';
 import ActionButtons from '../common/ActionButtons'
-
+import RenderActive from "../common/renderActive";
 
 DataTable.use(DT);
 
@@ -523,6 +523,45 @@ if(response.codeStatus === 200)
     });
   }
 
+
+  deleteBudgetById = async (anio_presupuesto) =>
+  {
+
+      const { t } = this.props;
+
+     const result = await Swal.fire({
+        customClass: { container: 'swal-above-modal' },
+        didOpen: () => {
+          const swalContainer = document.querySelector('.swal-above-modal');
+          if (swalContainer) swalContainer.style.zIndex = '9999';
+        },
+        icon: 'warning',
+        title: t('are_you_sure'),
+        text: t('this_action_will_delete_the_record'),
+        showCancelButton: true,
+        confirmButtonColor: '#000f47',
+        cancelButtonColor: '#d33',
+        confirmButtonText: t('yes_delete'),
+        cancelButtonText: t('cancel'),
+      });
+
+      if (!result.isConfirmed) return;
+
+
+    AppUtil.deleteAPI(`gestion_presupuestaria/${anio_presupuesto}`).then(response => {
+      const data = response ? response.data : [];
+          console.log(response);
+      if(response.codeStatus === 200)
+      {
+alertSuccess(t("deleted_successfully"), "success", t);
+      }
+      
+        
+  
+      
+    });
+  }
+
   getMovementsByYear = (anio_presupuesto) => {
     AppUtil.getAPI(`gestion_p_detalle/gestion/${anio_presupuesto}`).then(response => {
       const movementsByYear = response ? response.data : [];
@@ -565,16 +604,18 @@ if(response.codeStatus === 200)
     });
 
 
-  ActionButtons = (rowData, cellData) => (
+  ActionButtons = (rowData, cellData) => {
+    
+
+    return(
 
       <ActionButtons
         viewAction={() => this.getBudgetById(rowData.anio_presupuesto, true)}
         editAction={() => this.getBudgetById(rowData.anio_presupuesto)}
         listAction={() => this.props.navigate(`/home/budget_detail/${rowData.anio_presupuesto}`)}
+        deleteAction={()=> this.deleteBudgetById(rowData.anio_presupuesto)}
       />
-
-   
-    );
+    )};
 
 
 
@@ -823,19 +864,20 @@ if(response.codeStatus === 200)
                 data={budgets} 
                 columns={[
                   
-                  {data:'nombre', title:t("name")},
+                  {data:'nombre', title:t("name"), render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>`},
                   {data:'anio_presupuesto', title:t("year_budget")},
                   {data:'periodo_inicio', title:t("begin_period"), render: (data) =>{  return moment(`${data}`).format(`${this.user.formatoFecha.toUpperCase()}`) }},
                   {data:'periodo_fin', title:t("end_period"),  render: (data) =>{ return moment(`${data}`).format(`${this.user.formatoFecha.toUpperCase()}`) }},
                   {data:'monto_aprobado', title:t("amount"), render:(data, type, row) => { return `${row.simbolo} ${AppUtil.formatNumber(row.monto)}` }},
+                  {data: 'estado', title: t("status"), orderable:false, searchable: false},
                   {title:t("action"), data:null, orderable: false, searchable:false, 
                  //   render:(data, type, row)=> {return `<Button variant="danger" className="" onClick={this.removeLine(${row.usuario_id})}><i className="fas fa-trash" /></Button>` }
                  },
                 ]}
                 className="display table cell-border compact stripe"     
                 slots={{
-                
-                  5: (cellData, rowData) => this.ActionButtons(rowData, cellData)}}
+                  5: (cellData, rowData) => RenderActive(cellData, t),
+                  6: (cellData, rowData) => this.ActionButtons(rowData, cellData)}}
                 options={{
                 language: {
                   zeroRecords:t("zeroRecords"),
@@ -1289,7 +1331,7 @@ if(response.codeStatus === 200)
                     onChange={this._saveNewCostCenterLine}
                   />
                 </Col>
-                <Col sm="12" xl="2">
+                {/*<Col sm="12" xl="2">
                   <label>{t("currency")}</label>
                   <Form.Select
                     name="tipo_moneda_id"
@@ -1302,7 +1344,7 @@ if(response.codeStatus === 200)
                       <option key={item.id} value={item.id}>{item.nombre}</option>
                     ))}
                   </Form.Select>
-                </Col>
+                </Col>*/}
                 <Col sm="12" xl="1">
                   <Button variant="primary" type="submit">
                     <i className="fas fa-plus" />
@@ -1320,7 +1362,7 @@ if(response.codeStatus === 200)
                       <th>{t("name")}</th>
                       <th>{t("code")}</th>
                       <th>{t("annual_budgeted_amount")}</th>
-                      <th>{t("currency")}</th>
+                     {/* <th>{t("currency")}</th>*/}
                       <th>{t("action")}</th>
                     </tr>
                   </thead>
@@ -1356,7 +1398,7 @@ if(response.codeStatus === 200)
                             step="0.01"
                           />
                         </td>
-                        <td>
+                      {/*  <td>
                           <Form.Select
                             name="tipo_moneda_id"
                             value={line.tipo_moneda_id || ""}
@@ -1367,7 +1409,7 @@ if(response.codeStatus === 200)
                               <option key={item.id} value={item.id}>{item.nombre}</option>
                             ))}
                           </Form.Select>
-                        </td>
+                        </td>*/}
                         <td>
                           <Button
                             variant="danger"
@@ -1398,12 +1440,15 @@ if(response.codeStatus === 200)
           onHide={this.toggleMoverModal}
           backdrop="static"
           keyboard={false}
+          size="lg"
         >
           <Modal.Header closeButton>
             <h3 className="tituloFerias">{t("move_budget_management")}</h3>
-            <small>{t("note_budget_movement")}</small>
+         
           </Modal.Header>
+          
           <Modal.Body>
+               <small className="text-warning">{t("note_budget_movement")}</small>
             {(() => {
               const MONTH_KEYS = ["january","february","march","april","may","june","july","august","september","october","november","december"];
               const currentYear = new Date().getFullYear();

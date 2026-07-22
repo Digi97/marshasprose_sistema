@@ -124,6 +124,8 @@ class Settings extends Component {
     const { t } = this.props;
     e.preventDefault();
     e.stopPropagation();
+    console.log(this.state.empresa);
+    
     AppUtil.putAPI(`empresa/1`, this.state.empresa).then((response) => {
     
       if (response) {
@@ -280,6 +282,7 @@ class Settings extends Component {
                       name="ruta_nas"
                       onChange={this._saveStateVariable}
                       required
+                      type="url"
                       value={empresa.ruta_nas}
                     ></Form.Control>
                   </Form.Group>
@@ -288,13 +291,32 @@ class Settings extends Component {
                     <Form.Label className="txt-darkblue">
                       {t("date_format")}
                     </Form.Label>
-                    <Form.Control
-                      placeholder={t("date_format")}
-                      name="Formato_fecha"
-                      onChange={this._saveStateVariable}
-                      required
-                      value={empresa.formato_fecha}
-                    ></Form.Control>
+                   
+
+<Form.Select
+                                                                placeholder={t("date_format")}
+                                                                onChange={this._saveStateVariable}
+                                                                name="Formato_fecha"
+                                                                required
+                                                                defaultValue={empresa.formato_fecha}
+                    
+                                                            >
+                                                                <option value="" >{t("select_option")}</option>
+
+                                                                <option value="DD-MM-YYYY" selected={empresa.formato_fecha === "DD-MM-YYYY"}>DD-MM-YYYY</option>
+                                                                <option value="MM-DD-YYYY" selected={empresa.formato_fecha === "MM-DD-YYYY"}>MM-DD-YYYY</option>
+                                                                <option value="YYYY-MM-DD" selected={empresa.formato_fecha === "YYYY-MM-DD"}>YYYY-MM-DD</option>
+                                                                <option value="YYYY-DD-MM" selected={empresa.formato_fecha === "YYYY-DD-MM"}>YYYY-DD-MM</option>
+
+
+
+                                                      
+                                                            </Form.Select>
+
+
+
+
+
                   </Form.Group>
 
                   <Form.Group>
@@ -594,7 +616,7 @@ class Settings extends Component {
                           placeholder={t("pin")}
                           name="pin_llave"
                           onChange={this._saveStateVariable}
-                          required
+                          
                           value={empresa.pin_llave}
                         ></Form.Control>
                       </Form.Group>

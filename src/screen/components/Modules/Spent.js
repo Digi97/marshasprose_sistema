@@ -572,10 +572,10 @@ this.getSaleConditions();});
                 }}
                 columns={[
                   { data: "id", title: t("id") },
-                  { data: "doc_Referencia", title: t("reference") },
-                  { data: "proveedor",      title: t("provider") },
+                  { data: "doc_Referencia", title: t("reference"),  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>` },
+                  { data: "proveedor",      title: t("provider"),  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>` },
                   { data: "fecha",      title: t("date"), render: (data, type, row) =>{ return moment(`${row.fecha}`).format(`${this.user.formatoFecha.toUpperCase()}`)} },
-                  { data: "usuario",      title: t("created_by") },
+                  { data: "usuario",      title: t("created_by"),  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>` },
                   { data: "subtotal", title: t("subtotal"), render:function(data, type,row){ return `${row.tipo_moneda} ${data}` } },
                   { data: "impuesto", title: t("tax"), render:function(data, type,row){ return `${row.tipo_moneda} ${data}` }},
                   { data: "total", title: t("total"), render:function(data, type,row){ return `${row.tipo_moneda} ${data}` } },
@@ -616,7 +616,7 @@ this.getSaleConditions();});
             onHide={this.toggleShow}
             backdrop="static"
             keyboard={false}
-            size="lg"
+            size="xl"
             
             scrollable
           >
@@ -998,7 +998,7 @@ this.getSaleConditions();});
                                   <tr key={index}>
                                     <td>{index + 1}</td>
                                    
-                                    <td>{line.detalle}</td>
+                                    <td className="dt-truncate_detail ">{line.detalle}</td>
                                     <td>{line.subtotal}</td>
                                     <td>{line.descuento}</td>
                                     <td>{line.impuesto}</td>

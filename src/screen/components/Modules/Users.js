@@ -274,11 +274,29 @@ alertSuccess( t(response.message), "warning", t );
                             data={users}
                             columns={[
                                 { data: "usuario_id", title: t("id") },
-                                { data: "nombre", title: t("name") },
-                                { data: "apellido1", title: t("lastname") },
+                                {
+                                    data: "nombre",
+                                    title: t("name"),
+                                    render: (data) =>
+                                        `<span class="dt-truncate" title="${
+                                            data ?? ""
+                                        }">${data ?? ""}</span>`,
+                                },
+                                {
+                                    data: "apellido1",
+                                    title: t("lastname"),
+                                    render: (data) =>
+                                        `<span class="dt-truncate" title="${
+                                            data ?? ""
+                                        }">${data ?? ""}</span>`,
+                                },
                                 {
                                     data: "apellido2",
                                     title: t("secondlastname"),
+                                    render: (data) =>
+                                        `<span class="dt-truncate" title="${
+                                            data ?? ""
+                                        }">${data ?? ""}</span>`,
                                 },
                                 { data: "correo", title: t("email") },
                                 { data: "rol", title: t("rol") },
@@ -400,7 +418,7 @@ alertSuccess( t(response.message), "warning", t );
                                         <Form.Group>
                                             <Form.Control
                                                 placeholder={t("email")}
-                                                type="text"
+                                                type="email"
                                                 onChange={
                                                     this._saveStateVariable
                                                 }

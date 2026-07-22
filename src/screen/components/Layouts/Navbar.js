@@ -89,7 +89,7 @@ function Header() {
                 >
                   <i className="nc-icon nc-single-02 mr-1"></i>
                   {/* Mostrar nombre del usuario del state */}
-                  <span className="ml-1">
+                  <span className="ml-1 truncate_text">
                     {user.nombre} 
                   </span>
                 </Dropdown.Toggle>

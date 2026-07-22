@@ -864,7 +864,7 @@ _triggerDefaultTax = () => {
                                             { title: t("key"), data:null, orderable: false, searchable:false, defaultContent:""},
                                             { data: "consecutivo_electronico", title: t("consecutive") },
                                             { data: "fecha",                   title: t("creation_date"),  render: (data, type, row) =>{ return moment(`${row.fecha}`).format(`${this.state.formatoFecha}`) } },
-                                            { data: "cliente",                 title: t("customer") },
+                                            { data: "cliente",                 title: t("customer") ,  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>`},
                                             { data: "tipo_moneda",             title: t("currency") },
                                             { data: "estado_factura",          title: t("invoice_status") },
                                             { data: "subtotal",                title: t("subtotal") },
@@ -1314,7 +1314,7 @@ _triggerDefaultTax = () => {
                                                                 <td>{index + 1}</td>
                                                                 <td>{line.codigos_cabys_codigo}</td>
                                                                 <td>{line.codigo_comercial_label}</td>
-                                                                <td>{line.detalle}</td>
+                                                                <td className="dt-truncate_detail ">{line.detalle}</td>
                                                                 <td>{line.cantidad}</td>
                                                                 <td>{line.subtotal}</td>
                                                                 <td>{line.descuento}</td>

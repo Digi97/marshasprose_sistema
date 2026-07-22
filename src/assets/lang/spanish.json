@@ -295,7 +295,7 @@
 "invalid_string_form_banco_id":"Debe seleccionar una Cuenta Bancaria",
 "spent_exceeds_budget_amount":"El gasto no puede ser creado ya que el total sobrepasa el monto disponible del presupuesto seleccionado",
 "spent_exceeds_bank_amount":"El gasto no puede ser creado ya que el total sobrepasa el saldo disponible de la cuenta bancaria seleccionada",
-"invalid_string_form_contrasena":"Información inválida para el campo Contraseña",
+"invalid_string_form_contrasena":"Información inválida para el campo Contraseña, debe poseer números, letras en mayúsculas y minúsculas y caracteres especiales",
 "invalid_string_form_roles_id":"Debe seleccionar un Rol",
 "lines_required":"Debe agregar al menos una línea de detalle",
     "invalid_model_request_missing": "El modelo de la solicitud falta o no es válido.",
