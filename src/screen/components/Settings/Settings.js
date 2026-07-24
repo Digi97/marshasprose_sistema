@@ -36,6 +36,9 @@ class Settings extends Component {
         codigo_actividad_id: null,
         tipo_identificacion_id: 0,
         impuesto_id: null,
+        provincia_id:0,
+        canton_id:0,
+        distrito_id:0
       },
       taxes: [],
       identificationType: [],
