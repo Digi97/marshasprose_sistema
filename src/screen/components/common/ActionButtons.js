@@ -17,7 +17,7 @@ const renderActive  =(props) => {
         <i className="fas fa-eye" />
       </Button>
     )}
-    {props.editAction && (
+    {props.editAction && props.isNota ===false && (
       <Button variant="warning" onClick={props.editAction}>
         <i className="fas fa-pen" />
       </Button>
@@ -27,7 +27,7 @@ const renderActive  =(props) => {
         <i className="fas fa-calendar-alt" />
       </Button>
     )}
-    {props.deleteAction && (
+    {props.deleteAction && props.isNota ===false && (
       <Button variant="danger" onClick={props.deleteAction}>
         <i className="fas fa-trash" />
       </Button>

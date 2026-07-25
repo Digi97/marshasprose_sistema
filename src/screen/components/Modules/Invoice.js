@@ -647,11 +647,12 @@ class Invoice extends Component {
         });
     };
 
-    ActionButtons = (rowData) => (
+    ActionButtons = (rowData, isNota = false) => (
         <ActionButtons
             editAction ={() => this.getInvoiceById(rowData.id)}
             viewAction={() => this.getInvoiceById(rowData.id, true)}
             deleteAction={() => this.deleteInvoice(rowData.id)}
+            isNota={isNota}
         />
     );
 
@@ -688,6 +689,7 @@ class Invoice extends Component {
                 columns={[
                     { data: "id",                      title: t("id") },
                     { title: t("key"), data: null, orderable: false, searchable: false, defaultContent: "" },
+                    {title: t("reference"),  data: null, orderable: false, searchable: false, defaultContent: ""},
                     { data: "consecutivo_electronico", title: t("consecutive") },
                     { data: "fecha",                   title: t("creation_date"), render: (data, type, row) => moment(`${row.fecha}`).format(`${this.state.formatoFecha}`) },
                     { data: "cliente",                 title: t("customer") },
@@ -697,9 +699,16 @@ class Invoice extends Component {
                     { data: "impuesto",                title: t("tax") },
                     { data: "descuento",               title: t("discount") },
                     { data: "total",                   title: t("total") },
+                     {
+                                                title: t("action"),
+                                                data: null,
+                                                orderable: false,
+                                                searchable: false,
+                                                defaultContent: "",
+                                            },
                 ]}
                 className="display table cell-border compact stripe"
-                slots={{ 1: (cellData) => this.OverlayBtn(cellData) }}
+                slots={{ 1: (cellData) => this.OverlayBtn(cellData), 2:(cellData) => this.OverlayBtn(cellData, true), 11: (cellData, rowData) => this.ActionButtons(rowData, true) }}
                 options={{
                     language: {
                         zeroRecords:       t("zeroRecords"),
@@ -721,20 +730,18 @@ class Invoice extends Component {
         );
     };
 
-    OverlayBtn = (rowData) => (
+    OverlayBtn = (rowData, isReference = false) => (
+
+        
         <Row className="m-2">
             <Col lg="12" sm="12">
- <OverlayTrigger
-      placement="top"
-      delay={{ show: 250, hide: 400 }}
-      overlay={  <Tooltip id="button-tooltip">
-      {rowData.clave}
-    </Tooltip>}
-    >
-      <Button variant="success"><i className="fas fa-info" /></Button>
+ <OverlayTrigger placement="top" delay={{ show: 250, hide: 4000 }} overlay={  <Tooltip id="button-tooltip"> {isReference ? rowData.referencia  : rowData.clave}</Tooltip>}>
+        <span className={`badge_status badge-active`} >
+          <i className={"fas fa-info"} aria-hidden="true"></i>
+          </span>
     </OverlayTrigger>
-     </Col>
-        </Row>
+    </Col>
+</Row>
         
     );
 
