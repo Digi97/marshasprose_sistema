@@ -27,6 +27,11 @@ const renderActive  =(props) => {
         <i className="fas fa-calendar-alt" />
       </Button>
     )}
+    {props.sendMail && (
+      <Button variant="dark" onClick={props.sendMail}>
+        <i className="fas fa-envelope" />
+      </Button>
+    )}
     {props.deleteAction && props.isNota ===false && (
       <Button variant="danger" onClick={props.deleteAction}>
         <i className="fas fa-trash" />

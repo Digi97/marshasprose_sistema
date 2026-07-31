@@ -479,6 +479,8 @@ class Invoice extends Component {
         const { t } = this.props;
         const { invoice, lines, dolar_compra, dolar_venta, factura_DetalleAgregados, factura_DetalleEliminados } = this.state;
 
+        this.setState({ processing: true });
+        
         if (!this.validateForm(t)) {
             return;
         }
@@ -488,7 +490,7 @@ class Invoice extends Component {
             return;
         }
 
-        this.setState({ processing: true });
+        
 
         // Adjuntar líneas al payload
         const payload = { ...invoice, Factura_Detalles: lines, cambio_compra:dolar_compra, cambio_venta:dolar_venta };
@@ -647,12 +649,40 @@ class Invoice extends Component {
         });
     };
 
+
+      sendMail = async (id) => {
+        const { t } = this.props;
+        const result = await Swal.fire({
+            icon: "info",
+            title: t("are_you_sure"),
+            text: t("this_action_will_notify_the_customer"),
+            showCancelButton: true,
+            confirmButtonColor: "#000f47",
+            cancelButtonColor: "#d33",
+            confirmButtonText: t("yes"),
+            cancelButtonText: t("cancel"),
+        });
+
+        if (!result.isConfirmed) return;
+
+        AppUtil.postAPI(`facturas/${id}/enviarcorreo`).then((response) => {
+            if (response?.codeStatus === 200) {
+                alertSuccess(t("sent_success"), "success", t);
+               
+            } else {
+                alertSuccess(t(response?.message || "please_verify_data"), "error", t);
+            }
+        });
+    };
+
     ActionButtons = (rowData, isNota = false) => (
         <ActionButtons
             editAction ={() => this.getInvoiceById(rowData.id)}
             viewAction={() => this.getInvoiceById(rowData.id, true)}
             deleteAction={() => this.deleteInvoice(rowData.id)}
             isNota={isNota}
+            sendMail={()=> this.sendMail(rowData.id)}
+            
         />
     );
 

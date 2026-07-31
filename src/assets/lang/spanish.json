@@ -528,7 +528,9 @@
       "session_expired":"Tu sesión ha expirado",
       "session_ended":"Tu sesión ha sido cerrada exitosamente",
       "code_required":"El campo del código de verificación es obligatorio",
-      "today":"Hoy"
+      "today":"Hoy",
+      "this_action_will_notify_the_customer":"Está acción notificará al correo registrado de este cliente.",
+      "sent_success":"Enviado Correctamente"
     }
 
 }

@@ -527,6 +527,8 @@
     "send": "Send",
     "ctaiban_colones": "IBAN Account (Colones)",
     "ctaiban_dolares": "IBAN Account (Dollars)",
-    "budget": "Budget"
+    "budget": "Budget",
+    "this_action_will_notify_the_customer":"This action will notify the email registered for this customer.",
+      "sent_success":"Sent Successfully"
   }
 }
