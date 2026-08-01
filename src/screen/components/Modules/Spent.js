@@ -509,6 +509,8 @@ this.getSaleConditions();});
       <ActionButtons
         viewAction={() => this.getSpentById(rowData.id, true)}
         editAction={() => this.getSpentById(rowData.id)}
+                isNota={false}
+
       />
     );
   };

@@ -25,6 +25,8 @@ import alertSuccess from "../common/SweetAlert";
 import RenderActive from "../common/renderActive";
 import ActionButtons from "../common/ActionButtons";
 
+import SlideDown from "../common/SlideDownExo";
+
 DataTable.use(DT);
 
 class Customer_Provider extends Component {
@@ -55,7 +57,12 @@ class Customer_Provider extends Component {
                 exonerado: false,
                 otrasSenas: "",
                 ctaIBAN_Dolares:"",
-                ctaIBAN_Colones:""
+                ctaIBAN_Colones:"",
+                tipoExoneracion: "",
+                codigoExoneracion: "",
+                nombreInstitucionExo: "",
+                porcentajeExo: "",
+                fechaEmision:""
             },
             telefonos: [],
             token: "",
@@ -418,6 +425,7 @@ class Customer_Provider extends Component {
             <ActionButtons
                 editAction={() => this.getCustomerProviderById(rowData.id, true)}
                 viewAction={() => this.getCustomerProviderById(rowData.id, true, true)}
+                isNota={false}
             />
         );
     };
@@ -1081,6 +1089,8 @@ class Customer_Provider extends Component {
                                     />
                                 </Col>
 
+                             
+
                                 <Col sm="12" xl="4">
                                     <Form.Check // prettier-ignore
                                         type="checkbox"
@@ -1094,6 +1104,24 @@ class Customer_Provider extends Component {
                                     />
                                 </Col>
                             </Row>
+
+<SlideDown
+    show={customer_provider.exonerado}
+    values={{
+        tipoExoneracion: customer_provider.tipoExoneracion,
+        codigoExoneracion: customer_provider.codigoExoneracion,
+        nombreInstitucionExo: customer_provider.nombreInstitucionExo,
+        porcentajeExo: customer_provider.porcentajeExo,
+    }}
+    onChange={this._saveStateVariable}
+    disabled={isView}
+    t={t}
+/>
+
+
+
+
+
 
                           {isProvider &&  
                           <Row className="m-2">

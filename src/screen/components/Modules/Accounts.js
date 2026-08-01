@@ -998,8 +998,9 @@ class Accounts extends Component {
                 {activeTab === "info" && (
                   <Row className="m-2">
                     <Col sm="12" xl="4" className="mb-2">
-                      <small className="text-muted">{t("reference")}</small>
-                      <p className="fw-bold mb-1">{cuentaDetalle.referencia}</p>
+                      <small className="text-muted truncate_text">{t("reference")}</small>
+                      <br/>
+                      <p className="truncate_text fw-bold mb-1">{cuentaDetalle.referencia}</p>
                     </Col>
                     <Col sm="12" xl="4" className="mb-2">
                       <small className="text-muted">{t("account_type")}</small>

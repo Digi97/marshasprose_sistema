@@ -258,6 +258,8 @@ class Bank extends Component {
       viewAction={() => this.getBancoDetalle(rowData.id)}
       editAction={() => this.getBancoById(rowData.id)}
       deleteAction={()=> this.deleteBanco(rowData.id)}
+                isNota={false}
+
     />
   );
 

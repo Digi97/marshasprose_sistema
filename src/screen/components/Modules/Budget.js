@@ -614,6 +614,8 @@ alertSuccess(t("deleted_successfully"), "success", t);
         editAction={() => this.getBudgetById(rowData.anio_presupuesto)}
         listAction={() => this.props.navigate(`/home/budget_detail/${rowData.anio_presupuesto}`)}
         deleteAction={()=> this.deleteBudgetById(rowData.anio_presupuesto)}
+                isNota={false}
+
       />
     )};
 

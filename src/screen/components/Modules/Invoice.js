@@ -29,10 +29,7 @@ class Invoice extends Component {
             isView:false,
             // ── Modal aceptación de facturas
             showAcceptance: false,
-
             processing: true,
-   
-
             // ── Objeto principal de la factura (campos FacturasController)
             invoice: {
                 id: 0,
@@ -479,18 +476,21 @@ class Invoice extends Component {
         const { t } = this.props;
         const { invoice, lines, dolar_compra, dolar_venta, factura_DetalleAgregados, factura_DetalleEliminados } = this.state;
 
-        this.setState({ processing: true });
+         this.setState({ processing: true });
         
-        if (!this.validateForm(t)) {
+        
+        if (!this.validateForm(t)) 
+            {
+                this.setState({ processing: false });
             return;
         }
 
-        if (lines.length === 0) {
+        if (lines.length === 0) 
+            {
+                this.setState({ processing: false });
             alertSuccess(t("lines_required"),"warning",t);
             return;
         }
-
-        
 
         // Adjuntar líneas al payload
         const payload = { ...invoice, Factura_Detalles: lines, cambio_compra:dolar_compra, cambio_venta:dolar_venta };
@@ -499,6 +499,10 @@ class Invoice extends Component {
         if (invoice.id === 0) {
             // ── CREAR
             AppUtil.postAPI("facturas", payload).then((response) => {
+
+
+                  this.setState({ processing: false });
+
                 if (response.codeStatus === 200) {
 
                      alertSuccess(t("updated_successfully"),"success",t);
@@ -522,6 +526,9 @@ class Invoice extends Component {
             };
 
             AppUtil.putAPI(`facturas/${invoice.id}`, putPayload).then((response) => {
+
+                
+                  this.setState({ processing: false }); //cerramos el processing
                 if (response.codeStatus === 200) {
                     
                     alertSuccess(t("updated_successfully"),"success",t);
@@ -539,7 +546,7 @@ class Invoice extends Component {
                 }
             });
         }
-                    this.setState({ processing: false });
+                   
     };
 
     // 
@@ -706,6 +713,8 @@ class Invoice extends Component {
                         "X-Session-Id": token,
                     },
                     dataSrc: function (json) {
+                        console.log(json);
+                        
                         return json.data || [];
                     },
                     dataType: "json",
@@ -725,10 +734,10 @@ class Invoice extends Component {
                     { data: "cliente",                 title: t("customer") },
                     { data: "tipo_moneda",             title: t("currency") },
                     { data: "estado_factura",          title: t("invoice_status") },
-                    { data: "subtotal",                title: t("subtotal") },
-                    { data: "impuesto",                title: t("tax") },
-                    { data: "descuento",               title: t("discount") },
-                    { data: "total",                   title: t("total") },
+                    { data: "subtotal",                title: t("subtotal"), render: (data, type, row) => `${row.simbolo} ${data}`  },
+                    { data: "impuesto",                title: t("tax"),  render: (data, type, row) => `${row.simbolo} ${data}` },
+                    { data: "descuento",               title: t("discount"),  render: (data, type, row) => `${row.simbolo} ${data}` },
+                    { data: "total",                   title: t("total"),  render: (data, type, row) => `${row.simbolo} ${data}` },
                      {
                                                 title: t("action"),
                                                 data: null,
@@ -738,7 +747,7 @@ class Invoice extends Component {
                                             },
                 ]}
                 className="display table cell-border compact stripe"
-                slots={{ 1: (cellData) => this.OverlayBtn(cellData), 2:(cellData) => this.OverlayBtn(cellData, true), 11: (cellData, rowData) => this.ActionButtons(rowData, true) }}
+                slots={{ 1: (cellData) => this.OverlayBtn(cellData), 2:(cellData) => this.OverlayBtn(cellData, true), 12: (cellData, rowData) => this.ActionButtons(rowData, true) }}
                 options={{
                     language: {
                         zeroRecords:       t("zeroRecords"),
@@ -819,16 +828,12 @@ _triggerDefaultTax = () => {
   
     render() {
         const { t } = this.props;
-
-        
         const {
             invoice,
             lines,
             customers,
             paymentMethods,
             currencies,
-        
-        
             saleConditions,
             taxes,
             commercialCodes,

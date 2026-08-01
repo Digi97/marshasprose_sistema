@@ -458,6 +458,8 @@ class Income extends Component {
             <ActionButtons
                 viewAction={() => this.getIncomeById(rowData.id, true)}
                 editAction={() => this.getIncomeById(rowData.id)}
+                isNota={false}
+
             />
         );
     };

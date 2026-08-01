@@ -4,8 +4,6 @@ import { Card, Container, Row, Col} from "react-bootstrap";
 import crypto from "crypto-js";
 import AppUtil from "../../../AppUtil/AppUtil";
 
-import { PieChart } from 'react-minimal-pie-chart';
-
 
 class Home extends Component { 
 
@@ -27,15 +25,7 @@ getDashboardInfo(){
             let dashboardInfo = response.data;
             console.log(dashboardInfo);
             
-            
-          let arrayPonerColor = dashboardInfo.facturas_por_tipo_documento;
 
-          for(let i = 0; i< arrayPonerColor.length; i++)
-          {
-            arrayPonerColor[i].color = AppUtil.randomHexColor()
-          }
-          
-          dashboardInfo.facturas_por_tipo_documento = arrayPonerColor;
 
               localStorage.setItem("dolar_compra", dashboardInfo.tipo_cambio?.compra)
               localStorage.setItem("dolar_venta", dashboardInfo.tipo_cambio?.venta)
@@ -181,7 +171,9 @@ render(){
                                     <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
                                         {t("monthly_gains")}
                                     </p>
-                                    <h3 className="fw-bold mb-0">{typeof(dashboardInfo.total_ganancias_mes) !== "undefined" ? AppUtil.formatNumber(dashboardInfo.total_ganancias_mes) : t("loading")}</h3>
+                                    <h3 className="fw-bold mb-0">{typeof(dashboardInfo.total_ganancias_mes) !== "undefined" ? `${dashboardInfo.total_ganancias_mes[0].simbolo} ${AppUtil.formatNumber(dashboardInfo.total_ganancias_mes[0].total)}` : t("loading")}</h3>
+                                       <h3 className="fw-bold mb-0">{typeof(dashboardInfo.total_ganancias_mes) !== "undefined" ? `${dashboardInfo.total_ganancias_mes[1].simbolo} ${AppUtil.formatNumber(dashboardInfo.total_ganancias_mes[1].total)}` : t("loading")}</h3>
+                                    
                                 </Col>
                                 <Col xs="4" className="text-end">
                                     <div style={{
@@ -216,7 +208,10 @@ render(){
                                     <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
                                         {t("monthly_spent")}
                                     </p>
-                                    <h3 className="fw-bold mb-0">{typeof(dashboardInfo.total_gastos_mes) !== "undefined" ? AppUtil.formatNumber(dashboardInfo.total_gastos_mes): t("loading")}</h3>
+                                    <h3 className="fw-bold mb-0">{typeof(dashboardInfo.total_gastos_mes) !== "undefined" ? `${dashboardInfo.total_gastos_mes[0].simbolo} ${AppUtil.formatNumber(dashboardInfo.total_gastos_mes[0].total)}`: t("loading")}</h3>
+                                    <h3 className="fw-bold mb-0">{typeof(dashboardInfo.total_gastos_mes) !== "undefined" ? `${dashboardInfo.total_gastos_mes[1].simbolo} ${AppUtil.formatNumber(dashboardInfo.total_gastos_mes[1].total)}`: t("loading")}</h3>
+
+                              
                                 </Col>
                                 <Col xs="4" className="text-end">
                                     <div style={{

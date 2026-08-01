@@ -530,7 +530,11 @@
       "code_required":"El campo del código de verificación es obligatorio",
       "today":"Hoy",
       "this_action_will_notify_the_customer":"Está acción notificará al correo registrado de este cliente.",
-      "sent_success":"Enviado Correctamente"
+      "sent_success":"Enviado Correctamente",
+        "exoneration_type":"Tipo Exoneración",
+      "institution_name":"Nombre Institución"
+
+
     }
 
 }
