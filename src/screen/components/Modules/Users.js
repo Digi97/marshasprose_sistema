@@ -229,6 +229,7 @@ alertSuccess( t(response.message), "warning", t );
             editAction={() => this.getUserById(rowData.usuario_id)}
             viewAction={() => this.getUserById(rowData.usuario_id, true)}
             deleteAction={()=> this.deleteUserById(rowData.usuario_id,)}
+            isNota={false}
         />
     );
 

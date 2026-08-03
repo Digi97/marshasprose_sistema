@@ -532,7 +532,14 @@
       "this_action_will_notify_the_customer":"Está acción notificará al correo registrado de este cliente.",
       "sent_success":"Enviado Correctamente",
         "exoneration_type":"Tipo Exoneración",
-      "institution_name":"Nombre Institución"
+      "institution_name":"Nombre Institución",
+        "audit":"Log de Auditoría",
+          "column":"Columna",
+      "table":"Tabla",
+      "old_value":"Valores Anteriores",
+      "new_value":"Valores Nuevos",
+      "value":"Valores",
+        "user":"Usuario"
 
 
     }

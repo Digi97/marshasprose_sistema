@@ -3,10 +3,15 @@ import { Container, Row, Col, Tabs, Tab, Button, Form } from "react-bootstrap";
 import AppUtil from "../../../AppUtil/AppUtil.js";
 import Toast from "../common/Toast.js";
 import Select from "react-select";
+import DataTable from "datatables.net-react";
+import DT from "datatables.net-dt";
 import { withTranslation } from "react-i18next";
 
-
+import { url } from "screen/components/services/api";
 import alertSuccess from "../common/SweetAlert.js";
+
+
+DataTable.use(DT);
 
 class Settings extends Component {
   constructor(props) {
@@ -43,9 +48,9 @@ class Settings extends Component {
       taxes: [],
       identificationType: [],
       activityCode: [],
+       token: ""
 
     };
-
   }
 
   //#region opciones_selects
@@ -187,6 +192,8 @@ class Settings extends Component {
        this.getCanton(this.state.empresa.provincia_id)
        this.getDistrito(this.state.empresa.canton_id)
     });
+
+       this.setState({ token: sessionStorage.getItem("sessionId")});
   }
 
 
@@ -222,6 +229,7 @@ class Settings extends Component {
       identificationType,
       activityCode,
       taxes,
+      token
     } = this.state;
     const { t } = this.props;
 
@@ -1062,7 +1070,84 @@ class Settings extends Component {
                   </div>
                 </div>
               </Tab>
+
+                 <Tab
+                eventKey="audit"
+                title={
+                  <span>
+                    <i className="fas fa-file"></i> {t("audit")}
+                  </span>
+                }
+              >
+
+
+{token === "" ? (<div /> ) : (
+ <DataTable
+                                        ajax={{
+                                            url: `${url}empresa/auditlog`,
+                                            type: "GET",
+                                            headers: {
+                                                Accept: "application/json",
+                                                "Content-Type": "application/json; charset=UTF-8",
+                                                "X-Session-Id": token,
+                                            },
+                                            dataSrc: function (json) {
+                                 
+                                                return json.data || [];
+                                            },
+                                            dataType: "json",
+                                                error: function (xhr) {
+                  if (xhr.status === 401) {
+                sessionStorage.setItem("expired", true);
+
+                    window.location.href = "/";
+                  }
+                },
+                                        }}
+                                        columns={[
+                                            { data: "id", title: t("id"), orderable: false, searchable:false, defaultContent:"" },
+                                            { title: t("key"), data:"camposKey", orderable: false, searchable:false, defaultContent:""},
+                                            { data: "camposValores", title: t("value"), orderable: false, searchable:false, defaultContent:"" },
+                                            { data: "fecha",                   title: t("creation_date"),  orderable: false, searchable:false, defaultContent:"" },
+                                            { data: "accion",                 title: t("action") ,  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>`,  orderable: false, searchable:false, defaultContent:""},
+                                            {data:"nombreTabla", title:t("table"),  orderable: false, searchable:false, defaultContent:"" },
+                                            { data: "nombreColumna",             title: t("column"),  orderable: false, searchable:false},
+                                            { data: "valorAnterior",          title: t("old_value"),  orderable: false, searchable:false},
+                                            { data: "valorNuevo",                title: t("new_value"),  orderable: false, searchable:false},
+                                            { data: "usuario_id",                title: t("user"), render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>`,  orderable: false, searchable:false, defaultContent:"" },
+                                        ]}
+                                        className="display table cell-border compact stripe"
+                                        options={{
+                                            language: {
+                                                zeroRecords:       t("zeroRecords"),
+                                                emptyTable:        t("emptyTable"),
+                                                search:            t("search"),
+                                                paginate:          t("paginate"),
+                                                searchPlaceholder: t("searchPlaceholder"),
+                                                info:              t("info"),
+                                                lengthMenu:        t("lengthMenu"),
+                                            },
+                                            layout: {
+                                                topStart:    "pageLength",
+                                                topEnd:      "search",
+                                                bottomStart: "info",
+                                                bottomEnd:   "paging",
+                                            },
+                                        }}
+                                    />
+
+) }
+
+
+                 
+
+              </Tab>
+
             </Tabs>
+
+
+   
+
 
             <Button
               className="btn-rounded btn-fill bg-darkblue"

@@ -531,6 +531,13 @@
     "this_action_will_notify_the_customer":"This action will notify the email registered for this customer.",
       "sent_success":"Sent Successfully",
       "exoneration_type":"Exoneration Type",
-      "institution_name":"Institution Name"
+      "institution_name":"Institution Name",
+      "audit":"Audit Log",
+      "column":"Column",
+      "table":"Table",
+      "old_value":"Old Value",
+      "new_value":"New Value",
+      "value":"Value",
+      "user":"User"
   }
 }
