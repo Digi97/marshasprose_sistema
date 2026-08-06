@@ -1,5 +1,5 @@
-export const url = "http://localhost:44356/api/v1/";// //"http://192.168.10.117:8081/api/v1/";//"http://192.168.1.98:8081/api/v1/";//"http://172.20.10.3:8081/api/v1/"
-export const host = "http://192.168.10.40:3000" //"http://192.168.10.182:3000"  //"http://localhost:3000/"
+export const url = "https://localhost/api/v1/" //"http://localhost:44356/api/v1/"//"https://localhost/api/v1/";//
+export const host = "https://localhost/" //"http://192.168.10.182:3000"  //"http://localhost:3000/"
 
 export const Login = "login";
 export const Users = "users";

@@ -39,7 +39,8 @@ function Header() {
   const handleLogout = (e) => {
     e.preventDefault();
     sessionStorage.removeItem("user");
-    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("sessionId");
+    sessionStorage.setItem("closed", "true");
     navigate("/");
   };
 

@@ -23,7 +23,7 @@ getDashboardInfo(){
           {
 
             let dashboardInfo = response.data;
-            console.log(dashboardInfo);
+           
             
 
 
@@ -36,15 +36,25 @@ getDashboardInfo(){
 }
 
     getUserInfo = () => {
-        let bytes = crypto.AES.decrypt(
+        
+        try{
+       let bytes = crypto.AES.decrypt(
             sessionStorage.getItem("user"),
             "@marsh_contable"
         );
 
-    
         this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
         this.getDashboardInfo()
       
+
+        } catch(e){
+          
+            console.error(e);
+               sessionStorage.setItem("closed", "true");
+                 window.location.href = "/";
+            
+        }
+ 
       }
 
 

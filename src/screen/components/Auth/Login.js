@@ -43,18 +43,20 @@ class Login extends Component {
 
   componentDidMount() {
       const { t } = this.props;
+
+
+      
+
+
     let exp = sessionStorage.getItem("expired");
-
- 
-
     if (exp) {
       sessionStorage.removeItem("expired");
             alertSuccess(t("session_expired"), "warning", t);
-
             return
-   
     }
     let closed = sessionStorage.getItem("closed");
+   
+    
     if (closed) {
       sessionStorage.removeItem("closed");
 
@@ -63,10 +65,11 @@ class Login extends Component {
     }
 
    let token = sessionStorage.getItem("sessionId");
- 
-       if(token)
+
+       if(token && !closed && !exp)
     {
-         window.location.href = "/home";
+         window.location.href = "/home"; 
+         
     }
 
 

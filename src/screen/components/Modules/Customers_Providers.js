@@ -254,18 +254,14 @@ class Customer_Provider extends Component {
                     if (Number.isInteger(customer_provider)) {
                         alertSuccess(t("updated_successfully"), "success", t);
 
-                        if (this.DTProvider.current?.dt() && isProvider) {
-                            this.DTProvider.current
+                         this.DTProvider.current
                                 .dt()
                                 .ajax.reload(null, false);
-                        } else if (
-                            this.DTCustomer.current?.dt() &&
-                            isProvider
-                        ) {
-                            this.DTCustomer.current
+
+                                 this.DTCustomer.current
                                 .dt()
                                 .ajax.reload(null, false);
-                        }
+
                     } else {
                         alertSuccess(t(response.message), "error", t);
                     }
