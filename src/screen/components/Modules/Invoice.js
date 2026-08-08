@@ -51,6 +51,7 @@ class Invoice extends Component {
                 dias_credito: "",
                 medio_pago_id: 0,
                 usuarios_Usuario_id: 0,
+               
             },
 
             // ── Líneas de detalle (Factura_Detalles)
@@ -94,7 +95,9 @@ class Invoice extends Component {
             bancos:[],
             condicion_venta_id: 0,
             dias_credito: "",
-            banco_id:""
+            banco_id:"",
+             presupuesto_id:"",
+            dropGP:[]
         };
         this.impuestoSelectRef = createRef();
         this.datatableRef = createRef();
@@ -106,7 +109,16 @@ class Invoice extends Component {
     componentDidMount() {
         this.getUserInfo();
         this.getBanks();
+        this.getCategories_dropdown();
     }
+
+            getCategories_dropdown = () =>
+    AppUtil.getAPI(`gestion_presupuestaria_dropdown/${moment().year()}/""`).then(
+      (response) => {
+        const dropGP = response ? response.data : [];
+        this.setState({ dropGP });
+      }
+    );
 
     getUserInfo = () => {
         let bytes = crypto.AES.decrypt(
@@ -596,7 +608,7 @@ class Invoice extends Component {
 
     saveAcceptance = () => {
         const { t } = this.props;
-        const { facturaData, gastoRegistrado, banco_id, condicion_venta_id, dias_credito } = this.state;
+        const { facturaData, gastoRegistrado, banco_id, condicion_venta_id, dias_credito, presupuesto_id } = this.state;
 
         if (!facturaData) {
             alertSuccess(t("xml_file_required"), "error", t);
@@ -606,8 +618,10 @@ class Invoice extends Component {
         this.setState({ processing: true });
         let usuarios_Usuario_id = this.user.usuario_id;
 
-        const payload = { ...facturaData, gastoRegistrado, banco_id, condicion_venta_id, dias_credito, usuarios_Usuario_id};
+        const payload = { ...facturaData, gastoRegistrado, banco_id, presupuesto_id, condicion_venta_id, dias_credito, usuarios_Usuario_id};
 
+        console.log(payload);
+        
 
         AppUtil.postAPI("aceptafactura", payload).then((response) => {
             this.setState({ processing: false });
@@ -844,6 +858,7 @@ _triggerDefaultTax = () => {
             AuxLine,
             facturaData,
             gastoRegistrado,
+            dropGP
         } = this.state;
 
         return (
@@ -1154,7 +1169,6 @@ _triggerDefaultTax = () => {
                                         onChange={this._saveCustomer}
                                         placeholder={`${t("select_option")}`}
                                         name="clientes_id"
-                                       // onChange={(value) => this.setState({ spent: { ...this.state.spent, proveedor_id: value.id}}) }
                                         getOptionValue={(option) => option.id}
                                         disabled={isView}
                                         getOptionLabel={(option) => `${option.nombre} ${option.apellido1}`}
@@ -1461,8 +1475,27 @@ _triggerDefaultTax = () => {
                         </Form.Select>
                       </Form.Group>
                     </Col>
-
                     <Col sm="12" xl="6">
+                                          <label>{t("budget")}</label>
+                                          <Form.Group>
+                                            <Form.Select
+                                              name="presupuesto_id"
+                                             // onChange={this._saveStateVariable}
+                                              onChange={(e) => {e.preventDefault(); this.setState({presupuesto_id: e.target.value})}}
+                                              required
+                                            >
+                                              <option value="">{t("select_option")}</option>
+                                              {dropGP.map((item) => (
+                                      
+                                                <option key={item.id} value={item.id} disabled={item.monto ===0}>
+                                                  {item.descripcion} {item.simbolo}{item.monto}
+                                                </option>
+                                              ))}
+                                            </Form.Select>
+                                          </Form.Group>
+                                        </Col>
+
+                    <Col sm="12" xl="12">
                                     <label className="txt-darkblue">{t("sale_condition")}</label>
                                     <Form.Group>
                                         <Form.Select name="condicion_venta_id" onChange={(e) => {e.preventDefault(); this.setState({condicion_venta_id: e.target.value})}} required 

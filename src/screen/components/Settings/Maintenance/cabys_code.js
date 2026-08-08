@@ -119,6 +119,8 @@ class Cabys_Code extends Component {
   ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getCabysCodeById(rowData.id)}
+      isNota={false}
+
       />
     );
 

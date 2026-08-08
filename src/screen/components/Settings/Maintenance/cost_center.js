@@ -112,6 +112,8 @@ class Cost_Center extends Component {
     ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getCostCenterById(rowData.id)}
+      isNota={false}
+
       />
     );
 

@@ -110,6 +110,8 @@ class Currency extends Component {
   ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getCurrencyById(rowData.id)}
+      isNota={false}
+
       />
     );
 

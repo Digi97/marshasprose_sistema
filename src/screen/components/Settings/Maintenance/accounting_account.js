@@ -160,6 +160,7 @@ class Accounting_account extends Component {
   ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getAccountingAccountById(rowData.id)}
+      isNota={false}
       />
     );
   

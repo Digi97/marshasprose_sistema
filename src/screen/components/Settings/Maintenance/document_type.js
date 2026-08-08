@@ -106,6 +106,8 @@ class Document_Type extends Component {
       ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getDocumentTypeById(rowData.id)}
+      isNota={false}
+
       />
     );
 

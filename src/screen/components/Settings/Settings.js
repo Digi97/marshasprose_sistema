@@ -6,9 +6,13 @@ import Select from "react-select";
 import DataTable from "datatables.net-react";
 import DT from "datatables.net-dt";
 import { withTranslation } from "react-i18next";
+import crypto from "crypto-js";
+
 
 import { url } from "screen/components/services/api";
 import alertSuccess from "../common/SweetAlert.js";
+import permissions from "../../../permission.json";
+
 
 
 DataTable.use(DT);
@@ -48,13 +52,32 @@ class Settings extends Component {
       taxes: [],
       identificationType: [],
       activityCode: [],
-       token: ""
+       token: "",
+      auditLog:false
 
     };
+
+    this.user = null
   }
 
   //#region opciones_selects
 
+      getUserInfo = () => {
+        let bytes = crypto.AES.decrypt(
+            sessionStorage.getItem("user"),
+            "@marsh_contable"
+        );
+        this.user = JSON.parse(bytes.toString(crypto.enc.Utf8));
+        const permisos = this.user.permisos;
+        let auditLog =
+            permisos.indexOf(permissions.UsuarioAuditoria) === -1
+                ? false
+                : true;
+        
+        this.setState({
+            auditLog,
+        });
+    };
 
   getEmpresaById = () => {
     const { t } = this.props;
@@ -186,6 +209,7 @@ class Settings extends Component {
 
   //#endregion
   componentDidMount() {
+    this.getUserInfo();
     this.logCatalogInfo().then(() => {
       this.getEmpresaById();
        this.getProvincia();
@@ -1071,7 +1095,7 @@ class Settings extends Component {
                 </div>
               </Tab>
 
-                 <Tab
+                 {this.state.auditLog && <Tab
                 eventKey="audit"
                 title={
                   <span>
@@ -1141,7 +1165,7 @@ class Settings extends Component {
 
                  
 
-              </Tab>
+              </Tab>}
 
             </Tabs>
 

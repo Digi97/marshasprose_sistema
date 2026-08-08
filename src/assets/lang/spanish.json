@@ -539,7 +539,9 @@
       "old_value":"Valores Anteriores",
       "new_value":"Valores Nuevos",
       "value":"Valores",
-        "user":"Usuario"
+        "user":"Usuario",
+      "factura_clave_already_exists":"Este documento ya ha sido registrado"
+
 
 
     }

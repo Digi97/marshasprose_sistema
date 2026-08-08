@@ -101,6 +101,8 @@ class Expenses_Category extends Component {
         ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getExpensesCategoryById(rowData.id)}
+      isNota={false}
+
       />
     );
 

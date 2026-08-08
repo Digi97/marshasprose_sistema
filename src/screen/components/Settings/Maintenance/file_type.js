@@ -102,6 +102,8 @@ class File_Type extends Component {
         ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getFileTypeById(rowData.id)}
+      isNota={false}
+
       />
     );
 

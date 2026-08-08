@@ -106,6 +106,8 @@ class Sale_Condition extends Component {
                 ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getSaleConditionById(rowData.id)}
+      isNota={false}
+
       />
     );
 

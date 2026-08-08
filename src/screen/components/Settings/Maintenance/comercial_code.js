@@ -106,6 +106,8 @@ class Comercial_Code extends Component {
     ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getComercialCodeById(rowData.id)}
+      isNota={false}
+
       />
     );
  

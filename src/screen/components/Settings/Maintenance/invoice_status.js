@@ -102,6 +102,8 @@ class Invoice_Status extends Component {
         ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getInvoiceStatusById(rowData.id)}
+      isNota={false}
+
       />
     );
 

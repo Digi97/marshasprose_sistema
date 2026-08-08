@@ -538,6 +538,7 @@
       "old_value":"Old Value",
       "new_value":"New Value",
       "value":"Value",
-      "user":"User"
+      "user":"User",
+      "factura_clave_already_exists":"This document is already registered"
   }
 }

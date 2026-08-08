@@ -107,6 +107,8 @@ class Measurement_Unity extends Component {
         ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getMeasurementUnityById(rowData.id)}
+      isNota={false}
+
       />
     );
 

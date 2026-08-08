@@ -178,6 +178,8 @@ AppUtil.putAPI(`catalogos/codigo_actividad/${this.state.activityCode.id}`, this.
   ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getActivityCodeById(rowData.id)}
+      isNota={false}
+
       />
     );
   

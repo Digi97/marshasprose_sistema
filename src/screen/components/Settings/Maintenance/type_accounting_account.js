@@ -107,6 +107,8 @@ class Type_Accounting_Account extends Component {
                 ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getTypeAccountingAccountById(rowData.id)}
+      isNota={false}
+
       />
     );
 

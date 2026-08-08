@@ -108,6 +108,8 @@ class Permissions extends Component {
           ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getPermissionsById(rowData.id)}
+      isNota={false}
+
       />
     );
 

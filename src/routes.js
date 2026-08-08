@@ -137,6 +137,7 @@ const ROUTE_PERMISSIONS = {
     "/budget_management":    9,  // UsuarioPresupuestos
     "/users":                1,  // AdministracionUsuarios
     "/settings":             10, // UsuarioMantenimiento
+    "/reports" : 11 //UsuarioReporte
 };
 
 

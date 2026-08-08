@@ -106,6 +106,8 @@ class Payment_Method extends Component {
           ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getPaymentMethodById(rowData.id)}
+      isNota={false}
+
       />
     );
 

@@ -165,6 +165,8 @@ class Tax_Type extends Component {
                 ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getTaxTypeById(rowData.id)}
+      isNota={false}
+
       />
     );
 

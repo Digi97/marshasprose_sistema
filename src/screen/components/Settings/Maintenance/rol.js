@@ -211,6 +211,8 @@ class Rol extends Component {
               ActionButtons = (rowData) => (
       <ActionButtons 
       editAction={() => this.getRolById(rowData.id)}
+      isNota={false}
+
       />
     );
 
