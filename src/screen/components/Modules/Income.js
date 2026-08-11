@@ -576,6 +576,7 @@ class Income extends Component {
                                         this.ActionButtons(rowData),
                                 }}
                                 options={{
+                                     order: [[0, 'desc']], 
                                     language: {
                                         zeroRecords: t("zeroRecords"),
                                         emptyTable: t("emptyTable"),

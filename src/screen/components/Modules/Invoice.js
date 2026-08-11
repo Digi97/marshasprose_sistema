@@ -260,6 +260,12 @@ class Invoice extends Component {
         e.stopPropagation();
 
         const {selectedCabys} = this.state; //obtenemos el cabyscode
+      
+        
+        if(selectedCabys.length ===0)
+        {
+            return
+        }
         const formData = new FormData(e.target);
         const selectComercial = e.target.elements["codigo_comercial_id"];
         let cabys = selectedCabys.label.split(" - ")
@@ -620,7 +626,7 @@ class Invoice extends Component {
 
         const payload = { ...facturaData, gastoRegistrado, banco_id, presupuesto_id, condicion_venta_id, dias_credito, usuarios_Usuario_id};
 
-        console.log(payload);
+     
         
 
         AppUtil.postAPI("aceptafactura", payload).then((response) => {
@@ -718,6 +724,8 @@ class Invoice extends Component {
         return (
             <DataTable
                 ref={ref}
+                 defaultSortFieldId="id"   // el id/name de la columna
+                defaultSortAsc={false} 
                 ajax={{
                     url: `${url}${endpoint}`,
                     type: "GET",
@@ -727,7 +735,6 @@ class Invoice extends Component {
                         "X-Session-Id": token,
                     },
                     dataSrc: function (json) {
-                        console.log(json);
                         
                         return json.data || [];
                     },
@@ -763,6 +770,7 @@ class Invoice extends Component {
                 className="display table cell-border compact stripe"
                 slots={{ 1: (cellData) => this.OverlayBtn(cellData), 2:(cellData) => this.OverlayBtn(cellData, true), 12: (cellData, rowData) => this.ActionButtons(rowData, true) }}
                 options={{
+                    order: [[0, 'desc']],  // columna índice 0 = "id", orden descendente
                     language: {
                         zeroRecords:       t("zeroRecords"),
                         emptyTable:        t("emptyTable"),
@@ -939,6 +947,7 @@ _triggerDefaultTax = () => {
                                         className="display table cell-border compact stripe"
                                         slots={{ 1: (cellData, rowData) => this.OverlayBtn(cellData),  11: (cellData, rowData) => this.ActionButtons(rowData) }}
                                         options={{
+                                             order: [[0, 'desc']], 
                                             language: {
                                                 zeroRecords:       t("zeroRecords"),
                                                 emptyTable:        t("emptyTable"),
@@ -1485,9 +1494,9 @@ _triggerDefaultTax = () => {
                                               required
                                             >
                                               <option value="">{t("select_option")}</option>
-                                              {dropGP.map((item) => (
+                                              {dropGP?.map((item) => (
                                       
-                                                <option key={item.id} value={item.id} disabled={item.monto ===0}>
+                                                <option key={item.id} value={item.id} disabled={item.monto <= 0}>
                                                   {item.descripcion} {item.simbolo}{item.monto}
                                                 </option>
                                               ))}

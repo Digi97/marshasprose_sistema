@@ -594,6 +594,7 @@ this.getSaleConditions();});
                   8: (cellData, rowData) => this.ActionButtons(rowData),
                 }}
                 options={{
+                   order: [[0, 'desc']], 
                   language: {
                     zeroRecords: t("zeroRecords"),
                     emptyTable: t("emptyTable"),
@@ -679,9 +680,9 @@ this.getSaleConditions();});
                           disabled={isView}
                         >
                           <option value="">{t("select_option")}</option>
-                          {dropGP.map((item) => (
+                          {dropGP?.map((item) => (
                   
-                            <option key={item.id} value={item.id} disabled={item.monto ===0}>
+                            <option key={item.id} value={item.id} disabled={item.monto <=0}>
                               {item.descripcion} {item.simbolo}{item.monto}
                             </option>
                           ))}
