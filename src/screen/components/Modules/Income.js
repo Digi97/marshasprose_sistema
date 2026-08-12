@@ -494,7 +494,12 @@ class Income extends Component {
                             <h1>{t("income")}</h1>
                         </Col>
                         <Col lg="6" sm="12">
-                            <Button onClick={this.toggleShow}>
+                            <Button onClick={this.toggleShow}   variant="primary"
+              size="lg"
+              className="shadow-sm rounded-pill px-4 fw-semibold"
+            >
+                                              <i className="fa fa-plus me-2"></i>
+
                                 {t("create")}
                             </Button>
                         </Col>
@@ -541,21 +546,21 @@ class Income extends Component {
                                         data: "subtotal",
                                         title: t("subtotal"),
                                         render: function (data, type, row) {
-                                            return `${row.tipo_moneda} ${data}`;
+                                            return `${row.tipo_moneda} ${AppUtil.formatNumber(data)}`;
                                         },
                                     },
                                     {
                                         data: "impuesto",
                                         title: t("tax"),
                                         render: function (data, type, row) {
-                                            return `${row.tipo_moneda} ${data}`;
+                                            return `${row.tipo_moneda} ${AppUtil.formatNumber(data)}`;
                                         },
                                     },
                                     {
                                         data: "total",
                                         title: t("total"),
                                         render: function (data, type, row) {
-                                            return `${row.tipo_moneda} ${data}`;
+                                            return `${row.tipo_moneda} ${AppUtil.formatNumber(data)}`;
                                         },
                                     },
                                     {

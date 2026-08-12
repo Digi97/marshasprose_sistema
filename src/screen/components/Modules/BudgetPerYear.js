@@ -78,8 +78,7 @@ class BudgetPerYear extends Component {
   };
 
   getExecutedAmount = (item) => {
-    console.log(item);
-    
+   
     return (this.state.movementsByYear || [])
       .filter(m =>
         m.categoria_presupuestaria_id === item.categoria_presupuestaria_id &&

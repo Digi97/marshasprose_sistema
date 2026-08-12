@@ -649,3 +649,17 @@ table.dataTable tbody td {
 .css-19bb58m{
   margin:0px !important;
 }
+
+/* en tu archivo CSS */
+.btn-crear-cuenta {
+  font-size: 1.1rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-crear-cuenta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}

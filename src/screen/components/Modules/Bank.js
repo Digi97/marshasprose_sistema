@@ -337,8 +337,16 @@ class Bank extends Component {
             <Col lg="6" sm="12">
               <h1>{t("bank_accounts")}</h1>
             </Col>
-            <Col lg="6" sm="12" className="text-end">
-              <Button onClick={this.toggleShow}>{t("create")}</Button>
+            <Col lg="6" sm="12">
+            <Button
+              variant="primary"
+              size="lg"
+              className="shadow-sm rounded-pill px-4 fw-semibold"
+              onClick={this.toggleShow}
+            >
+              <i className="fa fa-plus me-2"></i>
+              {t("create")}
+            </Button>
             </Col>
           </Row>
 

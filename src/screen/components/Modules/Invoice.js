@@ -755,10 +755,10 @@ class Invoice extends Component {
                     { data: "cliente",                 title: t("customer") },
                     { data: "tipo_moneda",             title: t("currency") },
                     { data: "estado_factura",          title: t("invoice_status") },
-                    { data: "subtotal",                title: t("subtotal"), render: (data, type, row) => `${row.simbolo} ${data}`  },
-                    { data: "impuesto",                title: t("tax"),  render: (data, type, row) => `${row.simbolo} ${data}` },
-                    { data: "descuento",               title: t("discount"),  render: (data, type, row) => `${row.simbolo} ${data}` },
-                    { data: "total",                   title: t("total"),  render: (data, type, row) => `${row.simbolo} ${data}` },
+                    { data: "subtotal",                title: t("subtotal"), render: (data, type, row) => `${row.simbolo} ${AppUtil.formatNumber(data)}`  },
+                    { data: "impuesto",                title: t("tax"),  render: (data, type, row) => `${row.simbolo} ${AppUtil.formatNumber(data)}` },
+                    { data: "descuento",               title: t("discount"),  render: (data, type, row) => `${row.simbolo} ${AppUtil.formatNumber(data)}` },
+                    { data: "total",                   title: t("total"),  render: (data, type, row) => `${row.simbolo} ${AppUtil.formatNumber(data)}` },
                      {
                                                 title: t("action"),
                                                 data: null,
@@ -889,7 +889,12 @@ _triggerDefaultTax = () => {
                                  
                                     <Row>
                                         <Col lg="3" sm="12">
-                                           <Button className=" " onClick={this.toggleShow}>
+                                           <Button onClick={this.toggleShow}   variant="primary"
+              size="lg"
+              className="shadow-sm rounded-pill px-4 fw-semibold"
+            >
+                                                          <i className="fa fa-plus me-2"></i>
+
                                                 {t("create")}
                                             </Button>
                                         </Col>
@@ -932,10 +937,10 @@ _triggerDefaultTax = () => {
                                             { data: "cliente",                 title: t("customer") ,  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>`},
                                             { data: "tipo_moneda",             title: t("currency") },
                                             { data: "estado_factura",          title: t("invoice_status") },
-                                            { data: "subtotal",                title: t("subtotal"), render: (data, type, row) => `${row.simbolo} ${data}` },
-                                            { data: "impuesto",                title: t("tax"),  render: (data, type, row) => `${row.simbolo} ${data}` },
-                                            { data: "descuento",               title: t("discount"),  render: (data, type, row) => `${row.simbolo} ${data}` },
-                                            { data: "total",                   title: t("total"),  render: (data, type, row) => `${row.simbolo} ${data}` },
+                                            { data: "subtotal",                title: t("subtotal"), render: (data, type, row) => `${row.simbolo} ${AppUtil.formatNumber(data)}` },
+                                            { data: "impuesto",                title: t("tax"),  render: (data, type, row) => `${row.simbolo} ${AppUtil.formatNumber(data)}` },
+                                            { data: "descuento",               title: t("discount"),  render: (data, type, row) => `${row.simbolo} ${AppUtil.formatNumber(data)}` },
+                                            { data: "total",                   title: t("total"),  render: (data, type, row) => `${row.simbolo} ${AppUtil.formatNumber(data)}` },
                                             {
                                                 title: t("action"),
                                                 data: null,
@@ -969,26 +974,7 @@ _triggerDefaultTax = () => {
                             </Row>
                         </Tab>
 
-                        {/* ══════════════════════════════════════════
-                            TAB 2 — ACEPTACIÓN DE FACTURAS
-                        ══════════════════════════════════════════ */}
-                        <Tab eventKey="invoice_acceptance" title={t("invoice_acceptance")} className="txt-darkblue">
-                            <Row>
-                                <Col lg="6" sm="12">
-                                    <h1>{t("invoice_acceptance")}</h1>
-                                </Col>
-                                <Col lg="6" sm="12">
-                                    <Row>
-                                        <Col lg="3" sm="12">
-                                            <Button className=" " onClick={this.toggleShowAcceptance}>
-                                                {t("create")}
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                            </Row>
-                        </Tab>
-
+             
                         {/* ══════════════════════════════════════════
                             TAB 3 — NOTAS DE CRÉDITO
                         ══════════════════════════════════════════ */}
@@ -1015,6 +1001,93 @@ _triggerDefaultTax = () => {
                             <Row>
                                 {this.renderNotesDataTable("notadebito", this.datatableRefDebitNote)}
                             </Row>
+                        </Tab>
+
+
+           {/* ══════════════════════════════════════════
+                            TAB 2 — ACEPTACIÓN DE FACTURAS
+                        ══════════════════════════════════════════ */}
+                        <Tab eventKey="invoice_acceptance" title={t("invoice_acceptance")} className="txt-darkblue">
+                            <Row>
+                                <Col lg="6" sm="12">
+                                    <h1>{t("invoice_acceptance")}</h1>
+                                </Col>
+                                <Col lg="6" sm="12">
+                                    <Row>
+                                        <Col lg="3" sm="12">
+                                            <Button onClick={this.toggleShowAcceptance}   variant="primary"
+              size="lg"
+              className="shadow-sm rounded-pill px-4 fw-semibold"
+            >
+                                                              <i className="fa fa-plus me-2"></i>
+
+                                                {t("create")}
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+
+                            {token === "" ? (
+                                    <div />
+                                ) : (
+                                    <DataTable
+                                        ajax={{
+                                            url: `${url}aceptaciones`,
+                                            type: "GET",
+                                            headers: {
+                                                Accept: "application/json",
+                                                "Content-Type": "application/json; charset=UTF-8",
+                                                "X-Session-Id": token,
+                                            },
+                                            dataSrc: function (json) {
+                                                console.log(json);
+                                                
+                                                return json.data.data || [];
+                                            },
+                                            dataType: "json",
+                                                error: function (xhr) {
+                                                if (xhr.status === 401) {
+                                                sessionStorage.setItem("expired", true);
+
+                                                    window.location.href = "/";
+                                                }
+                                                },
+                                        }}
+                                        columns={[
+                                            { data: "id",                      title: t("id") },
+                                            { title: t("key"), data:"doc_Referencia",   render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>`},
+                                            { data: "descripcion", title: t("description"),   render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>` },
+                                            { data: "fecha",                   title: t("creation_date"),  render: (data, type, row) =>{ return moment(`${row.fecha}`).format(`${this.state.formatoFecha}`) } },
+                                            { data: "proveedor",                 title: t("provider") ,  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>`},
+                                            { data: "tipo_moneda",             title: t("currency") },
+                                            { data: "subtotal",                title: t("subtotal"), render: (data, type, row) => `${row.tipo_moneda} ${AppUtil.formatNumber(data)}` },
+                                            { data: "impuesto",                title: t("tax"),  render: (data, type, row) => `${row.tipo_moneda} ${AppUtil.formatNumber(data)}` },
+                                            { data: "descuento",               title: t("discount"),  render: (data, type, row) => `${row.tipo_moneda} ${AppUtil.formatNumber(data)}` },
+                                            { data: "total",                   title: t("total"),  render: (data, type, row) => `${row.tipo_moneda} ${AppUtil.formatNumber(data)}` },
+                                        
+                                        ]}
+                                        className="display table cell-border compact stripe"
+                                        options={{
+                                             order: [[0, 'desc']], 
+                                            language: {
+                                                zeroRecords:       t("zeroRecords"),
+                                                emptyTable:        t("emptyTable"),
+                                                search:            t("search"),
+                                                paginate:          t("paginate"),
+                                                searchPlaceholder: t("searchPlaceholder"),
+                                                info:              t("info"),
+                                                lengthMenu:        t("lengthMenu"),
+                                            },
+                                            layout: {
+                                                topStart:    "pageLength",
+                                                topEnd:      "search",
+                                                bottomStart: "info",
+                                                bottomEnd:   "paging",
+                                            },
+                                        }}
+                                    />
+                                )}
                         </Tab>
 
                     </Tabs>

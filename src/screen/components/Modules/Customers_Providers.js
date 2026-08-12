@@ -435,6 +435,7 @@ class Customer_Provider extends Component {
                 viewAction={() =>
                     this.getCustomerProviderById(rowData.id, false, true)
                 }
+                isNota={false}
             />
         );
     };
@@ -463,7 +464,12 @@ class Customer_Provider extends Component {
                                         <h1>{t("customer")}</h1>
                                     </Col>
                                     <Col lg="6" sm="12">
-                                        <Button onClick={this.toggleShow}>
+                                        <Button onClick={this.toggleShow}   variant="primary"
+              size="lg"
+              className="shadow-sm rounded-pill px-4 fw-semibold"
+            >
+                              <i className="fa fa-plus me-2"></i>
+
                                             {t("create")}
                                         </Button>
                                     </Col>
@@ -595,22 +601,20 @@ class Customer_Provider extends Component {
                                         <Row>
                                             <Col lg="3" sm="12">
                                                 <Button
-                                                    className=" "
+                                                      variant="primary"
+              size="lg"
+              className="shadow-sm rounded-pill px-4 fw-semibold"
+            
                                                     onClick={() =>
                                                         this.toggleShow(false)
                                                     }
                                                 >
+                                                                  <i className="fa fa-plus me-2"></i>
+
                                                     {t("create")}
                                                 </Button>
                                             </Col>
-                                            <Col lg="2" sm="12">
-                                                <Button
-                                                    className=" "
-                                                    onClick={() => {}}
-                                                >
-                                                    {t("clean")}
-                                                </Button>
-                                            </Col>
+                                        
                                         </Row>
                                     </Col>
                                 </Row>

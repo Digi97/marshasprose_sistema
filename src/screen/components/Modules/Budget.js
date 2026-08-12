@@ -550,7 +550,7 @@ if(response.codeStatus === 200)
 
     AppUtil.deleteAPI(`gestion_presupuestaria/${anio_presupuesto}`).then(response => {
       const data = response ? response.data : [];
-          console.log(response);
+         
       if(response.codeStatus === 200)
       {
 alertSuccess(t("deleted_successfully"), "success", t);
@@ -565,8 +565,7 @@ alertSuccess(t("deleted_successfully"), "success", t);
   getMovementsByYear = (anio_presupuesto) => {
     AppUtil.getAPI(`gestion_p_detalle/gestion/${anio_presupuesto}`).then(response => {
       const movementsByYear = response ? response.data : [];
-      console.log(movementsByYear);
-
+   
       this.setState({ movementsByYear });
     });
   }
@@ -663,7 +662,7 @@ alertSuccess(t("deleted_successfully"), "success", t);
       const { moverOrigen, moverDestino, moverMonto, mesOrigen, mesDestino, anioOrigen, anioDestino } = this.state;
 
 
-      console.log(moverOrigen, moverDestino,moverMonto, mesOrigen, mesDestino, anioOrigen, anioDestino);
+      
       if (moverOrigen==="" || moverDestino ==="" || !moverMonto || !mesOrigen || !mesDestino || !anioOrigen || !anioDestino) {
         alertSuccess(t("please_verify_data"), "warning", t);
         return;
@@ -747,7 +746,13 @@ alertSuccess(t("deleted_successfully"), "success", t);
           <Row>
             <Col lg="3" sm="12">
               <Button
+                variant="primary"
+              size="lg"
+              className="shadow-sm rounded-pill px-4 fw-semibold"
+            
                 onClick={this.toggleShow}>
+                                <i className="fa fa-plus me-2"></i>
+
                   {t("create")}
               </Button>
             </Col>

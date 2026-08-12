@@ -34,7 +34,6 @@ class BudgetDetail extends Component {
     componentDidMount() {
              this.getUserInfo();
         const { gestionID } = this.props;
-        console.log(gestionID, this.props);
         
         if (gestionID) {
             this.getMovements(gestionID);

@@ -543,7 +543,13 @@ this.getSaleConditions();});
              
                   <Button
                     onClick={this.toggleShow}
+                      variant="primary"
+              size="lg"
+              className="shadow-sm rounded-pill px-4 fw-semibold"
+            
                   >
+                          <i className="fa fa-plus me-2"></i>
+
                     {t("create")}
                   </Button>
                 
@@ -578,9 +584,9 @@ this.getSaleConditions();});
                   { data: "proveedor",      title: t("provider"),  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>` },
                   { data: "fecha",      title: t("date"), render: (data, type, row) =>{ return moment(`${row.fecha}`).format(`${this.user.formatoFecha.toUpperCase()}`)} },
                   { data: "usuario",      title: t("created_by"),  render: (data) => `<span class="dt-truncate" title="${ data ?? ""}">${data ?? ""}</span>` },
-                  { data: "subtotal", title: t("subtotal"), render:function(data, type,row){ return `${row.tipo_moneda} ${data}` } },
-                  { data: "impuesto", title: t("tax"), render:function(data, type,row){ return `${row.tipo_moneda} ${data}` }},
-                  { data: "total", title: t("total"), render:function(data, type,row){ return `${row.tipo_moneda} ${data}` } },
+                  { data: "subtotal", title: t("subtotal"), render:function(data, type,row){ return `${row.tipo_moneda} ${AppUtil.formatNumber(data)}` } },
+                  { data: "impuesto", title: t("tax"), render:function(data, type,row){ return `${row.tipo_moneda} ${AppUtil.formatNumber(data)}` }},
+                  { data: "total", title: t("total"), render:function(data, type,row){ return `${row.tipo_moneda} ${AppUtil.formatNumber(data)}` } },
                   {
                     title: t("action"),
                     data: null,

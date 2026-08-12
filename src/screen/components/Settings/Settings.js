@@ -155,7 +155,6 @@ class Settings extends Component {
     const { t } = this.props;
     e.preventDefault();
     e.stopPropagation();
-    console.log(this.state.empresa);
     
     AppUtil.putAPI(`empresa/1`, this.state.empresa).then((response) => {
     

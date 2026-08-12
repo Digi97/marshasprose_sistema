@@ -188,7 +188,7 @@ class Accounts extends Component {
   openDetalle = (id) => 
     AppUtil.getAPI(`cuenta_encabezado/${id}`).then((response) => {
       
-        console.log(response);
+       
         
       if (!response || !response.data) return;
       this.setState({

@@ -252,20 +252,18 @@ alertSuccess( t(response.message), "warning", t );
                             <Row>
                                 <Col lg="3" sm="12">
                                     <Button
-                                        className=" "
+                                          variant="primary"
+              size="lg"
+              className="shadow-sm rounded-pill px-4 fw-semibold"
+            
                                         onClick={this.toggleShow}
                                     >
+              <i className="fa fa-plus me-2"></i>
+
                                         {t("create")}
                                     </Button>
                                 </Col>
-                                <Col lg="2" sm="12">
-                                    <Button
-                                        className=" "
-                                        onClick={this.toggleShow}
-                                    >
-                                        {t("clean")}
-                                    </Button>
-                                </Col>
+                              
                             </Row>
                         </Col>
                     </Row>
